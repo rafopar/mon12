@@ -3,9 +3,8 @@ package org.clas.viewer;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -52,6 +51,7 @@ public class DetectorMonitor implements IDataEventListener, ActionListener {
     private Boolean                     detectorLogZ = true;
     private Boolean                     detectorLogY = false;
     private Boolean                             isTB = false;
+    private boolean                           active = true;
     private JRadioButton bS1,bS2,bS3,bS4,bS5,bS6;
     private JCheckBox        tbBtn;
     
@@ -187,6 +187,10 @@ public class DetectorMonitor implements IDataEventListener, ActionListener {
     public boolean testTriggerMask()      {return this.TriggerMask!=0 ? isTrigMaskSet(this.TriggerMask):true;}
     public boolean isGoodTrigger(int bit) {return TriggerBeam[bit] ? isTrigBitSet(bit):true;}
 
+    public boolean isActive() {
+        return active;
+    }
+
     public ConstantsManager getCcdb() {
         return ccdb;
     }
@@ -312,13 +316,16 @@ public class DetectorMonitor implements IDataEventListener, ActionListener {
     public void plotHistos() {
     }
     
-    public void printCanvas(String dir, String timestamp) {
+    public LinkedHashMap<String,String> printCanvas(String dir, String timestamp) {
         // print canvas to files
+        LinkedHashMap<String, String> prints = new LinkedHashMap<>();
         for(int tab=0; tab<this.detectorTabNames.size(); tab++) {
             String fileName = dir + "/" + this.detectorName + "_canvas" + tab + "_" + timestamp + ".png";
             System.out.println(fileName);
             this.detectorCanvas.getCanvas(this.detectorTabNames.get(tab)).save(fileName);
+            prints.put(fileName, this.detectorTabNames.get(tab));
         }
+        return prints;
     }
     
     @Override
@@ -334,6 +341,10 @@ public class DetectorMonitor implements IDataEventListener, ActionListener {
         }
     }
     
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
     public void setDetectorCanvas(EmbeddedCanvasTabbed canvas) {
         this.detectorCanvas = canvas;
     }
