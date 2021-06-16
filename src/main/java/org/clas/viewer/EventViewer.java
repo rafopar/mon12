@@ -470,7 +470,7 @@ public class EventViewer implements IDataEventListener, DetectorListener, Action
         splitPanel.setLeftComponent(CLAS12View);
         splitPanel.setRightComponent(CLAS12Canvas);
         JTextPane clas12Text   = new JTextPane();
-        clas12Text.setText("CLAS12\n monitoring plots\n V3.0\n");
+        clas12Text.setText("CLAS12\n monitoring plots\n V5.0\n");
         clas12Text.setEditable(false);       
         this.clas12Textinfo.setEditable(false);
         this.clas12Textinfo.setFont(new Font("Avenir",Font.PLAIN,16));
