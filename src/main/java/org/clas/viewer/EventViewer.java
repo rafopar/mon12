@@ -608,7 +608,7 @@ public class EventViewer implements IDataEventListener, DetectorListener, Action
                     if (monitors.get(key).isActive()) {
                         LinkedHashMap<String, String> prints = this.monitors.get(key).printCanvas(data, tstamp);
                         for(String print: prints.keySet()) {
-                            entry.addAttachment(print, prints.get(print));
+                            entry.addAttachment(print, key + " " + prints.get(print));
                         }
                         System.out.println(this.monitors.get(key).getDetectorName() + " plots uploaded");
                     }
