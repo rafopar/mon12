@@ -594,7 +594,7 @@ public class EventViewer implements IDataEventListener, DetectorListener, Action
             System.out.println(fileName4);
             CLAS12Canvas.getCanvas("RF/HEL/JITTER/TRIGGER").save(fileName4);
             
-            LogEntry entry = new LogEntry("All online monitoring histograms for run number " + this.runNumber, "TLOG");
+            LogEntry entry = new LogEntry("All online monitoring histograms for run number " + this.runNumber, "HBLOG");
             
             System.out.println("Starting to upload all monitoring plots");
             
