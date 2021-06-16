@@ -401,6 +401,7 @@ public class DetectorMonitor implements IDataEventListener, ActionListener {
     }
     
     public void writeDataGroup(TDirectory dir) {
+        System.out.println(this.getDetectorName());
         String folder = "/" + this.getDetectorName();
         dir.mkdir(folder);
         dir.cd(folder);

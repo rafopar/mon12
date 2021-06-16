@@ -34,7 +34,7 @@ public class FMTmonitor extends DetectorMonitor {
 
         this.loadConstantsFromCCDB(defaultRunNumber);
 
-        this.setDetectorTabNames("Occupancy", "TimeMax", "Multiplicity");
+        this.setDetectorTabNames("Occupancy", "TimeMax", "Amplitude", "Multiplicity");
         this.init(false);
     }
 
@@ -122,6 +122,15 @@ public class FMTmonitor extends DetectorMonitor {
                 timeOfMaxGroup.addDataSet(timeMaxHisto, 0);
                 this.getDataGroup().add(timeOfMaxGroup, sector, layer, 1);
 
+                H1F amplitudeHisto = new H1F("Amplitude : Layer " + layer + " Sector " + sector, "Amplitude : Layer " + layer + " Sector " + sector,
+                        500, 0., 5000.);
+                amplitudeHisto.setTitleX("Amplitude (Layer " + layer + " Sector " + sector + ")");
+                amplitudeHisto.setTitleY("Nb hits");
+                amplitudeHisto.setFillColor(4);
+                DataGroup amplitudeGroup = new DataGroup("");
+                amplitudeGroup.addDataSet(amplitudeHisto, 0);
+                this.getDataGroup().add(amplitudeGroup, sector, layer, 3);
+
             }
         }
     }
@@ -140,6 +149,12 @@ public class FMTmonitor extends DetectorMonitor {
         this.getDetectorCanvas().getCanvas("TimeMax").setGridY(false);
         this.getDetectorCanvas().getCanvas("TimeMax").setAxisTitleSize(12);
         this.getDetectorCanvas().getCanvas("TimeMax").setAxisLabelSize(12);
+
+        this.getDetectorCanvas().getCanvas("Amplitude").divide(maxNumberSectors, maxNumberLayers);
+        this.getDetectorCanvas().getCanvas("Amplitude").setGridX(false);
+        this.getDetectorCanvas().getCanvas("Amplitude").setGridY(false);
+        this.getDetectorCanvas().getCanvas("Amplitude").setAxisTitleSize(12);
+        this.getDetectorCanvas().getCanvas("Amplitude").setAxisLabelSize(12);
 
         for (int sector = 1; sector <= maxNumberSectors; sector++) {
             for (int layer = 1; layer <= maxNumberLayers; layer++) {
@@ -176,10 +191,16 @@ public class FMTmonitor extends DetectorMonitor {
                 this.getDetectorCanvas().getCanvas("TimeMax").cd(column + numberOfColumns * row);
                 this.getDetectorCanvas().getCanvas("TimeMax").draw(
                         this.getDataGroup().getItem(sector, layer, 1).getH1F("TimeOfMax : Layer " + layer + " Sector " + sector));
+
+                this.getDetectorCanvas().getCanvas("Amplitude").cd(column + numberOfColumns * row);
+                this.getDetectorCanvas().getCanvas("Amplitude").getPad(column + numberOfColumns * row).getAxisY().setLog(true);
+                this.getDetectorCanvas().getCanvas("Amplitude").draw(
+                        this.getDataGroup().getItem(sector, layer, 3).getH1F("Amplitude : Layer " + layer + " Sector " + sector));
             }
         }
         this.getDetectorCanvas().getCanvas("Occupancy").update();
         this.getDetectorCanvas().getCanvas("TimeMax").update();
+        this.getDetectorCanvas().getCanvas("Amplitude").update();
 
         this.getDetectorCanvas().getCanvas("Multiplicity").divide(1, 1);
         this.getDetectorCanvas().getCanvas("Multiplicity").setGridX(false);
@@ -219,6 +240,7 @@ public class FMTmonitor extends DetectorMonitor {
                 int sector = bank.getByte("sector", i);
                 int layer = bank.getByte("layer", i);
                 int strip = bank.getShort("component", i);
+                int adc   = bank.getInt("ADC", i);
                 float timeOfMax = bank.getFloat("time", i);
 
                 if (strip < 0 || !mask[sector][layer][strip]) {
@@ -229,6 +251,7 @@ public class FMTmonitor extends DetectorMonitor {
                 if ((samplingTime < timeOfMax) && (timeOfMax < samplingTime * (numberOfSamples - 1))) {
                     this.getDataGroup().getItem(sector, layer, 1).getH1F("TimeOfMax : Layer " + layer + " Sector " + sector).fill(timeOfMax);
                 }
+                this.getDataGroup().getItem(sector, layer, 3).getH1F("Amplitude : Layer " + layer + " Sector " + sector).fill(adc);
                 this.numberOfHitsPerDetector[sector][layer]++;
                 this.getDetectorSummary().getH1F("summary").setBinContent(maxNumberSectors * (layer - 1) + (sector - 1), (double) this.numberOfHitsPerDetector[sector][layer] / ((double) this.getNumberOfEvents()));
             }
