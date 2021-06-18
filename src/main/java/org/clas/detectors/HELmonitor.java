@@ -19,7 +19,7 @@ public class HELmonitor extends DetectorMonitor {
     
     public HELmonitor(String name) {
         super(name);
-        this.setDetectorTabNames("Raw Signals", "Helicity");
+        this.setDetectorTabNames("Signals/Helicity");
         this.init(false);
     }
 
@@ -78,8 +78,6 @@ public class HELmonitor extends DetectorMonitor {
         quartetSequence.setMarkerColor(44); // color from 0-9 for given palette
         quartetSequence.setMarkerSize(5);  // size in points on the screen
 
-//        helSequence.addPoint(0, 0, 1, 1);
-//        helSequence.addPoint(1, 1, 1, 1);
         DataGroup dg = new DataGroup(2,4);
         dg.addDataSet(rawHel,      0);
         dg.addDataSet(rawSync,     1);
@@ -97,45 +95,36 @@ public class HELmonitor extends DetectorMonitor {
     @Override
     public void plotHistos() {
         // initialize canvas and plot histograms
-        this.getDetectorCanvas().getCanvas("Raw Signals").divide(2, 2);
-        this.getDetectorCanvas().getCanvas("Raw Signals").setGridX(false);
-        this.getDetectorCanvas().getCanvas("Raw Signals").setGridY(false);
-        this.getDetectorCanvas().getCanvas("Raw Signals").cd(0);
-        this.getDetectorCanvas().getCanvas("Raw Signals").getPad(0).getAxisY().setLog(true);
-        this.getDetectorCanvas().getCanvas("Raw Signals").draw(this.getDataGroup().getItem(0,0,0).getH1F("rawHelicity"));
-        this.getDetectorCanvas().getCanvas("Raw Signals").cd(1);
-        this.getDetectorCanvas().getCanvas("Raw Signals").getPad(1).getAxisY().setLog(true);
-        this.getDetectorCanvas().getCanvas("Raw Signals").draw(this.getDataGroup().getItem(0,0,0).getH1F("rawSync"));
-        this.getDetectorCanvas().getCanvas("Raw Signals").cd(2);
-        this.getDetectorCanvas().getCanvas("Raw Signals").getPad(2).getAxisY().setLog(true);
-        this.getDetectorCanvas().getCanvas("Raw Signals").draw(this.getDataGroup().getItem(0,0,0).getH1F("rawQuartet"));
-        this.getDetectorCanvas().getCanvas("Helicity").divide(2, 2);
-        this.getDetectorCanvas().getCanvas("Helicity").setGridX(false);
-        this.getDetectorCanvas().getCanvas("Helicity").setGridY(false);
-        this.getDetectorCanvas().getCanvas("Helicity").cd(0);
-        this.getDetectorCanvas().getCanvas("Helicity").draw(this.getDataGroup().getItem(0,0,0).getH1F("helicity"));
-        this.getDetectorCanvas().getCanvas("Helicity").cd(1);
-        this.getDetectorCanvas().getCanvas("Helicity").draw(this.getDataGroup().getItem(0,0,0).getH1F("sync"));
-        this.getDetectorCanvas().getCanvas("Helicity").cd(2);
-        this.getDetectorCanvas().getCanvas("Helicity").draw(this.getDataGroup().getItem(0,0,0).getH1F("quartet"));
-        this.getDetectorCanvas().getCanvas("Helicity").cd(3);
-        this.getDetectorCanvas().getCanvas("Raw Signals").getPad(3).getAxisY().setRange(-1, 2);
-        if(this.getDataGroup().getItem(0,0,0).getGraph("helSequence").getVectorX().size()>1) {
-            this.getDetectorCanvas().getCanvas("Helicity").draw(this.getDataGroup().getItem(0,0,0).getGraph("helSequence"));
-            this.getDetectorCanvas().getCanvas("Helicity").draw(this.getDataGroup().getItem(0,0,0).getGraph("syncSequence"),"same");
-            this.getDetectorCanvas().getCanvas("Helicity").draw(this.getDataGroup().getItem(0,0,0).getGraph("quartetSequence"),"same");
-        }
-        this.getDetectorCanvas().getCanvas("Helicity").update();
+        this.getDetectorCanvas().getCanvas("Signals/Helicity").divide(3, 2);
+        this.getDetectorCanvas().getCanvas("Signals/Helicity").setGridX(false);
+        this.getDetectorCanvas().getCanvas("Signals/Helicity").setGridY(false);
+        this.getDetectorCanvas().getCanvas("Signals/Helicity").cd(0);
+        this.getDetectorCanvas().getCanvas("Signals/Helicity").getPad(0).getAxisY().setLog(true);
+        this.getDetectorCanvas().getCanvas("Signals/Helicity").draw(this.getDataGroup().getItem(0,0,0).getH1F("rawHelicity"));
+        this.getDetectorCanvas().getCanvas("Signals/Helicity").cd(1);
+        this.getDetectorCanvas().getCanvas("Signals/Helicity").getPad(1).getAxisY().setLog(true);
+        this.getDetectorCanvas().getCanvas("Signals/Helicity").draw(this.getDataGroup().getItem(0,0,0).getH1F("rawSync"));
+        this.getDetectorCanvas().getCanvas("Signals/Helicity").cd(2);
+        this.getDetectorCanvas().getCanvas("Signals/Helicity").getPad(2).getAxisY().setLog(true);
+        this.getDetectorCanvas().getCanvas("Signals/Helicity").draw(this.getDataGroup().getItem(0,0,0).getH1F("rawQuartet"));
+        this.getDetectorCanvas().getCanvas("Signals/Helicity").cd(3);
+        this.getDetectorCanvas().getCanvas("Signals/Helicity").draw(this.getDataGroup().getItem(0,0,0).getH1F("helicity"));
+        this.getDetectorCanvas().getCanvas("Signals/Helicity").cd(4);
+        this.getDetectorCanvas().getCanvas("Signals/Helicity").draw(this.getDataGroup().getItem(0,0,0).getH1F("sync"));
+        this.getDetectorCanvas().getCanvas("Signals/Helicity").cd(5);
+        this.getDetectorCanvas().getCanvas("Signals/Helicity").draw(this.getDataGroup().getItem(0,0,0).getH1F("quartet"));
+//        if(this.getDataGroup().getItem(0,0,0).getGraph("helSequence").getVectorX().size()>1) {
+//            this.getDetectorCanvas().getCanvas("Helicity").draw(this.getDataGroup().getItem(0,0,0).getGraph("helSequence"));
+//            this.getDetectorCanvas().getCanvas("Helicity").draw(this.getDataGroup().getItem(0,0,0).getGraph("syncSequence"),"same");
+//            this.getDetectorCanvas().getCanvas("Helicity").draw(this.getDataGroup().getItem(0,0,0).getGraph("quartetSequence"),"same");
+//        }
+        this.getDetectorCanvas().getCanvas("Signals/Helicity").update();
         
     }
 
     @Override
     public void processEvent(DataEvent event) {
         
-        if (this.getNumberOfEvents() >= super.eventResetTime_current && super.eventResetTime_current > 0){
-            resetEventListener();
-        }
-   
     // process event info and save into data group
         
         if(event.hasBank("RUN::trigger") && event.hasBank("RUN::config") && event.hasBank("HEL::adc")){
@@ -152,51 +141,52 @@ public class HELmonitor extends DetectorMonitor {
                 int component = bank.getShort("component", loop);
                 int rawValue  = bank.getShort("ped", loop);
                 int value = (int) rawValue/2000;
-                if(component      == 1) {
-                    this.getDataGroup().getItem(0,0,0).getH1F("rawHelicity").fill(rawValue);
-                    this.getDataGroup().getItem(0,0,0).getH1F("helicity").fill(value);
-                    hel=value;
-                }
-                else if(component == 2) {
-                    this.getDataGroup().getItem(0,0,0).getH1F("rawSync").fill(rawValue);
-                    this.getDataGroup().getItem(0,0,0).getH1F("sync").fill(value);
-                    sync=value;
-                }
-                else if(component == 3) {
-                    this.getDataGroup().getItem(0,0,0).getH1F("rawQuartet").fill(rawValue);
-                    this.getDataGroup().getItem(0,0,0).getH1F("quartet").fill(value);
-                    quartet=value;
-                }
-            }
-            if(hel==-1 || sync == -1 || quartet == -1) {
-                System.out.println("Helicity info not set for event number " + eventNumber);
-                bank.show();
-            }
-//                if(bank.getInt("trigger",0)==0) 
-//                    System.out.println(eventNumber + " " + unixTime + " " + String.format("0x%08X", bank.getInt("trigger",0))
-//                                               + " " + String.format("0x%08X", bank.getInt("trigger",1))
-//                                               + " " + String.format("0x%08X", bank.getInt("trigger",2)));
-            if(syncSave != sync) {
-                syncSave = sync;
-//                System.out.println(eventNumber + " " + unixTime + " " + hel + " " + sync + " " + quartet);
-                this.getDataGroup().getItem(0,0,0).getGraph("helSequence").addPoint(eventNumber, hel, 0., 0.);
-                this.getDataGroup().getItem(0,0,0).getGraph("syncSequence").addPoint(eventNumber, sync+0.1, 0., 0.);
-                this.getDataGroup().getItem(0,0,0).getGraph("quartetSequence").addPoint(eventNumber, quartet-0.1, 0., 0.);
-                if(this.getDataGroup().getItem(0,0,0).getGraph("helSequence").getVectorX().size()==2) {
-                    this.getDetectorCanvas().getCanvas("Helicity").cd(3);
-                    this.getDetectorCanvas().getCanvas("Helicity").draw(this.getDataGroup().getItem(0,0,0).getGraph("helSequence"));
-                    this.getDetectorCanvas().getCanvas("Helicity").draw(this.getDataGroup().getItem(0,0,0).getGraph("syncSequence"),"same");
-                    this.getDetectorCanvas().getCanvas("Helicity").draw(this.getDataGroup().getItem(0,0,0).getGraph("quartetSequence"),"same");
-                    this.getDetectorCanvas().getCanvas("Raw Signals").getPad(3).getAxisY().setRange(-1, 2);
+                switch (component) {
+                    case 1:
+                        this.getDataGroup().getItem(0,0,0).getH1F("rawHelicity").fill(rawValue);
+                        this.getDataGroup().getItem(0,0,0).getH1F("helicity").fill(value);
+                        hel=value;
+                        break;
+                    case 2:
+                        this.getDataGroup().getItem(0,0,0).getH1F("rawSync").fill(rawValue);
+                        this.getDataGroup().getItem(0,0,0).getH1F("sync").fill(value);
+                        sync=value;
+                        break;
+                    case 3:
+                        this.getDataGroup().getItem(0,0,0).getH1F("rawQuartet").fill(rawValue);
+                        this.getDataGroup().getItem(0,0,0).getH1F("quartet").fill(value);
+                        quartet=value;
+                        break;
+                    default:
+                        break;
                 }
             }
+//            if(hel==-1 || sync == -1 || quartet == -1) {
+//                System.out.println("Helicity info not set for event number " + eventNumber);
+//                bank.show();
+//            }
+
+//            if(syncSave != sync) {
+//                syncSave = sync;
+////                System.out.println(eventNumber + " " + unixTime + " " + hel + " " + sync + " " + quartet);
+//                this.getDataGroup().getItem(0,0,0).getGraph("helSequence").addPoint(eventNumber, hel, 0., 0.);
+//                this.getDataGroup().getItem(0,0,0).getGraph("syncSequence").addPoint(eventNumber, sync+0.1, 0., 0.);
+//                this.getDataGroup().getItem(0,0,0).getGraph("quartetSequence").addPoint(eventNumber, quartet-0.1, 0., 0.);
+//                if(this.getDataGroup().getItem(0,0,0).getGraph("helSequence").getVectorX().size()==2) {
+//                    this.getDetectorCanvas().getCanvas("Helicity").cd(3);
+//                    this.getDetectorCanvas().getCanvas("Helicity").draw(this.getDataGroup().getItem(0,0,0).getGraph("helSequence"));
+//                    this.getDetectorCanvas().getCanvas("Helicity").draw(this.getDataGroup().getItem(0,0,0).getGraph("syncSequence"),"same");
+//                    this.getDetectorCanvas().getCanvas("Helicity").draw(this.getDataGroup().getItem(0,0,0).getGraph("quartetSequence"),"same");
+//                    this.getDetectorCanvas().getCanvas("Raw Signals").getPad(3).getAxisY().setRange(-1, 2);
+//                }
+//            }
             this.getDetectorSummary().getH1F("summary").fill(hel);
         }       
         
     }
 
     @Override
-    public void timerUpdate() {
+    public void analysisUpdate() {
 
     }
     

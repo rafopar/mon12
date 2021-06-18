@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.clas.viewer.DetectorMonitor;
-import org.jlab.detector.calib.utils.ConstantsManager;
 import org.jlab.groot.data.H1F;
 import org.jlab.groot.data.H2F;
 import org.jlab.groot.group.DataGroup;
@@ -23,10 +22,6 @@ public class TJITTERmonitor  extends DetectorMonitor {
     
     private int ctofPaddles = 48;
     private int ftofPaddles = 62;
-    private double tdcconv  = 0.023456;
-    private double period  = 4;
-    private double phase   = 1;
-    private int    ncycles = 6;
     IndexedTable jitterConfig = null;
 
     
@@ -221,7 +216,7 @@ public class TJITTERmonitor  extends DetectorMonitor {
     }
 
     @Override
-    public void timerUpdate() {
+    public void analysisUpdate() {
 
     }
 

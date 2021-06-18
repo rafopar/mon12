@@ -2,7 +2,6 @@ package org.clas.detectors;
 
 import java.util.Arrays;
 import org.clas.viewer.DetectorMonitor;
-import org.jlab.detector.calib.utils.ConstantsManager;
 import org.jlab.groot.data.H1F;
 import org.jlab.groot.group.DataGroup;
 import org.jlab.io.base.DataBank;
@@ -98,10 +97,6 @@ public class FCUPmonitor extends DetectorMonitor {
     @Override
     public void processEvent(DataEvent event) {
 
-        if (this.getNumberOfEvents() >= super.eventResetTime_current && super.eventResetTime_current > 0){
-            resetEventListener();
-        }
-        
         DataBank config = null;
         DataBank scaler = null;
         if (event.hasBank("RUN::config")) config = event.getBank("RUN::config");
@@ -165,7 +160,7 @@ public class FCUPmonitor extends DetectorMonitor {
 
 
     @Override
-    public void timerUpdate() {
+    public void analysisUpdate() {
 
     }
     

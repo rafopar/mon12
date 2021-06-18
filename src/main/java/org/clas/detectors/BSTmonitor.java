@@ -1,7 +1,6 @@
 package org.clas.detectors;
 
 import org.clas.viewer.DetectorMonitor;
-import org.jlab.groot.base.GStyle;
 import org.jlab.groot.data.H1F;
 import org.jlab.groot.data.H2F;
 import org.jlab.groot.graphics.EmbeddedCanvas;
@@ -42,105 +41,83 @@ public class BSTmonitor extends DetectorMonitor {
         sum.addDataSet(summary, 0);
         this.setDetectorSummary(sum);
 
-        H2F[] hhitmap = new H2F[NLAYERS];
+        double hitallhigh = 999.5;
+        double hithigh = 199.5;
+        double hitlow = -0.5;
+        int nbinshit = 100;
+        int nbinshitall = 100;
+        
         for (int i = 0; i < NLAYERS; ++i) {
+            DataGroup dgLayer = new DataGroup(1,3);
             int nBins = sectors[i];
-            hhitmap[i] = new H2F("hitmap_l" + (i + 1), "BST Layer " + (i + 1), 256, 0.5, 256.5, nBins, 0.5,
-                    nBins + 0.5);
-            hhitmap[i].setTitleX("Strip");
-            hhitmap[i].setTitleY("Sector");
+            H2F hhitmap = new H2F("hitmap_l" + (i + 1), "BST Layer " + (i + 1), 256, 0.5, 256.5, nBins, 0.5, nBins + 0.5);
+            hhitmap.setTitleX("Strip");
+            hhitmap.setTitleY("Sector");
+            nBins = sectors[i] * 256;
+            H1F hhitl = new H1F("hits_l" + (i + 1), "BST Layer " + (i + 1), nBins, 0.5, nBins + 0.5);
+            hhitl.setTitleX("Channel");
+            hhitl.setTitleY("Counts");
+            H1F hmulti = new H1F("bstmulti_l" + (i + 1), nbinshit, hitlow, hithigh);
+            hmulti.setTitleX("BST Layer " + (i + 1) + " Multiplicity");
+            hmulti.setTitleY("Counts");
+            hmulti.setLineWidth(2);
+            hmulti.setFillColor(34);
+            hmulti.setOptStat("111110");
+            dgLayer.addDataSet(hhitmap, 0);
+            dgLayer.addDataSet(hhitl,   1);
+            dgLayer.addDataSet(hmulti,  2);
+            this.getDataGroup().add(dgLayer, 0, i+1, 0);
         }
 
-        H1F[] hhitl = new H1F[NLAYERS];
-        for (int i = 0; i < NLAYERS; ++i) {
-            int nBins = sectors[i] * 256;
-            hhitl[i] = new H1F("hits_l" + (i + 1), "BST Layer " + (i + 1), nBins, 0.5, nBins + 0.5);
-            hhitl[i].setTitleX("Channel");
-            hhitl[i].setTitleY("Counts");
-        }
-
+        DataGroup dgAll = new DataGroup(1,2);
         H1F hoccup = new H1F("occup", "", 7, -0.5, 6.5);
         hoccup.setTitleX("BST All Layers");
         hoccup.setTitleY("BST Occupancy (%)");
         hoccup.setLineWidth(2);
         hoccup.setFillColor(33);
-
-        double hitallhigh = 999.5;
-        double hithigh = 199.5;
-        double hitlow = -0.5;
-        H1F[] hmulti = new H1F[7];
-        int nbinshit = 100;
-        int nbinshitall = 100;
-
-        hmulti[0] = new H1F("bstmulti", "", nbinshitall, hitlow, hitallhigh);
-        hmulti[0].setTitleX("BST All Layers Multiplicity");
-        hmulti[0].setTitleY("Counts");
-        hmulti[0].setLineWidth(2);
-        hmulti[0].setFillColor(33);
-        hmulti[0].setOptStat("111110");
-        for (int i = 1; i < 7; ++i) {
-            hmulti[i] = new H1F("bstmulti_l" + i, nbinshit, hitlow, hithigh);
-            hmulti[i].setTitleX("BST Layer " + i + " Multiplicity");
-            hmulti[i].setTitleY("Counts");
-            hmulti[i].setLineWidth(2);
-            hmulti[i].setFillColor(34);
-            hmulti[i].setOptStat("111110");
-        }
-
-        DataGroup dg = new DataGroup("");
-        DataGroup hitmapGroup = new DataGroup("");
-        for (int i = 0; i < NLAYERS; ++i) {
-            hitmapGroup.addDataSet(hhitmap[i], 0);
-            this.getDataGroup().add(hitmapGroup, 0, i, 1);
-        }
-        DataGroup hitlGroup = new DataGroup("");
-        for (int i = 0; i < NLAYERS; ++i) {
-            hitlGroup.addDataSet(hhitl[i], 0);
-            this.getDataGroup().add(hitlGroup, 0, i, 2);
-        }
-        DataGroup hmultiGroup = new DataGroup("");
-        for (int i = 0; i <= NLAYERS; ++i) {
-            hmultiGroup.addDataSet(hmulti[i], 0);
-            this.getDataGroup().add(hmultiGroup, 0, i, 3);
-        }
-
-        dg.addDataSet(hoccup, 0);
-        this.getDataGroup().add(dg, 0, 0, 0);
+        H1F hmulti = new H1F("bstmulti", "", nbinshitall, hitlow, hitallhigh);
+        hmulti.setTitleX("BST All Layers Multiplicity");
+        hmulti.setTitleY("Counts");
+        hmulti.setLineWidth(2);
+        hmulti.setFillColor(33);
+        hmulti.setOptStat("111110");
+        dgAll.addDataSet(hoccup, 0);
+        dgAll.addDataSet(hmulti, 1);
+        this.getDataGroup().add(dgAll, 0, 0, 0);
     }
 
     @Override
     public void plotHistos() {
         EmbeddedCanvas canvas = this.getDetectorCanvas().getCanvas("Hit Maps");
-        for (int i = 0; i < canvas.getCanvasPads().size() / 2; ++i) {
+        for (int i = 0; i < NREGIONS; ++i) {
             canvas.cd(i);
             int j = 2 * i + 1;
-            canvas.draw(this.getDataGroup().getItem(0, j - 1, 1).getH2F("hitmap_l" + (j + 1)));
+            canvas.draw(this.getDataGroup().getItem(0, j+1, 0).getH2F("hitmap_l" + (j + 1)));
             canvas.cd(i + NREGIONS);
-            canvas.draw(this.getDataGroup().getItem(0, j - 1, 1).getH2F("hitmap_l" + j));
+            canvas.draw(this.getDataGroup().getItem(0, j, 0).getH2F("hitmap_l" + j));
         }
         canvas.update();
 
         canvas = this.getDetectorCanvas().getCanvas("Layer Hits");
-        for (int i = 0; i < canvas.getCanvasPads().size() / 2; ++i) {
+        for (int i = 0; i < NREGIONS; ++i) {
             canvas.cd(i);
             int j = 2 * i + 1;
-            canvas.draw(this.getDataGroup().getItem(0, j - 1, 2).getH1F("hits_l" + (j + 1)));
+            canvas.draw(this.getDataGroup().getItem(0, j+1, 0).getH1F("hits_l" + (j + 1)));
             canvas.cd(i + NREGIONS);
-            canvas.draw(this.getDataGroup().getItem(0, j - 1, 2).getH1F("hits_l" + j));
+            canvas.draw(this.getDataGroup().getItem(0, j, 0).getH1F("hits_l" + j));
         }
         canvas.update();
 
         canvas = this.getDetectorCanvas().getCanvas("Hit Multiplicity");
-        for (int p = 0; p < NREGIONS; ++p) {
-            canvas.cd(p);
-            int l = 2 * (p + 1);
-            canvas.draw(this.getDataGroup().getItem(0, l, 3).getH1F("bstmulti_l" + l));
-            canvas.cd(p + NREGIONS + 1);
-            l = 2 * p + 1;
-            canvas.draw(this.getDataGroup().getItem(0, l, 3).getH1F("bstmulti_l" + l));
+        for (int i = 0; i < NREGIONS; ++i) {
+            canvas.cd(i);
+            int j = 2 * i + 1;
+            canvas.draw(this.getDataGroup().getItem(0, j+1, 0).getH1F("bstmulti_l" + (j + 1)));
+            canvas.cd(i + NREGIONS + 1);
+            canvas.draw(this.getDataGroup().getItem(0, j, 0).getH1F("bstmulti_l" + j));
         }
         canvas.cd(3);
-        canvas.draw(this.getDataGroup().getItem(0, 0, 3).getH1F("bstmulti"));
+        canvas.draw(this.getDataGroup().getItem(0, 0, 0).getH1F("bstmulti"));
         canvas.cd(7);
         canvas.draw(this.getDataGroup().getItem(0, 0, 0).getH1F("occup"));
         canvas.update();
@@ -148,14 +125,6 @@ public class BSTmonitor extends DetectorMonitor {
 
     @Override
     public void processEvent(DataEvent event) {
-
-        if (this.getNumberOfEvents() >= super.eventResetTime_current && super.eventResetTime_current > 0) {
-            resetEventListener();
-        }
-
-        if (!testTriggerMask()) {
-            return;
-        }
 
         boolean[] trigger_bits1 = new boolean[32];
         boolean[] trigger_bits2 = new boolean[32];
@@ -191,8 +160,8 @@ public class BSTmonitor extends DetectorMonitor {
 
                 bsthits++;
                 hits[layer - 1]++;
-                this.getDataGroup().getItem(0, layer - 1, 1).getH2F("hitmap_l" + layer).fill(comp, sector);
-                this.getDataGroup().getItem(0, layer - 1, 2).getH1F("hits_l" + layer)
+                this.getDataGroup().getItem(0, layer, 0).getH2F("hitmap_l" + layer).fill(comp, sector);
+                this.getDataGroup().getItem(0, layer, 0).getH1F("hits_l" + layer)
                         .fill((sector - 1) * 256 + comp);
                 int shift = 0;
                 for (int l = 0; l < layer - 1; ++l) {
@@ -201,13 +170,13 @@ public class BSTmonitor extends DetectorMonitor {
                 this.getDetectorSummary().getH2F("summary").fill(comp, sector + shift);
             } // adc loop
         } // BST::adc
-        this.getDataGroup().getItem(0, 0, 3).getH1F("bstmulti").fill(bsthits);
-        double occup = this.getDataGroup().getItem(0, 0, 3).getH1F("bstmulti").getMean();
+        this.getDataGroup().getItem(0, 0, 0).getH1F("bstmulti").fill(bsthits);
+        double occup = this.getDataGroup().getItem(0, 0, 0).getH1F("bstmulti").getMean();
         occup /= occupNorm[0];
         this.getDataGroup().getItem(0, 0, 0).getH1F("occup").setBinContent(0, occup);
         for (int l = 1; l <= 6; ++l) {
-            this.getDataGroup().getItem(0, l, 3).getH1F("bstmulti_l" + l).fill(hits[l - 1]);
-            occup = this.getDataGroup().getItem(0, l, 3).getH1F("bstmulti_l" + l).getMean();
+            this.getDataGroup().getItem(0, l, 0).getH1F("bstmulti_l" + l).fill(hits[l - 1]);
+            occup = this.getDataGroup().getItem(0, l, 0).getH1F("bstmulti_l" + l).getMean();
             occup /= occupNorm[l];
             this.getDataGroup().getItem(0, 0, 0).getH1F("occup").setBinContent(l, occup);
         }
@@ -235,7 +204,7 @@ public class BSTmonitor extends DetectorMonitor {
     }
 
     @Override
-    public void timerUpdate() {
+    public void analysisUpdate() {
     }
 
 }

@@ -175,7 +175,7 @@ public class BANDmonitor  extends DetectorMonitor {
     }
 
     @Override
-    public void timerUpdate() {
+    public void analysisUpdate() {
 
     }
 

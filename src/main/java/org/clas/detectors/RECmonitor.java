@@ -2,7 +2,6 @@ package org.clas.detectors;
 
 import org.clas.viewer.DetectorMonitor;
 import org.jlab.groot.data.H1F;
-import org.jlab.groot.data.H2F;
 import org.jlab.groot.group.DataGroup;
 import org.jlab.io.base.DataBank;
 import org.jlab.io.base.DataEvent;
@@ -257,12 +256,6 @@ public class RECmonitor extends DetectorMonitor {
     @Override
     public void processEvent(DataEvent event) {
         
-        if (this.getNumberOfEvents() >= super.eventResetTime_current && super.eventResetTime_current > 0){
-            resetEventListener();
-        }
-        
-		//if (!testTriggerMask()) return;
-        
         // process event info and save into data group
                 
         if (event.hasBank("CVTRec::Cosmics")==true){
@@ -346,7 +339,7 @@ public class RECmonitor extends DetectorMonitor {
                   
 
     @Override
-    public void timerUpdate() {
+    public void analysisUpdate() {
         
     }
 

@@ -3,6 +3,7 @@ package org.clas.viewer;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -44,7 +45,7 @@ public class DetectorMonitor implements IDataEventListener, ActionListener {
     private JPanel                 detectorPanel     = null;
     private EmbeddedCanvasTabbed   detectorCanvas    = null;
     private DetectorPane2D         detectorView      = null;
-    private ButtonGroup            bG1               = null;
+    private ButtonGroup            buttonGroup       = null;
     private int                    numberOfEvents;
     private Boolean                sectorButtons     = false;
     private int                 detectorActiveSector = 1;
@@ -52,7 +53,7 @@ public class DetectorMonitor implements IDataEventListener, ActionListener {
     private Boolean                     detectorLogY = false;
     private Boolean                             isTB = false;
     private boolean                           active = true;
-    private JRadioButton bS1,bS2,bS3,bS4,bS5,bS6;
+    private JRadioButton[]   bS = new JRadioButton[6];
     private JCheckBox        tbBtn;
     
     public IndexedList<List<Float>>         ttdcs = new IndexedList<List<Float>>(4);
@@ -63,7 +64,6 @@ public class DetectorMonitor implements IDataEventListener, ActionListener {
     
     public int bitsec = 0;
     public long trigger = 0;
-    public long triggerPhase = 0;
     public double max_occ = 10.0;
     public int trigFD = 0;
     public int trigCD = 0;
@@ -72,8 +72,11 @@ public class DetectorMonitor implements IDataEventListener, ActionListener {
     public boolean TriggerBeam[] = new boolean[32];
     public int TriggerMask = 0;
     
-    public int eventResetTime_current = 0;
-    public int eventResetTime_default = 10000000;    
+    public double tdcconv  = 0.023456;
+    public double period  = 4;
+    public double phase   = 1;
+    public int    ncycles = 6;
+
     
     public DetectorMonitor(String name){
         GStyle.getAxisAttributesX().setTitleFontSize(18); //24
@@ -98,7 +101,6 @@ public class DetectorMonitor implements IDataEventListener, ActionListener {
         this.detectorView   = new DetectorPane2D();
         this.numberOfEvents = 0;   
         
-        eventResetTime_current = eventResetTime_default;
 
     }
 
@@ -132,14 +134,6 @@ public class DetectorMonitor implements IDataEventListener, ActionListener {
 
     public void drawDetector() {
     
-    }
-    
-    public void setTriggerPhase(long phase) {
-    	   this.triggerPhase = phase;
-    }
-    
-    public long getTriggerPhase() {
-    	    return this.triggerPhase;
     }
     
     public void setTriggerWord(long trig) {
@@ -272,33 +266,25 @@ public class DetectorMonitor implements IDataEventListener, ActionListener {
         }
         createHistos();
         plotHistos(); 
-        if (sectorButtons) bS2.doClick();
+        if (sectorButtons) bS[1].doClick();
     }
     
     public JPanel getButtonPane() {
-    	    bG1 = new ButtonGroup();
+        buttonGroup = new ButtonGroup();
         JPanel buttonPane = new JPanel();
-        bS1 = new JRadioButton("Sector 1"); buttonPane.add(bS1); bS1.setActionCommand("1"); bS1.addActionListener(this);
-        bS2 = new JRadioButton("Sector 2"); buttonPane.add(bS2); bS2.setActionCommand("2"); bS2.addActionListener(this); 
-        bS3 = new JRadioButton("Sector 3"); buttonPane.add(bS3); bS3.setActionCommand("3"); bS3.addActionListener(this); 
-        bS4 = new JRadioButton("Sector 4"); buttonPane.add(bS4); bS4.setActionCommand("4"); bS4.addActionListener(this); 
-        bS5 = new JRadioButton("Sector 5"); buttonPane.add(bS5); bS5.setActionCommand("5"); bS5.addActionListener(this);  
-        bS6 = new JRadioButton("Sector 6"); buttonPane.add(bS6); bS6.setActionCommand("6"); bS6.addActionListener(this); 
-        bG1.add(bS1);bG1.add(bS2);bG1.add(bS3);bG1.add(bS4);bG1.add(bS5);bG1.add(bS6);
-        //tbBtn = new JCheckBox("TrigBit");
-        //tbBtn.addItemListener(new ItemListener() {
-        //    public void itemStateChanged(ItemEvent e) {
-        //    	  isTB = e.getStateChange()==ItemEvent.SELECTED;
-        //    }
-        //});         
-        //tbBtn.setSelected(false);        
-        //buttonPane.add(tbBtn);       
+        for(int i=0; i<6; i++) {
+            bS[i] = new JRadioButton("Sector " + (i+1)); 
+            buttonPane.add(bS[i]); 
+            bS[i].setActionCommand(String.valueOf(i+1)); 
+            bS[i].addActionListener(this);
+            buttonGroup.add(bS[i]);
+        }
         return buttonPane;
     } 
     
     public void actionPerformed(ActionEvent e) {
         // TODO Auto-generated method stub
-        this.detectorActiveSector   = Integer.parseInt(bG1.getSelection().getActionCommand());
+        this.detectorActiveSector   = Integer.parseInt(buttonGroup.getSelection().getActionCommand());
         plotHistos();
     } 
     
@@ -366,10 +352,15 @@ public class DetectorMonitor implements IDataEventListener, ActionListener {
     }
 
     @Override
-    public void timerUpdate() {
+    public final void timerUpdate() {
+        this.analysisUpdate();
+        this.resetStreams();
+    }
+
+    public void analysisUpdate() {
         
     }
- 
+
     public void readDataGroup(TDirectory dir) {
         String folder = this.getDetectorName() + "/";
         System.out.println("Reading from: " + folder);
@@ -382,7 +373,6 @@ public class DetectorMonitor implements IDataEventListener, ActionListener {
         for(int i = 0; i < nds; i++){
             List<IDataSet> dsList = sum.getData(i);
             for(IDataSet ds : dsList){
-                System.out.println("\t --> " + ds.getName());
                 if(dir.getObject(folder, ds.getName())!=null) newSum.addDataSet(dir.getObject(folder, ds.getName()),i);
             }
         }            
@@ -401,7 +391,6 @@ public class DetectorMonitor implements IDataEventListener, ActionListener {
             for(int i = 0; i < nds; i++){
                 List<IDataSet> dsList = group.getData(i);
                 for(IDataSet ds : dsList){
-                    System.out.println("\t --> " + ds.getName());
                     if(dir.getObject(folder, ds.getName())!=null) newGroup.addDataSet(dir.getObject(folder, ds.getName()),i);
                 }
             }
@@ -423,7 +412,6 @@ public class DetectorMonitor implements IDataEventListener, ActionListener {
         for(int i = 0; i < nds; i++){
             List<IDataSet> dsList = sum.getData(i);
             for(IDataSet ds : dsList){
-                System.out.println("\t --> " + ds.getName());
                 dir.addDataSet(ds);
             }
         }            
@@ -436,7 +424,6 @@ public class DetectorMonitor implements IDataEventListener, ActionListener {
             for(int i = 0; i < nds; i++){
                 List<IDataSet> dsList = group.getData(i);
                 for(IDataSet ds : dsList){
-                    System.out.println("\t --> " + ds.getName());
                     dir.addDataSet(ds);
                 }
             }
@@ -459,5 +446,14 @@ public class DetectorMonitor implements IDataEventListener, ActionListener {
         } 	
         c.update();
     }     
+    
+    public static void resetStreams() {
+        PrintStream  outStream = System.out;
+        PrintStream  errStream = System.err;
+        System.setOut(outStream);
+        System.setErr(errStream);
+        System.out.flush();
+        System.err.flush();
+    }
         
 }

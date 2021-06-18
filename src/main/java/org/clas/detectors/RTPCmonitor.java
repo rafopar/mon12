@@ -154,10 +154,6 @@ public class RTPCmonitor extends DetectorMonitor {
     @Override
     public void processEvent(DataEvent event) {
         
-        if (this.getNumberOfEvents() >= super.eventResetTime_current && super.eventResetTime_current > 0){
-            resetEventListener();
-        }
-        
         // process event info and save into data group
 
         
@@ -318,7 +314,7 @@ public class RTPCmonitor extends DetectorMonitor {
     }
 
     @Override
-    public void timerUpdate() {
+    public void analysisUpdate() {
         this.getDetectorCanvas().getCanvas("Summary").getPad(5).getAxisX().setRange(0,maxtime + 50);
         this.getDetectorCanvas().getCanvas("Summary").getPad(7).getAxisX().setRange(0,maxnumhits + 50);
         this.getDetectorCanvas().getCanvas("Summary").getPad(8).getAxisX().setRange(0,maxpads + 50);

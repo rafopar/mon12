@@ -159,12 +159,6 @@ public class DCmonitor extends DetectorMonitor {
 
     @Override
     public void processEvent(DataEvent event) {
-        
-        if (this.getNumberOfEvents() >= super.eventResetTime_current && super.eventResetTime_current > 0){
-            resetEventListener();
-        }
-        
-//		if (!testTriggerMask()) return;
                 
         // process event info and save into data group
         if(event.hasBank("DC::tdc")==true){
@@ -227,7 +221,7 @@ public class DCmonitor extends DetectorMonitor {
     }
 
     @Override
-    public void timerUpdate() {
+    public void analysisUpdate() {
 //        System.out.println("Updating DC");
         if(this.getNumberOfEvents()>0) {
             for(int sector=1; sector <=6; sector++) {

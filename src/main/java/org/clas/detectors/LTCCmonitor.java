@@ -153,12 +153,6 @@ public class LTCCmonitor  extends DetectorMonitor {
     @Override
     public void processEvent(DataEvent event) {
         
-        if (this.getNumberOfEvents() >= super.eventResetTime_current && super.eventResetTime_current > 0){
-            resetEventListener();
-        }
-        
-		//if (!testTriggerMask()) return;
-        
         // process event info and save into data group
         if(event.hasBank("LTCC::adc")==true){
 	    DataBank bank = event.getBank("LTCC::adc");
@@ -219,7 +213,7 @@ public class LTCCmonitor  extends DetectorMonitor {
     }
 
     @Override
-    public void timerUpdate() {
+    public void analysisUpdate() {
         for(int ibin=0; ibin<this.getDataGroup().getItem(0,0,0).getH2F("occADC").getDataBufferSize(); ibin++) {
             float ref = this.getDataGroup().getItem(0,0,0).getH2F("occADCref").getDataBufferBin(ibin);
             float con = this.getDataGroup().getItem(0,0,0).getH2F("occADC").getDataBufferBin(ibin);

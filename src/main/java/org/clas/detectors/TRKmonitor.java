@@ -254,7 +254,7 @@ public class TRKmonitor extends DetectorMonitor {
     }
 
     @Override
-    public void timerUpdate() {
+    public void analysisUpdate() {
 
     }
 

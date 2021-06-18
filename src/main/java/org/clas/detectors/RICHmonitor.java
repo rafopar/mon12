@@ -1,18 +1,10 @@
 package org.clas.detectors;
 
 import org.clas.viewer.DetectorMonitor;
-import org.jlab.groot.data.H1F;
 import org.jlab.groot.data.H2F;
 import org.jlab.groot.group.DataGroup;
 import org.jlab.io.base.DataBank;
 import org.jlab.io.base.DataEvent;
-import org.jlab.groot.math.*;
-import org.jlab.groot.fitter.*;
-import java.awt.BorderLayout;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ListIterator;
 
 
 import java.awt.FlowLayout;
@@ -24,22 +16,18 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Line2D;
-import java.util.Map;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
 import javax.swing.event.MouseInputAdapter;
 import org.jlab.groot.data.H1F;
-import org.jlab.detector.view.DetectorShape2D;
-import org.jlab.groot.graphics.EmbeddedCanvas;
 import java.util.Map;
 import org.jlab.detector.view.DetectorShape2D;
 
 import java.util.HashMap;
 import org.jlab.detector.base.DetectorType;
 
-import org.jlab.io.hipo.HipoDataEvent;
 
 import org.jlab.groot.data.DataLine;
 
@@ -456,13 +444,6 @@ public class RICHmonitor  extends DetectorMonitor {
     //@Override
     public void processEvent(DataEvent event) {
 
-
-        if (this.getNumberOfEvents() >= super.eventResetTime_current && super.eventResetTime_current > 0) {
-            resetEventListener();
-        }
-
-        //if (!testTriggerMask()) return;
-
         // process event info and save into data group
         if(event.hasBank("RICH::adc")==true) {
             DataBank bank = event.getBank("RICH::adc");
@@ -539,7 +520,7 @@ public class RICHmonitor  extends DetectorMonitor {
 
 
     @Override
-    public void timerUpdate() {
+    public void analysisUpdate() {
 
     }
 

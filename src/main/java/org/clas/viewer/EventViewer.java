@@ -7,7 +7,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -32,7 +31,6 @@ import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextPane;
-import javax.swing.KeyStroke;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.text.SimpleAttributeSet;
@@ -85,101 +83,99 @@ public class EventViewer implements IDataEventListener, DetectorListener, Action
     private int runNumber     = 2284;
     private int ccdbRunNumber = 0;
     private int eventNumber = 0;
-    
-    double PERIOD = 0;
-    int     PHASE = 0;
-    int    CYCLES = 0;    
-    
+    private int histoResetEvents = 0;
+        
     public String outPath = null; 
     
     // detector monitors
     public LinkedHashMap<String, DetectorMonitor> monitors = new LinkedHashMap<>();
     
     
-    public void initMonitors() {
+    public final void initMonitors() {
         monitors.put("BAND",        new BANDmonitor("BAND"));
-        monitors.put("BMT",         new BMTmonitor("BMT"));       // 1
-        monitors.put("BST",         new BSTmonitor("BST"));        // 2
-        monitors.put("CND",         new CNDmonitor("CND"));       // 3
-        monitors.put("CTOF",        new CTOFmonitor("CTOF"));      // 4
-        monitors.put("DC",          new DCmonitor("DC"));          // 5
-        monitors.put("ECAL",        new ECmonitor("ECAL"));        // 6
-        monitors.put("FMT",         new FMTmonitor("FMT"));       // 7
-        monitors.put("FTCAL",       new FTCALmonitor("FTCAL"));    // 8
-        monitors.put("FTHODO",      new FTHODOmonitor("FTHODO"));  // 9
-        monitors.put("FTOF",        new FTOFmonitor("FTOF"));      // 10        
-        monitors.put("FTTRK",       new FTTRKmonitor("FTTRK"));    // 11
-        monitors.put("HTCC",        new HTCCmonitor("HTCC"));      // 12
-        monitors.put("LTCC",        new LTCCmonitor("LTCC"));      // 13
-        monitors.put("RICH",        new RICHmonitor("RICH"));      // 14
-        monitors.put("RTPC",        new RTPCmonitor("RTPC"));     // 15
-        monitors.put("RECON",       new RECmonitor("RECON"));      // 16
-//        monitors.put("TRK",         new TRKmonitor("TRK"));        // 15
-        monitors.put("RF",          new RFmonitor("RF"));          // 17
-        monitors.put("HEL",         new HELmonitor("HEL"));        // 18
-        monitors.put("FCUP",        new FCUPmonitor("FCUP"));  // 19
-        monitors.put("Trigger",     new TRIGGERmonitor("Trigger"));   // 20
-        monitors.put("TimeJitter",  new TJITTERmonitor("TimeJitter")); // 21
-        monitors.get("FTCAL").setActive(false);
-        monitors.get("FTHODO").setActive(false);
-        monitors.get("FTTRK").setActive(false);
-        monitors.get("RTPC").setActive(false);
-        monitors.get("RECON").setActive(false);
+        monitors.put("BMT",         new BMTmonitor("BMT"));
+        monitors.put("BST",         new BSTmonitor("BST"));
+        monitors.put("CND",         new CNDmonitor("CND")); 
+        monitors.put("CTOF",        new CTOFmonitor("CTOF")); 
+        monitors.put("DC",          new DCmonitor("DC"));     
+        monitors.put("ECAL",        new ECmonitor("ECAL"));       
+        monitors.put("FMT",         new FMTmonitor("FMT"));      
+        monitors.put("FTCAL",       new FTCALmonitor("FTCAL"));   
+        monitors.put("FTHODO",      new FTHODOmonitor("FTHODO")); 
+        monitors.put("FTOF",        new FTOFmonitor("FTOF"));             
+        monitors.put("FTTRK",       new FTTRKmonitor("FTTRK"));   
+        monitors.put("HTCC",        new HTCCmonitor("HTCC"));     
+        monitors.put("LTCC",        new LTCCmonitor("LTCC")); 
+        monitors.put("RICH",        new RICHmonitor("RICH"));    
+        monitors.put("RTPC",        new RTPCmonitor("RTPC"));    
+        monitors.put("RF",          new RFmonitor("RF"));       
+        monitors.put("HEL",         new HELmonitor("HEL"));      
+        monitors.put("FCUP",        new FCUPmonitor("FCUP")); 
+        monitors.put("Trigger",     new TRIGGERmonitor("Trigger"));
+        monitors.put("TimeJitter",  new TJITTERmonitor("TimeJitter"));
+//        monitors.get("FTCAL").setActive(false);
+//        monitors.get("FTHODO").setActive(false);
+//        monitors.get("FTTRK").setActive(false);
+//        monitors.get("RTPC").setActive(false);
     }
                     
-    public EventViewer() {    
-    	
-        String dir = ClasUtilsFile.getResourceDir("CLAS12DIR", "etc/bankdefs/hipo4");
-        schemaFactory.initFromDirectory(dir);
+    public EventViewer() {  
+        // create main panel
+        mainPanel = new JPanel();	
+        mainPanel.setLayout(new BorderLayout());
         
-        outPath = System.getProperty("user.home") + "/CLAS12MON/output";
-        System.out.println("OutPath set to :" + outPath);
+        tabbedpane = new JTabbedPane();
+        tabbedpane.addChangeListener(this);
+
+        processorPane = new DataSourceProcessorPane();
+        processorPane.setUpdateRate(analysisUpdateTime);
+        processorPane.addEventListener(this);
+
+        mainPanel.add(tabbedpane);
+        mainPanel.add(processorPane,BorderLayout.PAGE_END);
         
         this.initMonitors();
         
+    }
+    
+    public void init() {
+        this.initsPaths();
+        this.initSummary();
+        this.initTabs();
+        this.initMenus();
+    }
+    
+    public void initMenus() {   
         // create menu bar
         menuBar = new JMenuBar();
         JMenuItem menuItem;
         JMenu file = new JMenu("File");
-        file.setMnemonic(KeyEvent.VK_A);
         file.getAccessibleContext().setAccessibleDescription("File options");
-        menuItem = new JMenuItem("Open histograms file", KeyEvent.VK_O);
-        menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK));
+        menuItem = new JMenuItem("Open histograms file");
         menuItem.getAccessibleContext().setAccessibleDescription("Open histograms file");
         menuItem.addActionListener(this);
         file.add(menuItem);
-        menuItem = new JMenuItem("Save histograms to file", KeyEvent.VK_S);
-        menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK));
+        menuItem = new JMenuItem("Save histograms to file");
         menuItem.getAccessibleContext().setAccessibleDescription("Save histograms to file");
         menuItem.addActionListener(this);
         file.add(menuItem);
-        menuItem = new JMenuItem("Print histograms as png", KeyEvent.VK_B);
-        menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, ActionEvent.CTRL_MASK));
+        menuItem = new JMenuItem("Print histograms as png");
         menuItem.getAccessibleContext().setAccessibleDescription("Print histograms as png");
         menuItem.addActionListener(this);
         file.add(menuItem);
-        //menuItem = new JMenuItem("Create histogram PDF", KeyEvent.VK_P);
-        //menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, ActionEvent.CTRL_MASK));
-        //menuItem.getAccessibleContext().setAccessibleDescription("Create historgram PDF");
-        //menuItem.addActionListener(this);
-        //file.add(menuItem);
         
         menuBar.add(file);
         JMenu settings = new JMenu("Settings");
-        settings.setMnemonic(KeyEvent.VK_A);
         settings.getAccessibleContext().setAccessibleDescription("Choose monitoring parameters");
-        menuItem = new JMenuItem("Set GUI update interval", KeyEvent.VK_T);
-        menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, ActionEvent.CTRL_MASK));
+        menuItem = new JMenuItem("Set GUI update interval");
         menuItem.getAccessibleContext().setAccessibleDescription("Set GUI update interval");
         menuItem.addActionListener(this);
         settings.add(menuItem);
-        menuItem = new JMenuItem("Set global z-axis log scale", KeyEvent.VK_L);
-        menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, ActionEvent.CTRL_MASK));
+        menuItem = new JMenuItem("Set global z-axis log scale");
         menuItem.getAccessibleContext().setAccessibleDescription("Set global z-axis log scale");
         menuItem.addActionListener(this);
         settings.add(menuItem);
-        menuItem = new JMenuItem("Set global z-axis lin scale", KeyEvent.VK_R);
-        menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, ActionEvent.CTRL_MASK));
+        menuItem = new JMenuItem("Set global z-axis lin scale");
         menuItem.getAccessibleContext().setAccessibleDescription("Set global z-axis lin scale");
         menuItem.addActionListener(this);
         settings.add(menuItem);
@@ -194,180 +190,50 @@ public class EventViewer implements IDataEventListener, DetectorListener, Action
         menuBar.add(settings);
          
         JMenu upload = new JMenu("Upload");
-        upload.setMnemonic(KeyEvent.VK_A);
         upload.getAccessibleContext().setAccessibleDescription("Upload histograms to the Logbook");
         menuItem = new JMenuItem("Upload all histos to the logbook");
         menuItem.getAccessibleContext().setAccessibleDescription("Upload all histos to the logbook");
         menuItem.addActionListener(this);
         upload.add(menuItem);
-//        menuItem = new JMenuItem("Upload occupancy histos to the logbook", KeyEvent.VK_U);
-//        menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_U, ActionEvent.CTRL_MASK));
-//        menuItem.getAccessibleContext().setAccessibleDescription("Upload occupancy histos to the logbook");
-//        menuItem.addActionListener(this);
-        upload.add(menuItem);
         menuBar.add(upload);
         
         JMenu reset = new JMenu("Reset");
-        reset.getAccessibleContext().setAccessibleDescription("Reset histograms");
-        
-        JMenuItem menuItemdefault = new JMenuItem("Default for all");
-        menuItemdefault.getAccessibleContext().setAccessibleDescription("Default for all");
-        menuItemdefault.addActionListener(this);
-        reset.add(menuItemdefault);
-        
-        JMenuItem menuItemdisable = new JMenuItem("Disable histogram reset");
-        menuItemdisable.getAccessibleContext().setAccessibleDescription("Disable histogram reset");
+        reset.getAccessibleContext().setAccessibleDescription("Reset histograms");        
+        JMenuItem menuItemdisable = new JMenuItem("Set periodic reset");
+        menuItemdisable.getAccessibleContext().setAccessibleDescription("Set periodic reset");
         menuItemdisable.addActionListener(this);
-        reset.add(menuItemdisable);
-        
-        JMenuItem menuItemBMT = new JMenuItem("Reset BMT histograms");
-        menuItemBMT.getAccessibleContext().setAccessibleDescription("Reset BMT histograms");
-        menuItemBMT.addActionListener(this);
-        reset.add(menuItemBMT);
-        
-        JMenuItem menuItemBST = new JMenuItem("Reset BST histograms");
-        menuItemBST.getAccessibleContext().setAccessibleDescription("Reset BST histograms");
-        menuItemBST.addActionListener(this);
-        reset.add(menuItemBST);
-        
-        JMenuItem menuItemCND = new JMenuItem("Reset CND histograms");
-        menuItemCND.getAccessibleContext().setAccessibleDescription("Reset CND histograms");
-        menuItemCND.addActionListener(this);
-        reset.add(menuItemCND);
-        
-        JMenuItem menuItemCTOF = new JMenuItem("Reset CTOF histograms");
-        menuItemCTOF.getAccessibleContext().setAccessibleDescription("Reset CTOF histograms");
-        menuItemCTOF.addActionListener(this);
-        reset.add(menuItemCTOF);
-        
-        JMenuItem menuItemDC = new JMenuItem("Reset DC histograms");
-        menuItemDC.getAccessibleContext().setAccessibleDescription("Reset DC histograms");
-        menuItemDC.addActionListener(this);
-        reset.add(menuItemDC);
-        
-        JMenuItem menuItemECAL = new JMenuItem("Reset ECAL histograms");
-        menuItemECAL.getAccessibleContext().setAccessibleDescription("Reset ECAL histograms");
-        menuItemECAL.addActionListener(this);
-        reset.add(menuItemECAL);
-        
-        JMenuItem menuItemFMT = new JMenuItem("Reset FMT histograms");
-        menuItemFMT.getAccessibleContext().setAccessibleDescription("Reset FMT histograms");
-        menuItemFMT.addActionListener(this);
-        reset.add(menuItemFMT);
-        
-        JMenuItem menuItemFT = new JMenuItem("Reset FT histograms");
-        menuItemFT.getAccessibleContext().setAccessibleDescription("Reset FT histograms");
-        menuItemFT.addActionListener(this);
-        reset.add(menuItemFT);
-        
-        JMenuItem menuItemFTOF = new JMenuItem("Reset FTOF histograms");
-        menuItemFTOF.getAccessibleContext().setAccessibleDescription("Reset FTOF histograms");
-        menuItemFTOF.addActionListener(this);
-        reset.add(menuItemFTOF);
-  
-        JMenuItem menuItemHTTC = new JMenuItem("Reset HTTC histograms");
-        menuItemHTTC.getAccessibleContext().setAccessibleDescription("Reset HTTC histograms");
-        menuItemHTTC.addActionListener(this);
-        reset.add(menuItemHTTC);
-        
-        JMenuItem menuItemLTTC = new JMenuItem("Reset LTTC histograms");
-        menuItemLTTC.getAccessibleContext().setAccessibleDescription("Reset LTTC histograms");
-        menuItemLTTC.addActionListener(this);
-        reset.add(menuItemLTTC);
-        
-        JMenuItem menuItemRICH = new JMenuItem("Reset RICH histograms");
-        menuItemRICH.getAccessibleContext().setAccessibleDescription("Reset RICH histograms");
-        menuItemRICH.addActionListener(this);
-        reset.add(menuItemRICH);        
-        
-        JMenuItem menuItemRTPC = new JMenuItem("Reset RTPC histograms");
-        menuItemRTPC.getAccessibleContext().setAccessibleDescription("Reset RTPC histograms");
-        menuItemRTPC.addActionListener(this);
-        reset.add(menuItemRTPC);
-        
-        JMenuItem menuItemTRIG = new JMenuItem("Reset TRIGGER histograms");
-        menuItemTRIG.getAccessibleContext().setAccessibleDescription("Reset TRIGGER histograms");
-        menuItemTRIG.addActionListener(this);
-        reset.add(menuItemTRIG);        
-        
+        reset.add(menuItemdisable);        
+        for(String key : this.monitors.keySet()) {
+            if(this.monitors.get(key).isActive()) {
+                JMenuItem menuItemDet = new JMenuItem("Reset " + key + " histograms");
+                menuItemDet.getAccessibleContext().setAccessibleDescription("Reset " + key + " histograms");
+                menuItemDet.addActionListener(this);
+                reset.add(menuItemDet);
+            }
+        }        
+        JMenuItem menuItemStream = new JMenuItem("Reset stdout/stderr");
+        menuItemStream.getAccessibleContext().setAccessibleDescription("Reset stdout/stderr");
+        menuItemStream.addActionListener(this);
+        reset.add(menuItemStream);        
         menuBar.add(reset);
         
-        JMenu trigBits = new JMenu("DetectorBits");
-        trigBits.getAccessibleContext().setAccessibleDescription("Select Detectors for Testing Trigger Bits (not yet implmented)");
-        
-        JCheckBoxMenuItem cb1 = new JCheckBoxMenuItem("EC");    
-        cb1.addItemListener(new ItemListener() {
-            public void itemStateChanged(ItemEvent e) {
-                if(e.getStateChange() == ItemEvent.SELECTED) {
-                  	monitors.get("ECAL").setTestTrigger(true);
-                } else {
-                 	monitors.get("ECAL").setTestTrigger(false);
-                };
-            }
-        });         
-        trigBits.add(cb1); 
-        
-        JCheckBoxMenuItem cb2 = new JCheckBoxMenuItem("HTCC");
-        cb2.addItemListener(new ItemListener() {
-            public void itemStateChanged(ItemEvent e) {
-                if(e.getStateChange() == ItemEvent.SELECTED) {
-                  	monitors.get("HTCC").setTestTrigger(true);
-                } else {
-                 	monitors.get("HTCC").setTestTrigger(false);
-                };
-            }
-        });         
-        trigBits.add(cb2); 
-        
-        JCheckBoxMenuItem cb3 = new JCheckBoxMenuItem("BST");
-        cb3.addItemListener(new ItemListener() {
-            public void itemStateChanged(ItemEvent e) {
-                if(e.getStateChange() == ItemEvent.SELECTED) {
-                  	monitors.get("BST").setTestTrigger(true);
-                } else {
-                 	monitors.get("BST").setTestTrigger(false);
-                };
-            }
-        });         
-        trigBits.add(cb3); 
-        
-        JCheckBoxMenuItem cb4 = new JCheckBoxMenuItem("CTOF");
-        cb4.addItemListener(new ItemListener() {
-            public void itemStateChanged(ItemEvent e) {
-                if(e.getStateChange() == ItemEvent.SELECTED) {
-                  	monitors.get("CTOF").setTestTrigger(true);
-                } else {
-                 	monitors.get("CTOF").setTestTrigger(false);
-                };
-            }
-        });         
-        trigBits.add(cb4); 
-        
-        JCheckBoxMenuItem cb5 = new JCheckBoxMenuItem("BMT");
-        cb5.addItemListener(new ItemListener() {
-            public void itemStateChanged(ItemEvent e) {
-                if(e.getStateChange() == ItemEvent.SELECTED) {
-                  	monitors.get("BMT").setTestTrigger(true);
-                } else {
-                 	monitors.get("BMT").setTestTrigger(false);
-                };
-            }
-        });         
-        trigBits.add(cb5); 
-        
-        JCheckBoxMenuItem cb6 = new JCheckBoxMenuItem("FTOF");
-        cb6.addItemListener(new ItemListener() {
-            public void itemStateChanged(ItemEvent e) {
-                if(e.getStateChange() == ItemEvent.SELECTED) {
-                  	monitors.get("FTOF").setTestTrigger(true);
-                } else {
-                 	monitors.get("FTOF").setTestTrigger(false);
-                };
-            }
-        });         
-        trigBits.add(cb6); 
-               
-        menuBar.add(trigBits);
+//        JMenu trigBits = new JMenu("DetectorBits");
+//        trigBits.getAccessibleContext().setAccessibleDescription("Select Detectors for Testing Trigger Bits (not yet implmented)");
+//        String[] keys = {"BMT", "BST", "CTOF", "ECAL", "FTOF", "HTCC", "LTCC"};
+//        for(String key : keys) {
+//            JCheckBoxMenuItem cb = new JCheckBoxMenuItem(key);    
+//            cb.addItemListener(new ItemListener() {
+//                public void itemStateChanged(ItemEvent e) {
+//                    if(e.getStateChange() == ItemEvent.SELECTED) {
+//                            monitors.get(key).setTestTrigger(true);
+//                    } else {
+//                            monitors.get(key).setTestTrigger(false);
+//                    };
+//                }
+//            });         
+//            trigBits.add(cb); 
+//        }
+//        menuBar.add(trigBits);
         
         //RGA
         String TriggerDefRGAFall[] = { "Electron",
@@ -402,9 +268,8 @@ public class EventViewer implements IDataEventListener, DetectorListener, Action
 		        "1K Pulser"};    
         
         JMenu trigBitsBeam = new JMenu("TriggerBits");
-        trigBitsBeam.getAccessibleContext().setAccessibleDescription("Test Trigger Bits");
-        
-        for (int i=0; i<32; i++) {
+        trigBitsBeam.getAccessibleContext().setAccessibleDescription("Test Trigger Bits");        
+        for (int i=0; i<TriggerDef.length; i++) {
         	
             JCheckBoxMenuItem bb = new JCheckBoxMenuItem(TriggerDef[i]);  
             final Integer bit = new Integer(i);
@@ -425,23 +290,19 @@ public class EventViewer implements IDataEventListener, DetectorListener, Action
             trigBitsBeam.add(bb); 
         	        	
         }
-
         menuBar.add(trigBitsBeam);
         
-
-        // create main panel
-        mainPanel = new JPanel();	
-        mainPanel.setLayout(new BorderLayout());
+    }
         
-      	tabbedpane 	= new JTabbedPane();
-
-        processorPane = new DataSourceProcessorPane();
-        processorPane.setUpdateRate(analysisUpdateTime);
-
-        mainPanel.add(tabbedpane);
-        mainPanel.add(processorPane,BorderLayout.PAGE_END);
+    public void initsPaths() {
+        String dir = ClasUtilsFile.getResourceDir("CLAS12DIR", "etc/bankdefs/hipo4");
+        schemaFactory.initFromDirectory(dir);
         
-    
+        outPath = System.getProperty("user.home") + "/CLAS12MON/output";
+        System.out.println("OutPath set to: " + outPath);
+    }
+        
+    public void initSummary() {
         GStyle.getAxisAttributesX().setTitleFontSize(18);
         GStyle.getAxisAttributesX().setLabelFontSize(14);
         GStyle.getAxisAttributesY().setTitleFontSize(18);
@@ -483,52 +344,48 @@ public class EventViewer implements IDataEventListener, DetectorListener, Action
         clas12Text.setFont(new Font("Avenir",Font.PLAIN,20));
         JLabel clas12Design = this.getImage("https://www.jlab.org/Hall-B/clas12-web/sidebar/clas12-design.jpg",0.08);
         JLabel clas12Logo   = this.getImage("https://www.jlab.org/Hall-B/pubs-web/logo/CLAS-frame-low.jpg", 0.3);
-//        CLAS12View.add(clas12Name,BorderLayout.PAGE_START);
         CLAS12View.add(clas12Textinfo,BorderLayout.BEFORE_FIRST_LINE );
         CLAS12View.add(clas12Design);
         CLAS12View.add(clas12Text,BorderLayout.PAGE_END);
 
         tabbedpane.add(splitPanel,"Summary");
-        tabbedpane.addChangeListener(this);
-        
-        this.setCanvasUpdate(canvasUpdateTime);
-        this.plotSummaries();
-
-        this.processorPane.addEventListener(this);
-        
         
     }
       
-    public void init() {
+    public void initTabs() {
+
+        this.plotSummaries();
+        
         for(String key : monitors.keySet()) {
             if(monitors.get(key).isActive()) this.tabbedpane.add(this.monitors.get(key).getDetectorPanel(), monitors.get(key).getDetectorName()); //don't show FMT tab
             monitors.get(key).getDetectorView().getView().addDetectorListener(this);                       
         }
-        
-        this.tabbedpane.add(new Contact(),"Contacts");        
         this.tabbedpane.add(new Acronyms(),"Acronyms");
-    }
+       
+        this.setCanvasUpdate(canvasUpdateTime);
+     }
     
     
+    @Override
     public void actionPerformed(ActionEvent e) {
         System.out.println(e.getActionCommand());
-        if(e.getActionCommand()=="Set GUI update interval") {
+        if("Set GUI update interval".equals(e.getActionCommand())) {
             this.chooseUpdateInterval();
         }
-        if(e.getActionCommand()=="Set global z-axis log scale") {
+        if("Set global z-axis log scale".equals(e.getActionCommand())) {
         	   for(String key : monitors.keySet()) {this.monitors.get(key).setLogZ(true);this.monitors.get(key).plotHistos();}
         }
-        if(e.getActionCommand()=="Set global z-axis lin scale") {
+        if("Set global z-axis lin scale".equals(e.getActionCommand())) {
            for(String key : monitors.keySet()) {this.monitors.get(key).setLogZ(false);this.monitors.get(key).plotHistos();}
         }
-        if(e.getActionCommand()=="Set DC occupancy scale max") {
+        if("Set DC occupancy scale max".equals(e.getActionCommand())) {
            setDCRange(e.getActionCommand());
         }
-        if(e.getActionCommand()=="Set run number") {
+        if("Set run number".equals(e.getActionCommand())) {
            setRunNumber(e.getActionCommand());
         }
 
-        if(e.getActionCommand()=="Open histograms file") {
+        if("Open histograms file".equals(e.getActionCommand())) {
             String fileName = null;
             JFileChooser fc = new JFileChooser();
             fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
@@ -540,10 +397,10 @@ public class EventViewer implements IDataEventListener, DetectorListener, Action
             }
             if(fileName != null) this.loadHistosFromFile(fileName);
         }        
-        if(e.getActionCommand()=="Print histograms as png") {
+        if("Print histograms as png".equals(e.getActionCommand())) {
             this.printHistosToFile();
         }
-        if(e.getActionCommand()=="Save histograms to file") {
+        if("Save histograms to file".equals(e.getActionCommand())) {
             DateFormat df = new SimpleDateFormat("MM-dd-yyyy_hh.mm.ss_aa");
             String fileName = "CLAS12Mon_run_" + this.runNumber + "_" + df.format(new Date()) + ".hipo";
             JFileChooser fc = new JFileChooser();
@@ -558,7 +415,7 @@ public class EventViewer implements IDataEventListener, DetectorListener, Action
             this.saveHistosToFile(fileName);
         }
         
-        if(e.getActionCommand()=="Upload all histos to the logbook") {   
+        if("Upload all histos to the logbook".equals(e.getActionCommand())) {   
             
             DateFormat df = new SimpleDateFormat("MM-dd-yyyy_hh.mm.ss_aa");
             String tstamp = df.format(new Date());
@@ -623,26 +480,48 @@ public class EventViewer implements IDataEventListener, DetectorListener, Action
               
         }
                  
-         
-         if (e.getActionCommand()=="Default for all"){
-            for(String key : monitors.keySet()) {
-                this.monitors.get(key).eventResetTime_current = this.monitors.get(key).eventResetTime_default;
-            }
-        }
-         
-         if (e.getActionCommand()=="Disable histogram reset"){
-            for(String key : monitors.keySet()) {
-                this.monitors.get(key).eventResetTime_current = 0;
-            }
+        if ("Set periodic reset".equals(e.getActionCommand())){
+            this.choosePeriodicReset();
         }
         
-        if ( e.getActionCommand().substring(0, 5).equals("Reset")){
-            resetHistograms(e.getActionCommand());
+        if ( e.getActionCommand().substring(0, 5).equals("Reset") && e.getActionCommand().split(" ").length==3){
+            String key = e.getActionCommand().split(" ")[1];
+            if(monitors.containsKey(key)) monitors.get(key).resetEventListener();
+        }
+        
+        if ("Reset stdout/stderr".equals(e.getActionCommand())){
+            DetectorMonitor.resetStreams();
         }
         
         
     }
 
+    public void choosePeriodicReset() {
+        String s = (String)JOptionPane.showInputDialog(
+                    null,
+                    "Set periodic histogram reset (#events), 0-disabled ",
+                    " ",
+                    JOptionPane.PLAIN_MESSAGE,
+                    null,
+                    null,
+                    "0");
+        if(s!=null){
+            int nev = 1000;
+            try { 
+                nev= Integer.parseInt(s);
+            } catch(NumberFormatException e) { 
+                JOptionPane.showMessageDialog(null, "Value must be a >=0!");
+            }
+            if(nev>=0) {
+                this.histoResetEvents = nev;
+                System.out.println("Resetting histograms every " + this.histoResetEvents + " events");
+            }
+            else {
+                JOptionPane.showMessageDialog(null, "Value must be a >=0!");
+            }
+        }
+    }
+        
     public void chooseUpdateInterval() {
         String s = (String)JOptionPane.showInputDialog(
                     null,
@@ -668,39 +547,28 @@ public class EventViewer implements IDataEventListener, DetectorListener, Action
         }
     }
         
-    private JLabel getImage(String path,double scale) {
+    private JLabel getImage(String path, double scale) {
         JLabel label = null;
         Image image = null;
         try {
             URL url = new URL(path);
             image = ImageIO.read(url);
         } catch (IOException e) {
-        	e.printStackTrace();
-                System.out.println("Picture upload from " + path + " failed");
+            e.printStackTrace();
+            System.out.println("Picture upload from " + path + " failed");
         }
         ImageIcon imageIcon = new ImageIcon(image);
-        double width  = imageIcon.getIconWidth()*scale;
-        double height = imageIcon.getIconHeight()*scale;
-        imageIcon = new ImageIcon(image.getScaledInstance((int) width,(int) height, Image.SCALE_SMOOTH));
+        double width = imageIcon.getIconWidth() * scale;
+        double height = imageIcon.getIconHeight() * scale;
+        imageIcon = new ImageIcon(image.getScaledInstance((int) width, (int) height, Image.SCALE_SMOOTH));
         label = new JLabel(imageIcon);
         return label;
     }
     
-    public JPanel  getPanel(){
-        return mainPanel;
+    private int getEventNumber(DataEvent event) {
+        DataBank bank = event.getBank("RUN::config");
+        return (bank!=null) ? bank.getInt("event", 0): this.eventNumber;
     }
-    
-    public long getTriggerWord(DataEvent event) {    	
- 	    DataBank bank = event.getBank("RUN::config");	        
-        return bank.getLong("trigger", 0);
-    } 
-    
-    public long getTriggerPhase(DataEvent event) {    	
- 	    DataBank bank = event.getBank("RUN::config");	        
-        long timestamp = bank.getLong("timestamp",0);    
-        int phase_offset = 3;
-        return ((timestamp%6)+phase_offset)%6; // TI derived phase correction due to TDC and FADC clock differences 
-    }  
     
     private int getRunNumber(DataEvent event) {
         int rNum = this.runNumber;
@@ -711,10 +579,10 @@ public class EventViewer implements IDataEventListener, DetectorListener, Action
         return rNum;
     }
     
-    private int getEventNumber(DataEvent event) {
-        DataBank bank = event.getBank("RUN::config");
-        return (bank!=null) ? bank.getInt("event", 0): this.eventNumber;
-    }
+    public long getTriggerWord(DataEvent event) {    	
+        DataBank bank = event.getBank("RUN::config");	        
+        return bank.getLong("trigger", 0);
+    } 
     
     private void copyHitList(String k, String mon1, String mon2) {
     	if (k!=mon1) return;
@@ -727,22 +595,27 @@ public class EventViewer implements IDataEventListener, DetectorListener, Action
     
     @Override
     public void dataEventAction(DataEvent event) {
-    	
+        
+    	this.eventNumber++;
+        
     	DataEvent hipo = null;
    	
 	if(event!=null ){
             if(event instanceof EvioDataEvent){
-                Event    dump = clasDecoder.getDataEvent(event);    
-                Bank   header = clasDecoder.createHeaderBank(this.ccdbRunNumber, getEventNumber(event), (float) 0, (float) 0);
+                Event    dump = clasDecoder.getDataEvent(event);  
+                 Bank   header = clasDecoder.createHeaderBank(this.ccdbRunNumber, getEventNumber(event), (float) 0, (float) 0);
                 Bank  trigger = clasDecoder.createTriggerBank();
                 if(header!=null)  dump.write(header);
                 if(trigger!=null) dump.write(trigger);
                 hipo = new HipoDataEvent(dump,schemaFactory);
             }   
             else {            	
-            	hipo = event; 
+                hipo = event; 
             }
         
+            if(this.histoResetEvents>0 && (this.eventNumber % this.histoResetEvents) == 0)
+                this.resetEventListener();
+            
             if(this.runNumber != this.getRunNumber(hipo)) {
                 this.runNumber = this.getRunNumber(hipo);
                 System.out.println("Setting run number to: " +this.runNumber);
@@ -752,7 +625,6 @@ public class EventViewer implements IDataEventListener, DetectorListener, Action
             
             for(String key : monitors.keySet()) {
                 if(this.monitors.get(key).isActive()) {
-                    this.monitors.get(key).setTriggerPhase(getTriggerPhase(hipo));
                     this.monitors.get(key).setTriggerWord(getTriggerWord(hipo));
                     copyHitList(key,"Trigger","FTOF");
                     this.monitors.get(key).dataEventAction(hipo);
@@ -973,64 +845,6 @@ public class EventViewer implements IDataEventListener, DetectorListener, Action
             this.monitors.get(key).setCanvasUpdate(time);
         }
     }
-
-    public void stateChanged(ChangeEvent e) {
-        this.timerUpdate();
-    }
-    
-    @Override
-    public void timerUpdate() {
-//        System.out.println("Time to update ...");
-        for(String key : monitors.keySet()) {
-            this.monitors.get(key).timerUpdate();
-        }
-        this.plotSummaries();
-   }
-
-    public static void main(String[] args){
-        
-        OptionParser parser = new OptionParser();
-        
-        parser.addOption("-geometry", "1600x1000", "Select window size, e.g. 1600x1200");
-        parser.addOption("-tabs",     "",          "Select active tabs, e.g. Summary:BST:FTOF");
-        parser.parse(args);
-
-        int xSize = 1600;
-        int ySize = 1000;        
-        String geometry = parser.getOption("-geometry").stringValue();
-        if(!geometry.isEmpty()) {
-            if(geometry.split("x").length==2){
-                xSize = Integer.parseInt(geometry.split("x")[0]);
-                ySize = Integer.parseInt(geometry.split("x")[1]);
-            }
-        }
-        System.out.println("Setting windows size to " + xSize + "x" + ySize);
-        
-        EventViewer viewer = new EventViewer();
-        String tabs     = parser.getOption("-tabs").stringValue();
-        if(!tabs.isEmpty()) {           
-            if(tabs.split(":").length>0) {
-                for(String tab : viewer.monitors.keySet()) viewer.monitors.get(tab).setActive(false);
-                for(String tab: tabs.split(":")) {
-                    if(viewer.monitors.containsKey(tab.trim())) viewer.monitors.get(tab.trim()).setActive(true);
-                    System.out.println(tab + " monitor set to active");
-                }
-            }
-        }
-        else {
-            System.out.println("All monitors set to active");
-        }       
-        viewer.init();
-        
-        JFrame frame = new JFrame("CLAS12Mon");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        //frame.add(viewer.getPanel());
-        frame.add(viewer.mainPanel);
-        frame.setJMenuBar(viewer.menuBar);
-        frame.setSize(xSize, ySize);
-        frame.setVisible(true);
-    }
-    
     
     private void setDCRange(String actionCommand) {
     
@@ -1069,322 +883,61 @@ public class EventViewer implements IDataEventListener, DetectorListener, Action
         
     }
 
-    private void resetHistograms(String actionCommand) {
-       
-        if (actionCommand=="Reset BMT histograms"){
-            System.out.println("Reset BMT histograms");
-        	int resetOption = JOptionPane.showConfirmDialog(null, "Do you want to automaticaly reset BMT plots ?", " ", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
-                    if (resetOption == JOptionPane.YES_OPTION) {
-                        String  resetTiming = (String) JOptionPane.showInputDialog(null, "Update every (number of events)", " ", JOptionPane.PLAIN_MESSAGE, null, null, "10000");
-                        if (resetTiming != null) {    
-                            int time = this.monitors.get("BMT").eventResetTime_default;
-                            try {time = Integer.parseInt(resetTiming);} 
-                            catch (NumberFormatException f) {JOptionPane.showMessageDialog(null, "Value must be a positive integer!");}
-                            if (time > 0) {this.monitors.get("BMT").eventResetTime_current = time;} 
-                            else {JOptionPane.showMessageDialog(null, "Value must be a positive integer!");}   
-                        }
-                    }else if (resetOption == JOptionPane.NO_OPTION){
- 			this.monitors.get("BMT").eventResetTime_current = 0;
-                    }	
-         }
-        
-        if (actionCommand=="Reset BST histograms"){
-            System.out.println("Reset BST histograms");
-        	int resetOption = JOptionPane.showConfirmDialog(null, "Do you want to automaticaly reset BST plots ?", " ", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
-                    if (resetOption == JOptionPane.YES_OPTION) {
-                        String  resetTiming = (String) JOptionPane.showInputDialog(null, "Update every (number of events)", " ", JOptionPane.PLAIN_MESSAGE, null, null, "10000");
-                        if (resetTiming != null) {    
-                            int time = this.monitors.get("BST").eventResetTime_default;
-                            try {time = Integer.parseInt(resetTiming);} 
-                            catch (NumberFormatException f) {JOptionPane.showMessageDialog(null, "Value must be a positive integer!");}
-                            if (time > 0) {this.monitors.get("BST").eventResetTime_current = time;} 
-                            else {JOptionPane.showMessageDialog(null, "Value must be a positive integer!");}   
-                        }
-                    }else if (resetOption == JOptionPane.NO_OPTION){
- 			this.monitors.get("BST").eventResetTime_current = 0;
-                    }	
-         }
-        
-        if (actionCommand=="Reset CND histograms"){
-            System.out.println("Reset CND histograms");
-        	int resetOption = JOptionPane.showConfirmDialog(null, "Do you want to automaticaly reset CND plots ?", " ", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
-                    if (resetOption == JOptionPane.YES_OPTION) {
-                        String  resetTiming = (String) JOptionPane.showInputDialog(null, "Update every (number of events)", " ", JOptionPane.PLAIN_MESSAGE, null, null, "10000");
-                        if (resetTiming != null) {    
-                            int time = this.monitors.get("CND").eventResetTime_default;
-                            try {time = Integer.parseInt(resetTiming);} 
-                            catch (NumberFormatException f) {JOptionPane.showMessageDialog(null, "Value must be a positive integer!");}
-                            if (time > 0) {this.monitors.get("CND").eventResetTime_current = time;} 
-                            else {JOptionPane.showMessageDialog(null, "Value must be a positive integer!");}   
-                        }
-                    }else if (resetOption == JOptionPane.NO_OPTION){
- 			this.monitors.get("CND").eventResetTime_current = 0;
-                    }	
-         }
-        
-        if (actionCommand=="Reset CTOF histograms"){
-            System.out.println("Reset CTOF histograms");
-        	int resetOption = JOptionPane.showConfirmDialog(null, "Do you want to automaticaly reset CTOF plots ?", " ", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
-                    if (resetOption == JOptionPane.YES_OPTION) {
-                        String  resetTiming = (String) JOptionPane.showInputDialog(null, "Update every (number of events)", " ", JOptionPane.PLAIN_MESSAGE, null, null, "10000");
-                        if (resetTiming != null) {    
-                            int time = this.monitors.get("CTOF").eventResetTime_default;
-                            try {time = Integer.parseInt(resetTiming);} 
-                            catch (NumberFormatException f) {JOptionPane.showMessageDialog(null, "Value must be a positive integer!");}
-                            if (time > 0) {this.monitors.get("CTOF").eventResetTime_current = time;} 
-                            else {JOptionPane.showMessageDialog(null, "Value must be a positive integer!");}   
-                        }
-                    }else if (resetOption == JOptionPane.NO_OPTION){
- 			this.monitors.get("CTOF").eventResetTime_current = 0;
-                    }	
-         }
-        
-        if (actionCommand=="Reset DC histograms"){
-            System.out.println("Reset DC histograms");
-        	int resetOption = JOptionPane.showConfirmDialog(null, "Do you want to automaticaly reset DC plots ?", " ", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
-                    if (resetOption == JOptionPane.YES_OPTION) {
-                        String  resetTiming = (String) JOptionPane.showInputDialog(null, "Update every (number of events)", " ", JOptionPane.PLAIN_MESSAGE, null, null, "10000");
-                        if (resetTiming != null) {    
-                            int time = this.monitors.get("DC").eventResetTime_default;
-                            try {time = Integer.parseInt(resetTiming);} 
-                            catch (NumberFormatException f) {JOptionPane.showMessageDialog(null, "Value must be a positive integer!");}
-                            if (time > 0) {this.monitors.get("DC").eventResetTime_current = time;} 
-                            else {JOptionPane.showMessageDialog(null, "Value must be a positive integer!");}   
-                        }
-                    }else if (resetOption == JOptionPane.NO_OPTION){
- 			this.monitors.get("DC").eventResetTime_current = 0;
-                    }	
-         }
-        
-        if (actionCommand=="Reset ECAL histograms"){
-            System.out.println("Reset ECAL histograms");
-        	int resetOption = JOptionPane.showConfirmDialog(null, "Do you want to automaticaly reset ECAL plots ?", " ", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
-                    if (resetOption == JOptionPane.YES_OPTION) {
-                        String  resetTiming = (String) JOptionPane.showInputDialog(null, "Update every (number of events)", " ", JOptionPane.PLAIN_MESSAGE, null, null, "10000");
-                        if (resetTiming != null) {    
-                            int time = this.monitors.get("ECAL").eventResetTime_default;
-                            try {time = Integer.parseInt(resetTiming);} 
-                            catch (NumberFormatException f) {JOptionPane.showMessageDialog(null, "Value must be a positive integer!");}
-                            if (time > 0) {this.monitors.get("ECAL").eventResetTime_current = time;} 
-                            else {JOptionPane.showMessageDialog(null, "Value must be a positive integer!");}   
-                        }
-                    }else if (resetOption == JOptionPane.NO_OPTION){
- 			this.monitors.get("ECAL").eventResetTime_current = 0;
-                    }	
-         }
-        
-        if (actionCommand=="Reset FMT histograms"){
-            System.out.println("Reset FMT histograms");
-        	int resetOption = JOptionPane.showConfirmDialog(null, "Do you want to automaticaly reset FMT plots ?", " ", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
-                    if (resetOption == JOptionPane.YES_OPTION) {
-                        String  resetTiming = (String) JOptionPane.showInputDialog(null, "Update every (number of events)", " ", JOptionPane.PLAIN_MESSAGE, null, null, "10000");
-                        if (resetTiming != null) {    
-                            int time = this.monitors.get("FMT").eventResetTime_default;
-                            try {time = Integer.parseInt(resetTiming);} 
-                            catch (NumberFormatException f) {JOptionPane.showMessageDialog(null, "Value must be a positive integer!");}
-                            if (time > 0) {this.monitors.get("FMT").eventResetTime_current = time;} 
-                            else {JOptionPane.showMessageDialog(null, "Value must be a positive integer!");}   
-                        }
-                    }else if (resetOption == JOptionPane.NO_OPTION){
- 			this.monitors.get("FMT").eventResetTime_current = 0;
-                    }	
-         }
-        
-        if (actionCommand=="Reset FT histograms"){
-            System.out.println("Reset FT histograms");
-        	int resetOption = JOptionPane.showConfirmDialog(null, "Do you want to automaticaly reset FT plots ?", " ", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
-                    if (resetOption == JOptionPane.YES_OPTION) {
-                        String  resetTiming = (String) JOptionPane.showInputDialog(null, "Update every (number of events)", " ", JOptionPane.PLAIN_MESSAGE, null, null, "10000");
-                        if (resetTiming != null) {    
-                            int time = this.monitors.get("FTCAL").eventResetTime_default;
-                            try {time = Integer.parseInt(resetTiming);} 
-                            catch (NumberFormatException f) {JOptionPane.showMessageDialog(null, "Value must be a positive integer!");}
-                            if (time > 0) {
-                                this.monitors.get("FTCAL").eventResetTime_current = time;
-                                this.monitors.get("FTHODO").eventResetTime_current = time;
-                                this.monitors.get("FTTRK").eventResetTime_current = time;
-                            } 
-                            else {JOptionPane.showMessageDialog(null, "Value must be a positive integer!");}   
-                        }
-                    }else if (resetOption == JOptionPane.NO_OPTION){
- 		     this.monitors.get("FTCAL").eventResetTime_current = 0;
-                        this.monitors.get("FTHODO").eventResetTime_current = 0;
-                        this.monitors.get("FTTRK").eventResetTime_current = 0;
-                    }	
-         }
-        
-        if (actionCommand=="Reset FTOF histograms"){
-            System.out.println("Reset FTOF histograms");
-        	int resetOption = JOptionPane.showConfirmDialog(null, "Do you want to automaticaly reset FTOF plots ?", " ", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
-                    if (resetOption == JOptionPane.YES_OPTION) {
-                        String  resetTiming = (String) JOptionPane.showInputDialog(null, "Update every (number of events)", " ", JOptionPane.PLAIN_MESSAGE, null, null, "10000");
-                        if (resetTiming != null) {    
-                            int time = this.monitors.get("FTOF").eventResetTime_default;
-                            try {time = Integer.parseInt(resetTiming);} 
-                            catch (NumberFormatException f) {JOptionPane.showMessageDialog(null, "Value must be a positive integer!");}
-                            if (time > 0) {this.monitors.get("FTOF").eventResetTime_current = time;} 
-                            else {JOptionPane.showMessageDialog(null, "Value must be a positive integer!");}   
-                        }
-                    }else if (resetOption == JOptionPane.NO_OPTION){
- 			this.monitors.get("FTOF").eventResetTime_current = 0;
-                    }	
-         }
-        
-        if (actionCommand=="Reset HTTC histograms"){
-            System.out.println("Reset HTTC histograms");
-        	int resetOption = JOptionPane.showConfirmDialog(null, "Do you want to automaticaly reset HTTC plots ?", " ", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
-                    if (resetOption == JOptionPane.YES_OPTION) {
-                        String  resetTiming = (String) JOptionPane.showInputDialog(null, "Update every (number of events)", " ", JOptionPane.PLAIN_MESSAGE, null, null, "10000");
-                        if (resetTiming != null) {    
-                            int time = this.monitors.get("HTCC").eventResetTime_default;
-                            try {time = Integer.parseInt(resetTiming);} 
-                            catch (NumberFormatException f) {JOptionPane.showMessageDialog(null, "Value must be a positive integer!");}
-                            if (time > 0) {this.monitors.get("HTCC").eventResetTime_current = time;} 
-                            else {JOptionPane.showMessageDialog(null, "Value must be a positive integer!");}   
-                        }
-                    }else if (resetOption == JOptionPane.NO_OPTION){
- 			this.monitors.get("HTCC").eventResetTime_current = 0;
-                    }	
-         }
-        
-        if (actionCommand=="Reset LTTC histograms"){
-            System.out.println("Reset LTTC histograms");
-        	int resetOption = JOptionPane.showConfirmDialog(null, "Do you want to automaticaly reset LTTC plots ?", " ", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
-                    if (resetOption == JOptionPane.YES_OPTION) {
-                        String  resetTiming = (String) JOptionPane.showInputDialog(null, "Update every (number of events)", " ", JOptionPane.PLAIN_MESSAGE, null, null, "10000");
-                        if (resetTiming != null) {    
-                            int time = this.monitors.get("LTCC").eventResetTime_default;
-                            try {time = Integer.parseInt(resetTiming);} 
-                            catch (NumberFormatException f) {JOptionPane.showMessageDialog(null, "Value must be a positive integer!");}
-                            if (time > 0) {this.monitors.get("LTCC").eventResetTime_current = time;} 
-                            else {JOptionPane.showMessageDialog(null, "Value must be a positive integer!");}   
-                        }
-                    }else if (resetOption == JOptionPane.NO_OPTION){
- 			this.monitors.get("LTCC").eventResetTime_current = 0;
-                    }	
-         }
-        
-        if (actionCommand=="Reset RICH histograms"){
-            System.out.println("Reset RICH histograms");
-        	int resetOption = JOptionPane.showConfirmDialog(null, "Do you want to automaticaly reset RICH plots ?", " ", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
-                    if (resetOption == JOptionPane.YES_OPTION) {
-                        String  resetTiming = (String) JOptionPane.showInputDialog(null, "Update every (number of events)", " ", JOptionPane.PLAIN_MESSAGE, null, null, "10000");
-                        if (resetTiming != null) {    
-                            int time = this.monitors.get("RICH").eventResetTime_default;
-                            try {time = Integer.parseInt(resetTiming);} 
-                            catch (NumberFormatException f) {JOptionPane.showMessageDialog(null, "Value must be a positive integer!");}
-                            if (time > 0) {this.monitors.get("RICH").eventResetTime_current = time;} 
-                            else {JOptionPane.showMessageDialog(null, "Value must be a positive integer!");}   
-                        }
-                    }else if (resetOption == JOptionPane.NO_OPTION){
- 			this.monitors.get("RICH").eventResetTime_current = 0;
-                    }	
-         }
-        
-        if (actionCommand=="Reset RTPC histograms"){
-            System.out.println("Reset RTPC histograms");
-        	int resetOption = JOptionPane.showConfirmDialog(null, "Do you want to automaticaly reset RTPC plots ?", " ", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
-                    if (resetOption == JOptionPane.YES_OPTION) {
-                        String  resetTiming = (String) JOptionPane.showInputDialog(null, "Update every (number of events)", " ", JOptionPane.PLAIN_MESSAGE, null, null, "10000");
-                        if (resetTiming != null) {    
-                            int time = this.monitors.get("RTPC").eventResetTime_default;
-                            try {time = Integer.parseInt(resetTiming);} 
-                            catch (NumberFormatException f) {JOptionPane.showMessageDialog(null, "Value must be a positive integer!");}
-                            if (time > 0) {this.monitors.get("RTPC").eventResetTime_current = time;} 
-                            else {JOptionPane.showMessageDialog(null, "Value must be a positive integer!");}   
-                        }
-                    }else if (resetOption == JOptionPane.NO_OPTION){
- 			this.monitors.get("RTPC").eventResetTime_current = 0;
-                    }	
-         }
-
-        if (actionCommand=="Reset RECON histograms"){
-            System.out.println("Reset RECON histograms");
-        	int resetOption = JOptionPane.showConfirmDialog(null, "Do you want to automaticaly reset RECON plots ?", " ", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
-                    if (resetOption == JOptionPane.YES_OPTION) {
-                        String  resetTiming = (String) JOptionPane.showInputDialog(null, "Update every (number of events)", " ", JOptionPane.PLAIN_MESSAGE, null, null, "10000");
-                        if (resetTiming != null) {    
-                            int time = this.monitors.get("RF").eventResetTime_default;
-                            try {time = Integer.parseInt(resetTiming);} 
-                            catch (NumberFormatException f) {JOptionPane.showMessageDialog(null, "Value must be a positive integer!");}
-                            if (time > 0) {this.monitors.get("RF").eventResetTime_current = time;} 
-                            else {JOptionPane.showMessageDialog(null, "Value must be a positive integer!");}   
-                        }
-                    }else if (resetOption == JOptionPane.NO_OPTION){
- 			this.monitors.get("RF").eventResetTime_current = 0;
-                    }	
-         }
-        
-        if (actionCommand=="Reset RF histograms"){
-            System.out.println("Reset RF histograms");
-        	int resetOption = JOptionPane.showConfirmDialog(null, "Do you want to automaticaly reset RF plots ?", " ", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
-                    if (resetOption == JOptionPane.YES_OPTION) {
-                        String  resetTiming = (String) JOptionPane.showInputDialog(null, "Update every (number of events)", " ", JOptionPane.PLAIN_MESSAGE, null, null, "10000");
-                        if (resetTiming != null) {    
-                            int time = this.monitors.get("HEL").eventResetTime_default;
-                            try {time = Integer.parseInt(resetTiming);} 
-                            catch (NumberFormatException f) {JOptionPane.showMessageDialog(null, "Value must be a positive integer!");}
-                            if (time > 0) {this.monitors.get("HEL").eventResetTime_current = time;} 
-                            else {JOptionPane.showMessageDialog(null, "Value must be a positive integer!");}   
-                        }
-                    }else if (resetOption == JOptionPane.NO_OPTION){
- 			this.monitors.get("HEL").eventResetTime_current = 0;
-                    }	
-         }
-        
-        if (actionCommand=="Reset HEL histograms"){
-            System.out.println("Reset HEL histograms");
-        	int resetOption = JOptionPane.showConfirmDialog(null, "Do you want to automaticaly reset HEL plots ?", " ", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
-                    if (resetOption == JOptionPane.YES_OPTION) {
-                        String  resetTiming = (String) JOptionPane.showInputDialog(null, "Update every (number of events)", " ", JOptionPane.PLAIN_MESSAGE, null, null, "10000");
-                        if (resetTiming != null) {    
-                            int time = this.monitors.get("HEL").eventResetTime_default;
-                            try {time = Integer.parseInt(resetTiming);} 
-                            catch (NumberFormatException f) {JOptionPane.showMessageDialog(null, "Value must be a positive integer!");}
-                            if (time > 0) {this.monitors.get("HEL").eventResetTime_current = time;} 
-                            else {JOptionPane.showMessageDialog(null, "Value must be a positive integer!");}   
-                        }
-                    }else if (resetOption == JOptionPane.NO_OPTION){
- 			this.monitors.get("HEL").eventResetTime_current = 0;
-                    }	
-         }
-        
-        if (actionCommand=="Reset Faraday Cup histograms"){
-            System.out.println("Reset Faraday Cup histograms");
-        	int resetOption = JOptionPane.showConfirmDialog(null, "Do you want to automaticaly reset Faraday Cup plots ?", " ", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
-                    if (resetOption == JOptionPane.YES_OPTION) {
-                        String  resetTiming = (String) JOptionPane.showInputDialog(null, "Update every (number of events)", " ", JOptionPane.PLAIN_MESSAGE, null, null, "10000");
-                        if (resetTiming != null) {    
-                            int time = this.monitors.get("FCUP").eventResetTime_default;
-                            try {time = Integer.parseInt(resetTiming);} 
-                            catch (NumberFormatException f) {JOptionPane.showMessageDialog(null, "Value must be a positive integer!");}
-                            if (time > 0) {this.monitors.get("FCUP").eventResetTime_current = time;} 
-                            else {JOptionPane.showMessageDialog(null, "Value must be a positive integer!");}   
-                        }
-                    }else if (resetOption == JOptionPane.NO_OPTION){
- 			this.monitors.get("FCUP").eventResetTime_current = 0;
-                    }	
-         }
-        
-        if (actionCommand=="Reset TRIGGER histograms"){
-            System.out.println("Reset TRIGGER histograms");
-        	int resetOption = JOptionPane.showConfirmDialog(null, "Do you want to automaticaly reset Trigger plots ?", " ", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
-                    if (resetOption == JOptionPane.YES_OPTION) {
-                        String  resetTiming = (String) JOptionPane.showInputDialog(null, "Update every (number of events)", " ", JOptionPane.PLAIN_MESSAGE, null, null, "10000");
-                        if (resetTiming != null) {    
-                            int time = this.monitors.get("Trigger").eventResetTime_default;
-                            try {time = Integer.parseInt(resetTiming);} 
-                            catch (NumberFormatException f) {JOptionPane.showMessageDialog(null, "Value must be a positive integer!");}
-                            if (time > 0) {this.monitors.get("Trigger").eventResetTime_current = time;} 
-                            else {JOptionPane.showMessageDialog(null, "Value must be a positive integer!");}   
-                        }
-                    }else if (resetOption == JOptionPane.NO_OPTION){
- 			this.monitors.get("Trigger").eventResetTime_current = 0;
-                    }	
-         }
-        
-        
+    public void stateChanged(ChangeEvent e) {
+        this.timerUpdate();
     }
+    
+    @Override
+    public void timerUpdate() {
+//        System.out.println("Time to update ...");
+        for(String key : monitors.keySet()) {
+            this.monitors.get(key).timerUpdate();
+        }
+        this.plotSummaries();
+   }
 
-   
+    public static void main(String[] args){
+        
+        OptionParser parser = new OptionParser();
+        
+        parser.addOption("-geometry", "1600x1000", "Select window size, e.g. 1600x1200");
+        parser.addOption("-tabs",     "",          "Select active tabs, e.g. BST:FTOF");
+        parser.parse(args);
+
+        int xSize = 1600;
+        int ySize = 1000;        
+        String geometry = parser.getOption("-geometry").stringValue();
+        if(!geometry.isEmpty()) {
+            if(geometry.split("x").length==2){
+                xSize = Integer.parseInt(geometry.split("x")[0]);
+                ySize = Integer.parseInt(geometry.split("x")[1]);
+            }
+        }
+        System.out.println("Setting windows size to " + xSize + "x" + ySize);
+        
+        EventViewer viewer = new EventViewer();
+        String tabs     = parser.getOption("-tabs").stringValue();
+        if(!tabs.isEmpty()) {           
+            if(tabs.split(":").length>0) {
+                for(String tab : viewer.monitors.keySet()) viewer.monitors.get(tab).setActive(false);
+                for(String tab: tabs.split(":")) {
+                    if(viewer.monitors.containsKey(tab.trim())) viewer.monitors.get(tab.trim()).setActive(true);
+                    System.out.println(tab + " monitor set to active");
+                }
+            }
+        }
+        else {
+            System.out.println("All monitors set to active");
+        }       
+        viewer.init();
+        
+        JFrame frame = new JFrame("CLAS12Mon");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        //frame.add(viewer.getPanel());
+        frame.add(viewer.mainPanel);
+        frame.setJMenuBar(viewer.menuBar);
+        frame.setSize(xSize, ySize);
+        frame.setVisible(true);
+    }
+       
 }

@@ -2,7 +2,6 @@ package org.clas.detectors;
 
 import java.util.Arrays;
 import org.clas.viewer.DetectorMonitor;
-import org.jlab.detector.calib.utils.ConstantsManager;
 import org.jlab.groot.data.H1F;
 import org.jlab.groot.data.H2F;
 import org.jlab.groot.group.DataGroup;
@@ -30,7 +29,6 @@ public class FTHODOmonitor extends DetectorMonitor {
     @Override
     public void createHistos() {
         // initialize canvas and create histograms
-        this.geometry.show();
         this.setNumberOfEvents(0);
 
         H1F summary = new H1F("summary", "summary", 232, 0.5, 232.5);
@@ -103,11 +101,7 @@ public class FTHODOmonitor extends DetectorMonitor {
     @Override
     public void processEvent(DataEvent event) {
 
-        if (this.getNumberOfEvents() >= super.eventResetTime_current && super.eventResetTime_current > 0){
-            resetEventListener();
-        }
-
-        // process event info and save into data group
+       // process event info and save into data group
         if (event.hasBank("FTHODO::adc") == true) {
             DataBank bank = event.getBank("FTHODO::adc");
             int rows = bank.rows();
@@ -142,7 +136,7 @@ public class FTHODOmonitor extends DetectorMonitor {
     }
 
     @Override
-    public void timerUpdate() {
+    public void analysisUpdate() {
 
     }
 

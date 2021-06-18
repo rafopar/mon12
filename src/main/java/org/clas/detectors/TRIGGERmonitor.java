@@ -4,7 +4,6 @@ package org.clas.detectors;
 import org.clas.viewer.DetectorMonitor;
 import org.jlab.groot.data.GraphErrors;
 import org.jlab.groot.data.H1F;
-import org.jlab.groot.data.H2F;
 import org.jlab.groot.fitter.DataFitter;
 import org.jlab.groot.group.DataGroup;
 import org.jlab.groot.math.F1D;
@@ -164,10 +163,6 @@ public class TRIGGERmonitor extends DetectorMonitor {
     @Override
     public void processEvent(DataEvent event) {
 
-        if (this.getNumberOfEvents() >= super.eventResetTime_current && super.eventResetTime_current > 0){
-            resetEventListener();
-        }  
-        
         for (int i=0; i<32; i++) if(isTrigBitSet(i)) ((H1F) this.getDataGroup().getItem(0,0,0).getData(0).get(0)).fill(i);
         for (int i=0; i<32; i++) if(isTrigBitSet(i)) this.getDetectorSummary().getH1F("summary").fill(i);
         
@@ -316,7 +311,7 @@ public class TRIGGERmonitor extends DetectorMonitor {
     }
     
     @Override
-    public void timerUpdate() { 
+    public void analysisUpdate() { 
     	if(!datataking) return;
         getFits();
         fillFTOFGraphs();

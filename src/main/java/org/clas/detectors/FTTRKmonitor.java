@@ -143,10 +143,6 @@ public class FTTRKmonitor extends DetectorMonitor {
     @Override
     public void processEvent(DataEvent event) {
 
-        if (this.getNumberOfEvents() >= super.eventResetTime_current && super.eventResetTime_current > 0) {
-            resetEventListener();
-        }
-
         if (this.runNumber == 0) {
             int numberOfEvents = this.getNumberOfEvents();
             if (event.hasBank("RUN::config")) {
@@ -195,7 +191,7 @@ public class FTTRKmonitor extends DetectorMonitor {
     }
 
     @Override
-    public void timerUpdate() {
+    public void analysisUpdate() {
         if (this.getNumberOfEvents() > 0) {
             for (int layer = 1; layer <= nlayer; layer++) {
 //                H1F raw1 = this.getDataGroup().getItem(0,layer,0).getH1F("timeMaxTmp1_layer"+layer);

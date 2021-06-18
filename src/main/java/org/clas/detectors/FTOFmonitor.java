@@ -10,9 +10,11 @@ import org.jlab.io.base.DataBank;
 import org.jlab.io.base.DataEvent;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import org.jlab.utils.groups.IndexedList.IndexGenerator;
 import java.util.Map;
+import org.jlab.utils.groups.IndexedTable;
 
 public class FTOFmonitor  extends DetectorMonitor {
 
@@ -30,6 +32,8 @@ public class FTOFmonitor  extends DetectorMonitor {
         ftofHits[0] = new FTOFHits("PANEL1A");
         ftofHits[1] = new FTOFHits("PANEL1B");
         ftofHits[2] = new FTOFHits("PANEL2");
+        this.getCcdb().setVariation("default");
+        this.getCcdb().init(Arrays.asList(new String[]{"/calibration/ftof/time_jitter"}));
     }
 
     @Override
@@ -165,39 +169,39 @@ public class FTOFmonitor  extends DetectorMonitor {
     @Override
     public void plotHistos() {
     	
-        for(int lay=0; lay<3; lay++) {
-        	for(int ord=0; ord<2; ord++) {
-            this.getDetectorCanvas().getCanvas("ADC Occupancies").cd(lay*2+ord);
-            this.getDetectorCanvas().getCanvas("ADC Occupancies").getPad(lay*2+ord).getAxisZ().setLog(getLogZ());
-            this.getDetectorCanvas().getCanvas("ADC Occupancies").draw(this.getDataGroup().getItem(0,lay,0).getH2F("occADC"+lay+ord));
-            this.getDetectorCanvas().getCanvas("TDC Occupancies").cd(lay*2+ord);
-            this.getDetectorCanvas().getCanvas("TDC Occupancies").getPad(lay*2+ord).getAxisZ().setLog(getLogZ());
-            this.getDetectorCanvas().getCanvas("TDC Occupancies").draw(this.getDataGroup().getItem(0,lay,0).getH2F("occTDC"+lay+ord));
+        for (int lay = 0; lay < 3; lay++) {
+            for (int ord = 0; ord < 2; ord++) {
+                this.getDetectorCanvas().getCanvas("ADC Occupancies").cd(lay * 2 + ord);
+                this.getDetectorCanvas().getCanvas("ADC Occupancies").getPad(lay * 2 + ord).getAxisZ().setLog(getLogZ());
+                this.getDetectorCanvas().getCanvas("ADC Occupancies").draw(this.getDataGroup().getItem(0, lay, 0).getH2F("occADC" + lay + ord));
+                this.getDetectorCanvas().getCanvas("TDC Occupancies").cd(lay * 2 + ord);
+                this.getDetectorCanvas().getCanvas("TDC Occupancies").getPad(lay * 2 + ord).getAxisZ().setLog(getLogZ());
+                this.getDetectorCanvas().getCanvas("TDC Occupancies").draw(this.getDataGroup().getItem(0, lay, 0).getH2F("occTDC" + lay + ord));
+            }
         }
-        }
-        
-        for(int sec=1; sec<7; sec++) {
-            if(getActiveSector()==sec) {
-               for(int lay=0; lay < 3; lay++) {
-            	   for(int ord=0; ord < 2; ord++) {
-                   this.getDetectorCanvas().getCanvas("ADC Histograms").cd(lay*2+ord);
-                   this.getDetectorCanvas().getCanvas("ADC Histograms").getPad(lay*2+ord).getAxisZ().setLog(getLogZ());
-                   this.getDetectorCanvas().getCanvas("ADC Histograms").draw(this.getDataGroup().getItem(sec,lay,0).getH2F("datADC"+sec+lay+ord));
-                   this.getDetectorCanvas().getCanvas("FADC timing").cd(lay*2+ord);
-                   this.getDetectorCanvas().getCanvas("FADC timing").getPad(lay*2+ord).getAxisZ().setLog(getLogZ());
-                   this.getDetectorCanvas().getCanvas("FADC timing").draw(this.getDataGroup().getItem(sec,lay,0).getH2F("timeFADC"+sec+lay+ord));
-                   this.getDetectorCanvas().getCanvas("TDC Histograms").cd(lay*2+ord);
-                   this.getDetectorCanvas().getCanvas("TDC Histograms").getPad(lay*2+ord).getAxisZ().setLog(getLogZ());
-                   this.getDetectorCanvas().getCanvas("TDC Histograms").draw(this.getDataGroup().getItem(sec,lay,0).getH2F("datTDC"+sec+lay+ord));
-               }
-      	           this.getDetectorCanvas().getCanvas("GMEAN").cd(lay*2+0);
-                   this.getDetectorCanvas().getCanvas("GMEAN").getPad(lay*2+0).getAxisZ().setLog(getLogZ());
-                   this.getDetectorCanvas().getCanvas("GMEAN").draw(this.getDataGroup().getItem(sec,lay,0).getH2F("GMEAN"+sec+lay));
-      	           this.getDetectorCanvas().getCanvas("GMEAN").cd(lay*2+1);
-                   this.getDetectorCanvas().getCanvas("GMEAN").getPad(lay*2+1).getAxisZ().setLog(getLogZ());
-                   this.getDetectorCanvas().getCanvas("GMEAN").draw(this.getDataGroup().getItem(sec,lay,0).getH2F("TDIF"+sec+lay));
-               }
-    	       }
+
+        for (int sec = 1; sec < 7; sec++) {
+            if (getActiveSector() == sec) {
+                for (int lay = 0; lay < 3; lay++) {
+                    for (int ord = 0; ord < 2; ord++) {
+                        this.getDetectorCanvas().getCanvas("ADC Histograms").cd(lay * 2 + ord);
+                        this.getDetectorCanvas().getCanvas("ADC Histograms").getPad(lay * 2 + ord).getAxisZ().setLog(getLogZ());
+                        this.getDetectorCanvas().getCanvas("ADC Histograms").draw(this.getDataGroup().getItem(sec, lay, 0).getH2F("datADC" + sec + lay + ord));
+                        this.getDetectorCanvas().getCanvas("FADC timing").cd(lay * 2 + ord);
+                        this.getDetectorCanvas().getCanvas("FADC timing").getPad(lay * 2 + ord).getAxisZ().setLog(getLogZ());
+                        this.getDetectorCanvas().getCanvas("FADC timing").draw(this.getDataGroup().getItem(sec, lay, 0).getH2F("timeFADC" + sec + lay + ord));
+                        this.getDetectorCanvas().getCanvas("TDC Histograms").cd(lay * 2 + ord);
+                        this.getDetectorCanvas().getCanvas("TDC Histograms").getPad(lay * 2 + ord).getAxisZ().setLog(getLogZ());
+                        this.getDetectorCanvas().getCanvas("TDC Histograms").draw(this.getDataGroup().getItem(sec, lay, 0).getH2F("datTDC" + sec + lay + ord));
+                    }
+                    this.getDetectorCanvas().getCanvas("GMEAN").cd(lay * 2 + 0);
+                    this.getDetectorCanvas().getCanvas("GMEAN").getPad(lay * 2 + 0).getAxisZ().setLog(getLogZ());
+                    this.getDetectorCanvas().getCanvas("GMEAN").draw(this.getDataGroup().getItem(sec, lay, 0).getH2F("GMEAN" + sec + lay));
+                    this.getDetectorCanvas().getCanvas("GMEAN").cd(lay * 2 + 1);
+                    this.getDetectorCanvas().getCanvas("GMEAN").getPad(lay * 2 + 1).getAxisZ().setLog(getLogZ());
+                    this.getDetectorCanvas().getCanvas("GMEAN").draw(this.getDataGroup().getItem(sec, lay, 0).getH2F("TDIF" + sec + lay));
+                }
+            }
         }
         
         this.getDetectorCanvas().getCanvas("ADC Occupancies").update();
@@ -205,21 +209,29 @@ public class FTOFmonitor  extends DetectorMonitor {
         this.getDetectorCanvas().getCanvas("ADC Histograms").update();
         this.getDetectorCanvas().getCanvas("TDC Histograms").update();
         this.getDetectorCanvas().getCanvas("GMEAN").update();
-//      this.getDetectorView().getView().repaint();
-//      this.getDetectorView().update();
-
     }           
 
     @Override
     public void processEvent(DataEvent event) {
         
-        if (this.getNumberOfEvents() >= super.eventResetTime_current && super.eventResetTime_current > 0){
-            resetEventListener();
-        }
-	    
 	    clear(0); clear(1); clear(2); ttdcs.clear(); fadcs.clear(); ftdcs.clear(); ftpmt.clear() ; fapmt.clear();    	
 
 	            
+        int triggerPhase=0;
+        if(event.hasBank("RUN::config")) {
+            DataBank bank = event.getBank("RUN::config");
+            int runNumber  = bank.getInt("run", 0);
+            long timestamp = bank.getLong("timestamp",0);    
+            IndexedTable jitter = this.getCcdb().getConstants(runNumber, "/calibration/ftof/time_jitter");
+            this.period  = jitter.getDoubleValue("period",0,0,0);
+            this.phase   = jitter.getIntValue("phase",0,0,0);
+            this.ncycles = jitter.getIntValue("cycles",0,0,0);           
+//            System.out.println(period + phase + ncycles + " " + timestamp + " " + triggerPhase0);
+            if(ncycles>0){
+                triggerPhase  = (int) ((timestamp+phase)%ncycles); // TI derived phase correction due to TDC and FADC clock differences
+            }
+        }
+        
         if(event.hasBank("FTOF::tdc")==true){
             DataBank  bank = event.getBank("FTOF::tdc");
             for(int i = 0; i < bank.rows(); i++){
@@ -228,7 +240,7 @@ public class FTOFmonitor  extends DetectorMonitor {
                 int  lr = bank.getByte("order",i);                       
                 int  ip = bank.getShort("component",i);
                 
-                float    tdcd = bank.getInt("TDC",i)*0.02345f-triggerPhase*4;
+                float    tdcd = (float) (bank.getInt("TDC",i)*this.tdcconv-triggerPhase*this.period);
                 
                 int lay=il-1; int ord=lr-2;
                 if(tdcd>0) {               	
@@ -400,7 +412,7 @@ public class FTOFmonitor  extends DetectorMonitor {
     }    
     
     @Override
-    public void timerUpdate() {
+    public void analysisUpdate() {
 
     }
 
