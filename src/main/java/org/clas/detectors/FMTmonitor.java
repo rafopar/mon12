@@ -65,7 +65,8 @@ public class FMTmonitor extends DetectorMonitor {
         for (int layer = 1; layer < maxNumberLayers + 1; layer++) {
             this.numberStrips[layer] = dbprovider.getInteger("/geometry/fmt/fmt_global/N_strip", 0);
         }
-
+        dbprovider.disconnect();
+        
         this.mask = new boolean[maxNumberSectors + 1][maxNumberLayers + 1][maxNumberStrips + 1];
 
         for (int sector = 1; sector <= maxNumberSectors; sector++) {

@@ -72,7 +72,8 @@ public class BMTmonitor extends DetectorMonitor {
                 this.isZ[layer] = false;
             }
         }
-
+        dbprovider.disconnect();
+        
         this.mask = new boolean[maxNumberSectors + 1][maxNumberLayers + 1][maxNumberStrips + 1];
 
         for (int sector = 1; sector <= maxNumberSectors; sector++) {

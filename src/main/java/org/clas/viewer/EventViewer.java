@@ -86,6 +86,7 @@ public class EventViewer implements IDataEventListener, DetectorListener, Action
     private int histoResetEvents = 0;
         
     public String outPath = null; 
+    public String elog = null;
     
     // detector monitors
     public LinkedHashMap<String, DetectorMonitor> monitors = new LinkedHashMap<>();
@@ -308,23 +309,26 @@ public class EventViewer implements IDataEventListener, DetectorListener, Action
         GStyle.getAxisAttributesY().setTitleFontSize(18);
         GStyle.getAxisAttributesY().setLabelFontSize(14);
         
-        CLAS12Canvas    = new EmbeddedCanvasTabbed("FD");
-        CLAS12Canvas.getCanvas("FD").divide(3,3);
-        CLAS12Canvas.getCanvas("FD").setGridX(false);
-        CLAS12Canvas.getCanvas("FD").setGridY(false); 
-        CLAS12Canvas.addCanvas("CD");
-        CLAS12Canvas.getCanvas("CD").divide(2,2);
-        CLAS12Canvas.getCanvas("CD").setGridX(false);
-        CLAS12Canvas.getCanvas("CD").setGridY(false);
-        CLAS12Canvas.addCanvas("FT");
-        CLAS12Canvas.getCanvas("FT").divide(1,3);
-        CLAS12Canvas.getCanvas("FT").setGridX(false);
-        CLAS12Canvas.getCanvas("FT").setGridY(false);
-        CLAS12Canvas.addCanvas("RF/HEL/JITTER/TRIGGER");
-        CLAS12Canvas.getCanvas("RF/HEL/JITTER/TRIGGER").divide(2,2);
-        CLAS12Canvas.getCanvas("RF/HEL/JITTER/TRIGGER").setGridX(false);
-        CLAS12Canvas.getCanvas("RF/HEL/JITTER/TRIGGER").setGridY(false);
-
+        if(this.monitors.get("DC").isActive() ||
+           this.monitors.get("HTCC").isActive() ||
+           this.monitors.get("LTCC").isActive() ||
+           this.monitors.get("FTOF").isActive() ||
+           this.monitors.get("ECAL").isActive() ||
+           this.monitors.get("RICH").isActive()) {
+            this.createSummary("FD",3,3);
+        }
+        if(this.monitors.get("BST").isActive() ||
+           this.monitors.get("BMT").isActive() ||
+           this.monitors.get("CTOF").isActive() ||
+           this.monitors.get("CND").isActive()) {
+            this.createSummary("CD",2,2);
+        }
+        if(this.monitors.get("FTCAL").isActive() ||
+           this.monitors.get("FTHODO").isActive() ||
+           this.monitors.get("FTTRK").isActive()) {
+            this.createSummary("FT",1,3);
+        }
+        this.createSummary("RF/HEL/JITTER/TRIGGER",2,2);
         
         JPanel    CLAS12View = new JPanel(new BorderLayout());
         JSplitPane splitPanel = new JSplitPane();
@@ -351,7 +355,16 @@ public class EventViewer implements IDataEventListener, DetectorListener, Action
         tabbedpane.add(splitPanel,"Summary");
         
     }
-      
+    
+    public void createSummary(String name, int nx, int ny) {
+        if(CLAS12Canvas==null)
+            CLAS12Canvas = new EmbeddedCanvasTabbed(name);
+        else
+            CLAS12Canvas.addCanvas(name);
+        CLAS12Canvas.getCanvas(name).divide(nx,ny);
+        CLAS12Canvas.getCanvas(name).setGridX(false);
+        CLAS12Canvas.getCanvas(name).setGridY(false); 
+    }
     public void initTabs() {
 
         this.plotSummaries();
@@ -438,27 +451,36 @@ public class EventViewer implements IDataEventListener, DetectorListener, Action
                 System.out.println( exc.getMessage());
             }
             
-            String fileName1 = data + "/summary_FD_"+tstamp+".png";
-            System.out.println(fileName1);
-            CLAS12Canvas.getCanvas("FD").save(fileName1);
-            String fileName2 = data + "/summary_CD_"+tstamp+".png";
-            System.out.println(fileName2);
-            CLAS12Canvas.getCanvas("CD").save(fileName2);
-            String fileName3 = data + "/summary_FT_"+tstamp+".png";
-            System.out.println(fileName3);
-            CLAS12Canvas.getCanvas("FT").save(fileName3);
+            if(this.CLAS12Canvas.getCanvas("FD")!=null) {
+                String fileName1 = data + "/summary_FD_"+tstamp+".png";
+                System.out.println(fileName1);
+                CLAS12Canvas.getCanvas("FD").save(fileName1);
+            }
+            if(this.CLAS12Canvas.getCanvas("CD")!=null) {
+                String fileName2 = data + "/summary_CD_"+tstamp+".png";
+                System.out.println(fileName2);
+                CLAS12Canvas.getCanvas("CD").save(fileName2);
+            }
+            if(this.CLAS12Canvas.getCanvas("FT")!=null) {
+                String fileName3 = data + "/summary_FT_"+tstamp+".png";
+                System.out.println(fileName3);
+                CLAS12Canvas.getCanvas("FT").save(fileName3);
+            }
             String fileName4 = data + "/summary_RHJT_"+tstamp+".png";
             System.out.println(fileName4);
             CLAS12Canvas.getCanvas("RF/HEL/JITTER/TRIGGER").save(fileName4);
             
-            LogEntry entry = new LogEntry("All online monitoring histograms for run number " + this.runNumber, "HBLOG");
+            LogEntry entry = new LogEntry("All online monitoring histograms for run number " + this.runNumber, this.elog);
             
             System.out.println("Starting to upload all monitoring plots");
             
             try{
-                entry.addAttachment(data + "/summary_FD_" + tstamp + ".png", "Summary plots for the forward detector");
-                entry.addAttachment(data + "/summary_CD_" + tstamp + ".png", "Summary plots for the central detector");
-                entry.addAttachment(data + "/summary_FT_" + tstamp + ".png", "Summary plots for the forward tagger");
+                if(this.CLAS12Canvas.getCanvas("FD")!=null)
+                    entry.addAttachment(data + "/summary_FD_" + tstamp + ".png", "Summary plots for the forward detector");
+                if(this.CLAS12Canvas.getCanvas("CD")!=null)
+                    entry.addAttachment(data + "/summary_CD_" + tstamp + ".png", "Summary plots for the central detector");
+                if(this.CLAS12Canvas.getCanvas("FT")!=null) 
+                    entry.addAttachment(data + "/summary_FT_" + tstamp + ".png", "Summary plots for the forward tagger");
                 entry.addAttachment(data + "/summary_RHJT_" + tstamp + ".png", "Summary plots RF/HEL/JITTER/TRIGGER");
                 System.out.println("Summary plots uploaded");
                 for(String key : monitors.keySet()) {
@@ -652,95 +674,90 @@ public class EventViewer implements IDataEventListener, DetectorListener, Action
         
         /////////////////////////////////////////////////
         /// FD:
-        
-        // DC
-        this.CLAS12Canvas.getCanvas("FD").cd(0);
-        if(this.monitors.get("DC").getDetectorSummary()!=null) this.CLAS12Canvas.getCanvas("FD").draw(this.monitors.get("DC").getDetectorSummary().getH1F("summary")); 
-        // HTTC
-        this.CLAS12Canvas.getCanvas("FD").cd(1);
-        if(this.monitors.get("HTCC").getDetectorSummary()!=null) this.CLAS12Canvas.getCanvas("FD").draw(this.monitors.get("HTCC").getDetectorSummary().getH1F("summary"));
-        // LTTC
-        this.CLAS12Canvas.getCanvas("FD").cd(2);
-        if(this.monitors.get("LTCC").getDetectorSummary()!=null) this.CLAS12Canvas.getCanvas("FD").draw(this.monitors.get("LTCC").getDetectorSummary().getH1F("summary"));
-        // RICH
-        this.CLAS12Canvas.getCanvas("FD").cd(3);
-        this.CLAS12Canvas.getCanvas("FD").getPad(3).getAxisZ().setLog(true);
-        if(this.monitors.get("RICH").getDetectorSummary()!=null) this.CLAS12Canvas.getCanvas("FD").draw(this.monitors.get("RICH").getDetectorSummary().getH2F("summary"));
-        
-        // ECAL 
-        this.CLAS12Canvas.getCanvas("FD").cd(4); this.CLAS12Canvas.getCanvas("FD").getPad(4).setAxisRange(0.5,6.5,0.5,1.5);
-        if(this.monitors.get("ECAL").getDetectorSummary()!=null) { 
-        	this.CLAS12Canvas.getCanvas("FD").draw(this.monitors.get("ECAL").getDetectorSummary().getGraph("PCALu"));
-        	this.CLAS12Canvas.getCanvas("FD").draw(this.monitors.get("ECAL").getDetectorSummary().getGraph("PCALv"),"same");
-        	this.CLAS12Canvas.getCanvas("FD").draw(this.monitors.get("ECAL").getDetectorSummary().getGraph("PCALw"),"same");
-        	this.CLAS12Canvas.getCanvas("FD").draw(this.monitors.get("ECAL").getDetectorSummary().getF1D("p0"),"same");
+        if(this.CLAS12Canvas.getCanvas("FD")!=null) {
+            // DC
+            this.CLAS12Canvas.getCanvas("FD").cd(0);
+            if(this.monitors.get("DC").getDetectorSummary()!=null) this.CLAS12Canvas.getCanvas("FD").draw(this.monitors.get("DC").getDetectorSummary().getH1F("summary")); 
+            // HTTC
+            this.CLAS12Canvas.getCanvas("FD").cd(1);
+            if(this.monitors.get("HTCC").getDetectorSummary()!=null) this.CLAS12Canvas.getCanvas("FD").draw(this.monitors.get("HTCC").getDetectorSummary().getH1F("summary"));
+            // LTTC
+            this.CLAS12Canvas.getCanvas("FD").cd(2);
+            if(this.monitors.get("LTCC").getDetectorSummary()!=null) this.CLAS12Canvas.getCanvas("FD").draw(this.monitors.get("LTCC").getDetectorSummary().getH1F("summary"));
+            // RICH
+            this.CLAS12Canvas.getCanvas("FD").cd(3);
+            this.CLAS12Canvas.getCanvas("FD").getPad(3).getAxisZ().setLog(true);
+            if(this.monitors.get("RICH").getDetectorSummary()!=null) this.CLAS12Canvas.getCanvas("FD").draw(this.monitors.get("RICH").getDetectorSummary().getH2F("summary"));
+
+            // ECAL 
+            this.CLAS12Canvas.getCanvas("FD").cd(4); this.CLAS12Canvas.getCanvas("FD").getPad(4).setAxisRange(0.5,6.5,0.5,1.5);
+            if(this.monitors.get("ECAL").getDetectorSummary()!=null) { 
+                    this.CLAS12Canvas.getCanvas("FD").draw(this.monitors.get("ECAL").getDetectorSummary().getGraph("PCALu"));
+                    this.CLAS12Canvas.getCanvas("FD").draw(this.monitors.get("ECAL").getDetectorSummary().getGraph("PCALv"),"same");
+                    this.CLAS12Canvas.getCanvas("FD").draw(this.monitors.get("ECAL").getDetectorSummary().getGraph("PCALw"),"same");
+                    this.CLAS12Canvas.getCanvas("FD").draw(this.monitors.get("ECAL").getDetectorSummary().getF1D("p0"),"same");
+            }
+            this.CLAS12Canvas.getCanvas("FD").cd(5); this.CLAS12Canvas.getCanvas("FD").getPad(5).setAxisRange(0.5,6.5,0.5,1.5);
+            if(this.monitors.get("ECAL").getDetectorSummary()!=null) {
+                    this.CLAS12Canvas.getCanvas("FD").draw(this.monitors.get("ECAL").getDetectorSummary().getGraph("ECinu"));
+                    this.CLAS12Canvas.getCanvas("FD").draw(this.monitors.get("ECAL").getDetectorSummary().getGraph("ECinv"),"same");
+                    this.CLAS12Canvas.getCanvas("FD").draw(this.monitors.get("ECAL").getDetectorSummary().getGraph("ECinw"),"same");
+                    this.CLAS12Canvas.getCanvas("FD").draw(this.monitors.get("ECAL").getDetectorSummary().getGraph("ECoutu"),"same");
+                    this.CLAS12Canvas.getCanvas("FD").draw(this.monitors.get("ECAL").getDetectorSummary().getGraph("ECoutv"),"same");
+                    this.CLAS12Canvas.getCanvas("FD").draw(this.monitors.get("ECAL").getDetectorSummary().getGraph("ECoutw"),"same");
+                    this.CLAS12Canvas.getCanvas("FD").draw(this.monitors.get("ECAL").getDetectorSummary().getF1D("p0"),"same");
+            }
+            // FTOF:
+            this.CLAS12Canvas.getCanvas("FD").cd(6);
+            this.CLAS12Canvas.getCanvas("FD").getPad(6).getAxisZ().setLog(true);
+            if(this.monitors.get("FTOF").getDetectorSummary()!=null) this.CLAS12Canvas.getCanvas("FD").draw(this.monitors.get("FTOF").getDetectorSummary().getH1F("sum_p1"));
+            this.CLAS12Canvas.getCanvas("FD").cd(7);
+            this.CLAS12Canvas.getCanvas("FD").getPad(7).getAxisZ().setLog(true);
+            if(this.monitors.get("FTOF").getDetectorSummary()!=null) this.CLAS12Canvas.getCanvas("FD").draw(this.monitors.get("FTOF").getDetectorSummary().getH1F("sum_p2"));
+            this.CLAS12Canvas.getCanvas("FD").cd(8);
+            this.CLAS12Canvas.getCanvas("FD").getPad(8).getAxisZ().setLog(true);
+            if(this.monitors.get("FTOF").getDetectorSummary()!=null) this.CLAS12Canvas.getCanvas("FD").draw(this.monitors.get("FTOF").getDetectorSummary().getH1F("sum_p3"));
         }
-        this.CLAS12Canvas.getCanvas("FD").cd(5); this.CLAS12Canvas.getCanvas("FD").getPad(5).setAxisRange(0.5,6.5,0.5,1.5);
-        if(this.monitors.get("ECAL").getDetectorSummary()!=null) {
-        	this.CLAS12Canvas.getCanvas("FD").draw(this.monitors.get("ECAL").getDetectorSummary().getGraph("ECinu"));
-        	this.CLAS12Canvas.getCanvas("FD").draw(this.monitors.get("ECAL").getDetectorSummary().getGraph("ECinv"),"same");
-        	this.CLAS12Canvas.getCanvas("FD").draw(this.monitors.get("ECAL").getDetectorSummary().getGraph("ECinw"),"same");
-        	this.CLAS12Canvas.getCanvas("FD").draw(this.monitors.get("ECAL").getDetectorSummary().getGraph("ECoutu"),"same");
-        	this.CLAS12Canvas.getCanvas("FD").draw(this.monitors.get("ECAL").getDetectorSummary().getGraph("ECoutv"),"same");
-        	this.CLAS12Canvas.getCanvas("FD").draw(this.monitors.get("ECAL").getDetectorSummary().getGraph("ECoutw"),"same");
-        	this.CLAS12Canvas.getCanvas("FD").draw(this.monitors.get("ECAL").getDetectorSummary().getF1D("p0"),"same");
-        }
-        
-        // FMT:
-//        this.CLAS12Canvas.getCanvas("FD").cd(6);
-//        this.CLAS12Canvas.getCanvas("FD").getPad(6).getAxisZ().setLog(true);
-//        if(this.monitors.get("ECAL").getDetectorSummary()!=null) this.CLAS12Canvas.getCanvas("FD").draw(this.monitors.get("ECAL").getDetectorSummary().getH2F("summary"));
-       
-        // FTOF:
-        this.CLAS12Canvas.getCanvas("FD").cd(6);
-        this.CLAS12Canvas.getCanvas("FD").getPad(6).getAxisZ().setLog(true);
-        if(this.monitors.get("FTOF").getDetectorSummary()!=null) this.CLAS12Canvas.getCanvas("FD").draw(this.monitors.get("FTOF").getDetectorSummary().getH1F("sum_p1"));
-        this.CLAS12Canvas.getCanvas("FD").cd(7);
-        this.CLAS12Canvas.getCanvas("FD").getPad(7).getAxisZ().setLog(true);
-        if(this.monitors.get("FTOF").getDetectorSummary()!=null) this.CLAS12Canvas.getCanvas("FD").draw(this.monitors.get("FTOF").getDetectorSummary().getH1F("sum_p2"));
-        this.CLAS12Canvas.getCanvas("FD").cd(8);
-        this.CLAS12Canvas.getCanvas("FD").getPad(8).getAxisZ().setLog(true);
-        if(this.monitors.get("FTOF").getDetectorSummary()!=null) this.CLAS12Canvas.getCanvas("FD").draw(this.monitors.get("FTOF").getDetectorSummary().getH1F("sum_p3"));
         
         //////////////////////////////////////////////////
-        ///  CD:
-        
-        // CND
-        this.CLAS12Canvas.getCanvas("CD").cd(0);
-        if(this.monitors.get("CND").getDetectorSummary()!=null) this.CLAS12Canvas.getCanvas("CD").draw(this.monitors.get("CND").getDetectorSummary().getH1F("summary"));
-        // CTOF
-        this.CLAS12Canvas.getCanvas("CD").cd(1);
-        if(this.monitors.get("CTOF").getDetectorSummary()!=null) this.CLAS12Canvas.getCanvas("CD").draw(this.monitors.get("CTOF").getDetectorSummary().getH1F("summary"));
-//        // RTPC
-//        this.CLAS12Canvas.getCanvas("CD").cd(2);
-//        if(this.monitors.get("RTPC").getDetectorSummary()!=null) this.CLAS12Canvas.getCanvas("CD").draw(this.monitors.get("RTPC").getDetectorSummary().getH1F("summary"));
-//        // FMT
-//        this.CLAS12Canvas.getCanvas("CD").cd(3);
-//        if(this.monitors.get("FMT").getDetectorSummary()!=null) this.CLAS12Canvas.getCanvas("CD").draw(this.monitors.get("FMT").getDetectorSummary().getH1F("summary"));
-        // BMT
-        this.CLAS12Canvas.getCanvas("CD").cd(2);
-        this.CLAS12Canvas.getCanvas("CD").getPad(2).getAxisZ().setLog(true);
-        if(this.monitors.get("BMT").getDetectorSummary()!=null) this.CLAS12Canvas.getCanvas("CD").draw(this.monitors.get("BMT").getDetectorSummary().getH1F("summary"));
-        // BST
-        this.CLAS12Canvas.getCanvas("CD").cd(3);
-        this.CLAS12Canvas.getCanvas("CD").getPad(3).getAxisZ().setLog(true);
-        if(this.monitors.get("BST").getDetectorSummary()!=null) this.CLAS12Canvas.getCanvas("CD").draw(this.monitors.get("BST").getDetectorSummary().getH2F("summary"));
-        
+            ///  CD:
+            if(this.CLAS12Canvas.getCanvas("CD")!=null) {
+            // CND
+            this.CLAS12Canvas.getCanvas("CD").cd(0);
+            if(this.monitors.get("CND").getDetectorSummary()!=null) this.CLAS12Canvas.getCanvas("CD").draw(this.monitors.get("CND").getDetectorSummary().getH1F("summary"));
+            // CTOF
+            this.CLAS12Canvas.getCanvas("CD").cd(1);
+            if(this.monitors.get("CTOF").getDetectorSummary()!=null) this.CLAS12Canvas.getCanvas("CD").draw(this.monitors.get("CTOF").getDetectorSummary().getH1F("summary"));
+    //        // RTPC
+    //        this.CLAS12Canvas.getCanvas("CD").cd(2);
+    //        if(this.monitors.get("RTPC").getDetectorSummary()!=null) this.CLAS12Canvas.getCanvas("CD").draw(this.monitors.get("RTPC").getDetectorSummary().getH1F("summary"));
+    //        // FMT
+    //        this.CLAS12Canvas.getCanvas("CD").cd(3);
+    //        if(this.monitors.get("FMT").getDetectorSummary()!=null) this.CLAS12Canvas.getCanvas("CD").draw(this.monitors.get("FMT").getDetectorSummary().getH1F("summary"));
+            // BMT
+            this.CLAS12Canvas.getCanvas("CD").cd(2);
+            this.CLAS12Canvas.getCanvas("CD").getPad(2).getAxisZ().setLog(true);
+            if(this.monitors.get("BMT").getDetectorSummary()!=null) this.CLAS12Canvas.getCanvas("CD").draw(this.monitors.get("BMT").getDetectorSummary().getH1F("summary"));
+            // BST
+            this.CLAS12Canvas.getCanvas("CD").cd(3);
+            this.CLAS12Canvas.getCanvas("CD").getPad(3).getAxisZ().setLog(true);
+            if(this.monitors.get("BST").getDetectorSummary()!=null) this.CLAS12Canvas.getCanvas("CD").draw(this.monitors.get("BST").getDetectorSummary().getH2F("summary"));
+        }
         
         
         ///////////////////////////////////////////////////
         // FT:
-        
-        // FTCAL
-        this.CLAS12Canvas.getCanvas("FT").cd(0);
-        if(this.monitors.get("FTCAL").getDetectorSummary()!=null) this.CLAS12Canvas.getCanvas("FT").draw(this.monitors.get("FTCAL").getDetectorSummary().getH1F("summary"));
-        // FTHODO
-        this.CLAS12Canvas.getCanvas("FT").cd(1);
-        if(this.monitors.get("FTHODO").getDetectorSummary()!=null) this.CLAS12Canvas.getCanvas("FT").draw(this.monitors.get("FTHODO").getDetectorSummary().getH1F("summary"));
-        // FTTRK
-        this.CLAS12Canvas.getCanvas("FT").cd(2);
-        if(this.monitors.get("FTTRK").getDetectorSummary()!=null) this.CLAS12Canvas.getCanvas("FT").draw(this.monitors.get("FTTRK").getDetectorSummary().getH1F("summary"));
-        
+        if(this.CLAS12Canvas.getCanvas("FT")!=null) {
+            // FTCAL
+            this.CLAS12Canvas.getCanvas("FT").cd(0);
+            if(this.monitors.get("FTCAL").getDetectorSummary()!=null) this.CLAS12Canvas.getCanvas("FT").draw(this.monitors.get("FTCAL").getDetectorSummary().getH1F("summary"));
+            // FTHODO
+            this.CLAS12Canvas.getCanvas("FT").cd(1);
+            if(this.monitors.get("FTHODO").getDetectorSummary()!=null) this.CLAS12Canvas.getCanvas("FT").draw(this.monitors.get("FTHODO").getDetectorSummary().getH1F("summary"));
+            // FTTRK
+            this.CLAS12Canvas.getCanvas("FT").cd(2);
+            if(this.monitors.get("FTTRK").getDetectorSummary()!=null) this.CLAS12Canvas.getCanvas("FT").draw(this.monitors.get("FTTRK").getDetectorSummary().getH1F("summary"));
+        }
         ////////////////////////////////////////////////////
       
         ///////////////////////////////////////////////////
@@ -833,12 +850,18 @@ public class EventViewer implements IDataEventListener, DetectorListener, Action
     public void setCanvasUpdate(int time) {
         System.out.println("Setting " + time + " ms update interval");
         this.canvasUpdateTime = time;
-        this.CLAS12Canvas.getCanvas("FD").initTimer(time);
-        this.CLAS12Canvas.getCanvas("FD").update();
-        this.CLAS12Canvas.getCanvas("CD").initTimer(time);
-        this.CLAS12Canvas.getCanvas("CD").update();
-        this.CLAS12Canvas.getCanvas("FT").initTimer(time);
-        this.CLAS12Canvas.getCanvas("FT").update();
+        if(this.CLAS12Canvas.getCanvas("FD")!=null) {
+            this.CLAS12Canvas.getCanvas("FD").initTimer(time);
+            this.CLAS12Canvas.getCanvas("FD").update();
+        }
+        if (this.CLAS12Canvas.getCanvas("CD") != null) {
+            this.CLAS12Canvas.getCanvas("CD").initTimer(time);
+            this.CLAS12Canvas.getCanvas("CD").update();
+        }
+        if (this.CLAS12Canvas.getCanvas("FT") != null) {
+            this.CLAS12Canvas.getCanvas("FT").initTimer(time);
+            this.CLAS12Canvas.getCanvas("FT").update();
+        }
         this.CLAS12Canvas.getCanvas("RF/HEL/JITTER/TRIGGER").initTimer(time);
         this.CLAS12Canvas.getCanvas("RF/HEL/JITTER/TRIGGER").update();
         for(String key : monitors.keySet()) {
@@ -902,6 +925,7 @@ public class EventViewer implements IDataEventListener, DetectorListener, Action
         
         parser.addOption("-geometry", "1600x1000", "Select window size, e.g. 1600x1200");
         parser.addOption("-tabs",     "",          "Select active tabs, e.g. BST:FTOF");
+        parser.addOption("-logbook",  "HBLOG",     "Select electronic logbook");
         parser.parse(args);
 
         int xSize = 1600;
@@ -930,6 +954,8 @@ public class EventViewer implements IDataEventListener, DetectorListener, Action
             System.out.println("All monitors set to active");
         }       
         viewer.init();
+        
+        viewer.elog = parser.getOption("-logbook").stringValue();
         
         JFrame frame = new JFrame("CLAS12Mon");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
