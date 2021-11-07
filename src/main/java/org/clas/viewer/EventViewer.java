@@ -956,6 +956,7 @@ public class EventViewer implements IDataEventListener, DetectorListener, Action
         viewer.init();
         
         viewer.elog = parser.getOption("-logbook").stringValue();
+        System.out.println("Logbook set to " + viewer.elog);
         
         JFrame frame = new JFrame("CLAS12Mon");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
