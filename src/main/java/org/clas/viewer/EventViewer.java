@@ -938,10 +938,11 @@ public class EventViewer implements IDataEventListener, DetectorListener, Action
 
     public static void main(String[] args){
         
-        OptionParser parser = new OptionParser();
-        
+        OptionParser parser = new OptionParser("mon12");
+        parser.setRequiresInputList(false);
+        parser.setDescription("CLAS12 monitoring app");
         parser.addOption("-geometry", "1600x1000", "Select window size, e.g. 1600x1200");
-        parser.addOption("-tabs",     "",          "Select active tabs, e.g. BST:FTOF");
+        parser.addOption("-tabs",     "All",       "Select active tabs, e.g. BST:FTOF");
         parser.addOption("-logbook",  "HBLOG",     "Select electronic logbook");
         parser.parse(args);
 
@@ -958,7 +959,7 @@ public class EventViewer implements IDataEventListener, DetectorListener, Action
         
         EventViewer viewer = new EventViewer();
         String tabs     = parser.getOption("-tabs").stringValue();
-        if(!tabs.isEmpty()) {           
+        if(!tabs.equals("All")) {           
             if(tabs.split(":").length>0) {
                 for(String tab : viewer.monitors.keySet()) viewer.monitors.get(tab).setActive(false);
                 for(String tab: tabs.split(":")) {
@@ -975,7 +976,7 @@ public class EventViewer implements IDataEventListener, DetectorListener, Action
         viewer.elog = parser.getOption("-logbook").stringValue();
         System.out.println("Logbook set to " + viewer.elog);
         
-        JFrame frame = new JFrame("CLAS12Mon");
+        JFrame frame = new JFrame("MON12");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         //frame.add(viewer.getPanel());
         frame.add(viewer.mainPanel);
