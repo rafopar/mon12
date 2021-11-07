@@ -77,6 +77,8 @@ public class DetectorMonitor implements IDataEventListener, ActionListener {
     public double phase   = 1;
     public int    ncycles = 6;
 
+    private static PrintStream outStream = null;
+    private static PrintStream errStream = null;
     
     public DetectorMonitor(String name){
         GStyle.getAxisAttributesX().setTitleFontSize(18); //24
@@ -101,7 +103,8 @@ public class DetectorMonitor implements IDataEventListener, ActionListener {
         this.detectorView   = new DetectorPane2D();
         this.numberOfEvents = 0;   
         
-
+        DetectorMonitor.outStream = System.out;
+        DetectorMonitor.errStream = System.err;
     }
 
     
@@ -448,8 +451,6 @@ public class DetectorMonitor implements IDataEventListener, ActionListener {
     }     
     
     public static void resetStreams() {
-        PrintStream  outStream = System.out;
-        PrintStream  errStream = System.err;
         System.setOut(outStream);
         System.setErr(errStream);
         System.out.flush();
