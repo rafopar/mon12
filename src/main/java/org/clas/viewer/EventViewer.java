@@ -85,6 +85,9 @@ public class EventViewer implements IDataEventListener, DetectorListener, Action
     private int eventNumber = 0;
     private int histoResetEvents = 0;
         
+    private String defaultEtHost = null;
+    private String defaultEtIp   = null;
+    
     public String outPath = null; 
     public String elog = null;
     
@@ -120,15 +123,17 @@ public class EventViewer implements IDataEventListener, DetectorListener, Action
 //        monitors.get("RTPC").setActive(false);
     }
                     
-    public EventViewer() {  
+    public EventViewer(String host, String ip) {  
         // create main panel
         mainPanel = new JPanel();	
         mainPanel.setLayout(new BorderLayout());
         
         tabbedpane = new JTabbedPane();
         tabbedpane.addChangeListener(this);
-
-        processorPane = new DataSourceProcessorPane();
+        
+        this.defaultEtHost = host;
+        this.defaultEtIp   = ip;
+        processorPane = new DataSourceProcessorPane(defaultEtHost, defaultEtIp);
         processorPane.setUpdateRate(analysisUpdateTime);
         processorPane.addEventListener(this);
 
@@ -941,9 +946,11 @@ public class EventViewer implements IDataEventListener, DetectorListener, Action
         OptionParser parser = new OptionParser("mon12");
         parser.setRequiresInputList(false);
         parser.setDescription("CLAS12 monitoring app");
-        parser.addOption("-geometry", "1600x1000", "Select window size, e.g. 1600x1200");
-        parser.addOption("-tabs",     "All",       "Select active tabs, e.g. BST:FTOF");
-        parser.addOption("-logbook",  "HBLOG",     "Select electronic logbook");
+        parser.addOption("-geometry", "1600x1000",      "Select window size, e.g. 1600x1200");
+        parser.addOption("-tabs",     "All",            "Select active tabs, e.g. BST:FTOF");
+        parser.addOption("-logbook",  "HBLOG",          "Select electronic logbook");
+        parser.addOption("-ethost",   "clondaq6",       "Select ET host name");
+        parser.addOption("-etip",     "129.57.167.60",  "Select ET host name");
         parser.parse(args);
 
         int xSize = 1600;
@@ -957,7 +964,10 @@ public class EventViewer implements IDataEventListener, DetectorListener, Action
         }
         System.out.println("Setting windows size to " + xSize + "x" + ySize);
         
-        EventViewer viewer = new EventViewer();
+        String ethost = parser.getOption("-ethost").stringValue();
+        String etip   = parser.getOption("-etip").stringValue();        
+        EventViewer viewer = new EventViewer(ethost, etip);
+        
         String tabs     = parser.getOption("-tabs").stringValue();
         if(!tabs.equals("All")) {           
             if(tabs.split(":").length>0) {

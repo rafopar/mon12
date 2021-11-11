@@ -95,10 +95,12 @@ public class FMTmonitor extends DetectorMonitor {
         sum.addDataSet(summary, 0);
         this.setDetectorSummary(sum);
 
-        H1F histmulti = new H1F("multi", "multi", 200, -0.5, 199.5);
+        H1F histmulti = new H1F("multi", "multi", 100, -0.5, 199.5);
         histmulti.setTitleX("hit multiplicity");
         histmulti.setTitleY("counts");
         histmulti.setTitle("Multiplicity of FMT channels");
+        histmulti.setFillColor(34);
+        histmulti.setOptStat("111110");
         DataGroup occupancyGroup = new DataGroup("");
         occupancyGroup.addDataSet(histmulti, 0);
         this.getDataGroup().add(occupancyGroup, 0, 0, 0);
@@ -208,6 +210,7 @@ public class FMTmonitor extends DetectorMonitor {
         this.getDetectorCanvas().getCanvas("Multiplicity").setGridY(false);
         this.getDetectorCanvas().getCanvas("Multiplicity").cd(0);
         this.getDetectorCanvas().getCanvas("Multiplicity").draw(this.getDataGroup().getItem(0, 0, 0).getH1F("multi"));
+        this.getDetectorCanvas().getCanvas("Multiplicity").setStatBoxFontSize(18);
         this.getDetectorCanvas().getCanvas("Multiplicity").update();
     }
 
