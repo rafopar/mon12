@@ -173,7 +173,16 @@ public class DetectorMonitor implements IDataEventListener, ActionListener {
     public boolean isTrigMaskSet(int mask)   {return (getFDTrigger()&mask)!=0;}
     public boolean isGoodECALTrigger(int is) {return (testTrigger)? is==getECALTriggerSector():true;}    
     public int           getElecTrigger()    {return getFDTrigger()&0x1;}
-    public int     getElecTriggerSector()    {return (int) (isGoodFD() ? Math.log10(getFDTrigger()>>1)/0.301+1:0);} 
+    public int     getElecTriggerSector()    {
+        int sector = 0;
+        for(int i=1; i<=6; i++) {
+            if(this.isTrigBitSet(i)) {
+                sector = i;
+                break;
+            }
+        }
+        return sector;
+    } 
     public int     getECALTriggerSector()    {return (int) (isGoodFD() ? Math.log10(getFDTrigger()>>19)/0.301+1:0);}       
     public int     getPCALTriggerSector()    {return (int) (isGoodFD() ? Math.log10(getFDTrigger()>>13)/0.301+1:0);}       
     public int     getHTCCTriggerSector()    {return (int) (isGoodFD() ? Math.log10(getFDTrigger()>>7)/0.301+1:0);} 
