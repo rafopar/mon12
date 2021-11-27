@@ -699,8 +699,8 @@ public class EventViewer implements IDataEventListener, DetectorListener, Action
             if(this.monitors.get("LTCC").getDetectorSummary()!=null) this.CLAS12Canvas.getCanvas("FD").draw(this.monitors.get("LTCC").getDetectorSummary().getH1F("summary"));
             // RICH
             this.CLAS12Canvas.getCanvas("FD").cd(3);
-            this.CLAS12Canvas.getCanvas("FD").getPad(3).getAxisZ().setLog(true);
-            if(this.monitors.get("RICH").getDetectorSummary()!=null) this.CLAS12Canvas.getCanvas("FD").draw(this.monitors.get("RICH").getDetectorSummary().getH2F("summary"));
+            this.CLAS12Canvas.getCanvas("FD").getPad(3).getAxisY().setLog(true);
+            if(this.monitors.get("RICH").getDetectorSummary()!=null) this.CLAS12Canvas.getCanvas("FD").draw(this.monitors.get("RICH").getDetectorSummary().getH1F("summary"));
 
             // ECAL 
             this.CLAS12Canvas.getCanvas("FD").cd(4); this.CLAS12Canvas.getCanvas("FD").getPad(4).setAxisRange(0.5,6.5,0.5,1.5);
