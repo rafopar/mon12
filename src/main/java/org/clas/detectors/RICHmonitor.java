@@ -70,7 +70,7 @@ public class RICHmonitor  extends DetectorMonitor {
 
     @Override
     public void createHistos() {
-        H2F hi_pmt_leading_edge = new H2F("hi_pmt_leading_edge", "Leading Edge Pulse Time", NPMT, +0.5, NPMT+0.5, 100, 50, 150);
+        H2F hi_pmt_leading_edge = new H2F("hi_pmt_leading_edge", "Pulse Leading Edge", NPMT, +0.5, NPMT+0.5, 100, 50, 150);
         hi_pmt_leading_edge.setTitleX("PMT");
         hi_pmt_leading_edge.setTitleY("Leading Edge (ns)");
         H2F hi_pmt_duration     = new H2F("hi_pmt_duration", "Pulse Time Over Threshold",     NPMT, +0.5, NPMT+0.5, 100, 0,  100);
