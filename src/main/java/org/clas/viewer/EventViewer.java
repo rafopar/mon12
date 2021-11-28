@@ -90,7 +90,8 @@ public class EventViewer implements IDataEventListener, DetectorListener, Action
     
     public String outPath = null; 
     public String elog = null;
-    
+    private  long triggerMask;
+            
     // detector monitors
     public LinkedHashMap<String, DetectorMonitor> monitors = new LinkedHashMap<>();
     
@@ -117,10 +118,6 @@ public class EventViewer implements IDataEventListener, DetectorListener, Action
         monitors.put("FCUP",        new FCUPmonitor("FCUP")); 
         monitors.put("Trigger",     new TRIGGERmonitor("Trigger"));
         monitors.put("TimeJitter",  new TJITTERmonitor("TimeJitter"));
-//        monitors.get("FTCAL").setActive(false);
-//        monitors.get("FTHODO").setActive(false);
-//        monitors.get("FTTRK").setActive(false);
-//        monitors.get("RTPC").setActive(false);
     }
                     
     public EventViewer(String host, String ip) {  
@@ -223,24 +220,6 @@ public class EventViewer implements IDataEventListener, DetectorListener, Action
         reset.add(menuItemStream);        
         menuBar.add(reset);
         
-//        JMenu trigBits = new JMenu("DetectorBits");
-//        trigBits.getAccessibleContext().setAccessibleDescription("Select Detectors for Testing Trigger Bits (not yet implmented)");
-//        String[] keys = {"BMT", "BST", "CTOF", "ECAL", "FTOF", "HTCC", "LTCC"};
-//        for(String key : keys) {
-//            JCheckBoxMenuItem cb = new JCheckBoxMenuItem(key);    
-//            cb.addItemListener(new ItemListener() {
-//                public void itemStateChanged(ItemEvent e) {
-//                    if(e.getStateChange() == ItemEvent.SELECTED) {
-//                            monitors.get(key).setTestTrigger(true);
-//                    } else {
-//                            monitors.get(key).setTestTrigger(false);
-//                    };
-//                }
-//            });         
-//            trigBits.add(cb); 
-//        }
-//        menuBar.add(trigBits);
-        
         //RGA
         String TriggerDefRGAFall[] = { "Electron",
 		        "Electron S1","Electron S2","Electron S3","Electron S4","Electron S5","Electron S6",
@@ -267,32 +246,36 @@ public class EventViewer implements IDataEventListener, DetectorListener, Action
 		        "Electron OR no DC","","","","","","","","","","","","","","","","","","","","",
 		        "1K Pulser"};   
         
-        String TriggerDef[] = { "Electron OR",
-		        "e Sector 1","e Sector 2","e Sector 3","e Sector 4","e Sector 5","e Sector 6",
-		        "Muons S1+ S4-","Muons S2+ S5-","Muons S3+ S6-",
-		        "Muons S4+ S1-","Muons S5+ S2-","Muons S6+ S3-","","","","","","","","","","","","","","","","","","",
-		        "1K Pulser"};    
+        String TriggerDef[] = { "Electron OR", "Electron Sec 1","Electron Sec 2","Electron Sec 3",
+                        "Electron Sec 4","Electron Sec 5","Electron Sec 6",
+		        "","","","","","","","","","","","","","","","","","","","","","","","",
+		        "Random Pulser"};    
         
         JMenu trigBitsBeam = new JMenu("TriggerBits");
-        trigBitsBeam.getAccessibleContext().setAccessibleDescription("Test Trigger Bits");        
+        trigBitsBeam.getAccessibleContext().setAccessibleDescription("Select Trigger Bits");        
         for (int i=0; i<TriggerDef.length; i++) {
-        	
-            JCheckBoxMenuItem bb = new JCheckBoxMenuItem(TriggerDef[i]);  
+            
+            
+            JCheckBoxMenuItem bb = new JCheckBoxMenuItem(i + " " + TriggerDef[i]);
             final Integer bit = new Integer(i);
             bb.addItemListener(new ItemListener() {
+                @Override
+                @SuppressWarnings("empty-statement")
                 public void itemStateChanged(ItemEvent e) {
                 	
                     if(e.getStateChange() == ItemEvent.SELECTED) {
                         for(String key : monitors.keySet()) {
-                      	monitors.get(key).setTriggerMask(bit);
+                            monitors.get(key).setTriggerMask(bit);
                         }
                     } else {
                         for(String key : monitors.keySet()) {
-                      	monitors.get(key).clearTriggerMask(bit);
+                            monitors.get(key).clearTriggerMask(bit);
                         }
                     };
                 }
-            });         
+            });
+            boolean bstate = ((triggerMask >> i) & 1) == 1;
+            bb.setState(bstate);
             trigBitsBeam.add(bb); 
         	        	
         }
@@ -949,6 +932,7 @@ public class EventViewer implements IDataEventListener, DetectorListener, Action
         parser.addOption("-geometry", "1600x1000",      "Select window size, e.g. 1600x1200");
         parser.addOption("-tabs",     "All",            "Select active tabs, e.g. BST:FTOF");
         parser.addOption("-logbook",  "HBLOG",          "Select electronic logbook");
+        parser.addOption("-trigger",  "0x0",            "Select trigger bits");
         parser.addOption("-ethost",   "clondaq6",       "Select ET host name");
         parser.addOption("-etip",     "129.57.167.60",  "Select ET host name");
         parser.parse(args);
@@ -981,10 +965,20 @@ public class EventViewer implements IDataEventListener, DetectorListener, Action
         else {
             System.out.println("All monitors set to active");
         }       
-        viewer.init();
-        
+
+        String trigger = parser.getOption("-trigger").stringValue();
+        if(trigger.startsWith("0x")==true){
+            trigger = trigger.substring(2);
+        }
+        else 
+            trigger = "";
+        viewer.triggerMask = Long.parseLong(trigger,16);
+        System.out.println("Trigger mask set to 0x" + trigger);
+
         viewer.elog = parser.getOption("-logbook").stringValue();
         System.out.println("Logbook set to " + viewer.elog);
+       
+        viewer.init();
         
         JFrame frame = new JFrame("MON12");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
