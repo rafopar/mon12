@@ -58,7 +58,7 @@ public class RFmonitor extends DetectorMonitor {
         rf2.setTitleX("RF2 tdc");
         rf2.setTitleY("Counts");
         rf2.setFillColor(36);
-        H1F rfdiff = new H1F("rfdiff","rfdiff", 250, 0, rfbucket);
+        H1F rfdiff = new H1F("rfdiff","rfdiff", (int)(rfbucket/tdc2Time), 0, rfbucket);
         rfdiff.setTitleX("RF diff");
         rfdiff.setTitleY("Counts");
         F1D fdiff = new F1D("fdiff","[amp]*gaus(x,[mean],[sigma])", 0, rfbucket);
