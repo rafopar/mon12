@@ -79,14 +79,14 @@ public class RICHmonitor  extends DetectorMonitor {
         H1F hi_pmt_occupancy    = new H1F("hi_pmt_occupancy", "PMT",   "Counts", NPMT, +0.5, NPMT+0.5);
         hi_pmt_occupancy.setTitle("PMT Hit Occupancy");
         hi_pmt_occupancy.setFillColor(25);
-        hi_pmt_occupancy.setOptStat("1111");
+        hi_pmt_occupancy.setOptStat("10");
         H1F hi_pmt_max          = new H1F("hi_pmt_max", " ", 1, 0.5, NPMT+0.5);
         hi_pmt_max.setLineWidth(2);
         hi_pmt_max.setLineColor(2);        
         H1F hi_pix_occupancy    = new H1F("hi_pix_occupancy", "Pixel", "Counts", NPMT*NANODE, -0.5, NPMT*NANODE-0.5);
         hi_pix_occupancy.setTitle("Pixel Hit Occupancy");
         hi_pix_occupancy.setFillColor(25);
-        hi_pix_occupancy.setOptStat("1111");
+        hi_pix_occupancy.setOptStat("10");
         H1F hi_pix_max          = new H1F("hi_pix_max", " ", 1, 0.5, NPMT*NANODE+0.5);        
         hi_pix_max.setLineWidth(2);
         hi_pix_max.setLineColor(2);        
