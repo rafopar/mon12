@@ -234,6 +234,8 @@ public class RICHmonitor  extends DetectorMonitor {
         for(IDataSetPlotter hh : pad.getDatasetPlotters()) {
             max = Math.max(max, 1.2*hh.getDataSet().getMax());
         }
+        min = Math.max(min,0.1);
+        if(max<=min) max = min*10;
         pad.getAxisY().setRange(min, max);
     }
 
