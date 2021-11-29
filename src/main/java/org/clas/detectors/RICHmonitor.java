@@ -73,7 +73,7 @@ public class RICHmonitor  extends DetectorMonitor {
         H2F hi_pmt_leading_edge = new H2F("hi_pmt_leading_edge", "TDC Hit Leading Edge Time", NPMT, +0.5, NPMT+0.5, 100, 0, 300);
         hi_pmt_leading_edge.setTitleX("PMT");
         hi_pmt_leading_edge.setTitleY("Time (ns)");
-        H2F hi_pmt_duration     = new H2F("hi_pmt_duration", "TDC Hit Time Over Threshold",     NPMT*NANODE, +0.5, NPMT*NANODE+0.5, 100, 0,  100);
+        H2F hi_pmt_duration     = new H2F("hi_pmt_duration", "TDC Hit Time Over Threshold",   NPMT, +0.5, NPMT+0.5, 100, 0,  100);
         hi_pmt_duration.setTitleX("PMT");
         hi_pmt_duration.setTitleY("Time (ns)");
         H1F hi_pmt_occupancy    = new H1F("hi_pmt_occupancy", "PMT",   "Counts", NPMT, +0.5, NPMT+0.5);
