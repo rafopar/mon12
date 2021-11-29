@@ -194,7 +194,7 @@ public class RICHmonitor  extends DetectorMonitor {
                         int pmt   = pixel/NANODE + 1;
                         int anode = pixel%NANODE + 1;
                         this.getDataGroup().getItem(0,0,0).getH2F("hi_pmt_leading_edge").fill(pmt,hit.getLedingEdge());
-                        this.getDataGroup().getItem(0,0,0).getH2F("hi_pmt_duration").fill(pixel,hit.getDuration());
+                        this.getDataGroup().getItem(0,0,0).getH2F("hi_pmt_duration").fill(pmt,hit.getDuration());
                     
                         Point3D pxy = this.getCoordinates(pmt, anode);
                         this.getDataGroup().getItem(0,0,0).getH2F("hi_scaler").fill(pxy.x(), pxy.y());
