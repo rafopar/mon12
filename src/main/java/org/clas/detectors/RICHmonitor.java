@@ -15,6 +15,8 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
+import org.jlab.groot.graphics.EmbeddedPad;
+import org.jlab.groot.graphics.IDataSetPlotter;
 
 
 
@@ -25,8 +27,10 @@ public class RICHmonitor  extends DetectorMonitor {
     private static final int NTILE       = 138;
     private static final double MAXMAP   = 5;
     private static final double MAXPMT   = 64*4;
+    private static final double MINPMT   = MAXPMT/1000;
     private static final double MAXPIXEL = 20;
-    private static final double MAXTIME  = 4;
+    private static final double MINPIXEL = MAXPIXEL/1000;
+    private static final double MAXTIME  = 6;
     private static final int NPMTROWS        = 23;
     private static final int NPIXELROWS      = 8;
     private static final int NPIXELCOLUMNS   = 8;
@@ -216,12 +220,21 @@ public class RICHmonitor  extends DetectorMonitor {
     public void analysisUpdate() {
         double nentries = this.getDataGroup().getItem(0,0,0).getH2F("hi_scaler").getEntries();
         double average  = nentries/NPMT/NANODE;
-        double max = average+0*Math.sqrt(average);
-        this.getDataGroup().getItem(0,0,0).getH1F("hi_pmt_max").setBinContent(0, max*MAXPMT);
-        this.getDataGroup().getItem(0,0,0).getH1F("hi_pix_max").setBinContent(0, max*MAXPIXEL);
-        this.getDetectorCanvas().getCanvas("Occupancy and time").getPad(2).getAxisZ().setRange(0, max*MAXTIME);
-        this.getDetectorCanvas().getCanvas("Occupancy and time").getPad(3).getAxisZ().setRange(0, max*MAXTIME);
-        this.getDetectorCanvas().getCanvas("Occupancy Map").getPad().getAxisZ().setRange(0, max*MAXMAP);
+        this.getDataGroup().getItem(0,0,0).getH1F("hi_pmt_max").setBinContent(0, average*MAXPMT);
+        this.getDataGroup().getItem(0,0,0).getH1F("hi_pix_max").setBinContent(0, average*MAXPIXEL);
+        this.setYAxisMin(this.getDetectorCanvas().getCanvas("Occupancy and time").getPad(0),average*MINPMT);
+        this.setYAxisMin(this.getDetectorCanvas().getCanvas("Occupancy and time").getPad(1),average*MINPIXEL);
+        this.getDetectorCanvas().getCanvas("Occupancy and time").getPad(2).getAxisZ().setRange(0, average*MAXTIME);
+        this.getDetectorCanvas().getCanvas("Occupancy and time").getPad(3).getAxisZ().setRange(0, average*MAXTIME);
+        this.getDetectorCanvas().getCanvas("Occupancy Map").getPad().getAxisZ().setRange(0, average*MAXMAP);
+    }
+    
+    private void setYAxisMin(EmbeddedPad pad, double min) {
+        double max = 0;
+        for(IDataSetPlotter hh : pad.getDatasetPlotters()) {
+            max = Math.max(max, 1.2*hh.getDataSet().getMax());
+        }
+        pad.getAxisY().setRange(min, max);
     }
 
     private class TDCHit {
