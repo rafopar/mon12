@@ -47,7 +47,7 @@ public class RICHmonitor  extends DetectorMonitor {
     public RICHmonitor(String name) {
         super(name);
 
-        this.setDetectorTabNames("Occupancy and time","Scalers");
+        this.setDetectorTabNames("Occupancy and time","Occupancy Map");
         this.tileToPMT = this.setTiletoPMTMap();
         this.init(false);
     }
@@ -70,12 +70,12 @@ public class RICHmonitor  extends DetectorMonitor {
 
     @Override
     public void createHistos() {
-        H2F hi_pmt_leading_edge = new H2F("hi_pmt_leading_edge", "Pulse Leading Edge", NPMT, +0.5, NPMT+0.5, 100, 0, 300);
+        H2F hi_pmt_leading_edge = new H2F("hi_pmt_leading_edge", "TDC Hit Leading Edge Time", NPMT, +0.5, NPMT+0.5, 100, 0, 300);
         hi_pmt_leading_edge.setTitleX("PMT");
-        hi_pmt_leading_edge.setTitleY("TDC Hit Leading Edge (ns)");
-        H2F hi_pmt_duration     = new H2F("hi_pmt_duration", "Pulse Time Over Threshold",     NPMT, +0.5, NPMT+0.5, 100, 0,  100);
+        hi_pmt_leading_edge.setTitleY("Time (ns)");
+        H2F hi_pmt_duration     = new H2F("hi_pmt_duration", "TDC Hit Time Over Threshold",     NPMT*NANODE, +0.5, NPMT*NANODE+0.5, 100, 0,  100);
         hi_pmt_duration.setTitleX("PMT");
-        hi_pmt_duration.setTitleY("TDC Hit Time over threshold (ns)");
+        hi_pmt_duration.setTitleY("Time (ns)");
         H1F hi_pmt_occupancy    = new H1F("hi_pmt_occupancy", "PMT",   "Counts", NPMT, +0.5, NPMT+0.5);
         hi_pmt_occupancy.setTitle("PMT Hit Occupancy");
         hi_pmt_occupancy.setFillColor(25);
@@ -84,13 +84,13 @@ public class RICHmonitor  extends DetectorMonitor {
         hi_pmt_max.setLineWidth(2);
         hi_pmt_max.setLineColor(2);        
         H1F hi_pix_occupancy    = new H1F("hi_pix_occupancy", "Pixel", "Counts", NPMT*NANODE, -0.5, NPMT*NANODE-0.5);
-        hi_pix_occupancy.setTitle("Ixel Hit Occupancy");
+        hi_pix_occupancy.setTitle("Pixel Hit Occupancy");
         hi_pix_occupancy.setFillColor(25);
         hi_pix_occupancy.setOptStat("1111");
         H1F hi_pix_max          = new H1F("hi_pix_max", " ", 1, 0.5, NPMT*NANODE+0.5);        
         hi_pix_max.setLineWidth(2);
         hi_pix_max.setLineColor(2);        
-        H2F hi_scaler           = new H2F("hi_scaler", "RICH Scaler",260, -130, 130, 207, 0, 207); 
+        H2F hi_scaler           = new H2F("hi_scaler", "TDC Hit Map",260, -130, 130, 207, 0, 207); 
         H1F hi_summary          = new H1F("summary", "PMT",   "Counts", NPMT, +0.5, NPMT+0.5);
         hi_summary.setTitle("RICH");
         hi_summary.setFillColor(25);
@@ -139,9 +139,10 @@ public class RICHmonitor  extends DetectorMonitor {
         this.getDetectorCanvas().getCanvas("Occupancy and time").draw(lineXT);
         this.getDetectorCanvas().getCanvas("Occupancy and time").draw(lineTOT);
         this.getDetectorCanvas().getCanvas("Occupancy and time").update();
-        this.getDetectorCanvas().getCanvas("Scalers").getPad(0).setPalette("kRainBow");
-        this.getDetectorCanvas().getCanvas("Scalers").draw(this.getDataGroup().getItem(0,0,0).getH2F("hi_scaler"));
-        this.getDetectorCanvas().getCanvas("Scalers").update();
+        this.getDetectorCanvas().getCanvas("Occupancy Map").getPad(0).setPalette("kRainBow");
+        this.getDetectorCanvas().getCanvas("Occupancy Map").draw(this.getDataGroup().getItem(0,0,0).getH2F("hi_scaler"));
+        this.getDetectorCanvas().getCanvas("Occupancy Map").getPad(0).getAxisZ().setLog(true);
+        this.getDetectorCanvas().getCanvas("Occupancy Map").update();
         this.DrawTiles();
     }
 
@@ -193,7 +194,7 @@ public class RICHmonitor  extends DetectorMonitor {
                         int pmt   = pixel/NANODE + 1;
                         int anode = pixel%NANODE + 1;
                         this.getDataGroup().getItem(0,0,0).getH2F("hi_pmt_leading_edge").fill(pmt,hit.getLedingEdge());
-                        this.getDataGroup().getItem(0,0,0).getH2F("hi_pmt_duration").fill(pmt,hit.getDuration());
+                        this.getDataGroup().getItem(0,0,0).getH2F("hi_pmt_duration").fill(pixel,hit.getDuration());
                     
                         Point3D pxy = this.getCoordinates(pmt, anode);
                         this.getDataGroup().getItem(0,0,0).getH2F("hi_scaler").fill(pxy.x(), pxy.y());
@@ -220,7 +221,7 @@ public class RICHmonitor  extends DetectorMonitor {
         this.getDataGroup().getItem(0,0,0).getH1F("hi_pix_max").setBinContent(0, max*MAXPIXEL);
         this.getDetectorCanvas().getCanvas("Occupancy and time").getPad(2).getAxisZ().setRange(0, max*MAXTIME);
         this.getDetectorCanvas().getCanvas("Occupancy and time").getPad(3).getAxisZ().setRange(0, max*MAXTIME);
-        this.getDetectorCanvas().getCanvas("Scalers").getPad().getAxisZ().setRange(0, max*MAXMAP);
+        this.getDetectorCanvas().getCanvas("Occupancy Map").getPad().getAxisZ().setRange(0, max*MAXMAP);
     }
 
     private class TDCHit {
@@ -260,10 +261,10 @@ public class RICHmonitor  extends DetectorMonitor {
             DataLine line2 = new DataLine(p2.x()-0.5, p2.y()-0.5, p3.x()+1.5, p3.y()-0.5);
             DataLine line3 = new DataLine(p3.x()+1.5, p3.y()-0.5, p4.x()+1.5, p4.y()+1.5);
             DataLine line4 = new DataLine(p4.x()+1.5, p4.y()+1.5, p1.x()-0.5, p1.y()+1.5);
-            this.getDetectorCanvas().getCanvas("Scalers").draw(line1);
-            this.getDetectorCanvas().getCanvas("Scalers").draw(line2);
-            this.getDetectorCanvas().getCanvas("Scalers").draw(line3);
-            this.getDetectorCanvas().getCanvas("Scalers").draw(line4);
+            this.getDetectorCanvas().getCanvas("Occupancy Map").draw(line1);
+            this.getDetectorCanvas().getCanvas("Occupancy Map").draw(line2);
+            this.getDetectorCanvas().getCanvas("Occupancy Map").draw(line3);
+            this.getDetectorCanvas().getCanvas("Occupancy Map").draw(line4);
         }
     }
         
