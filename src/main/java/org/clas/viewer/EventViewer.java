@@ -265,11 +265,11 @@ public class EventViewer implements IDataEventListener, DetectorListener, Action
                 	
                     if(e.getStateChange() == ItemEvent.SELECTED) {
                         for(String key : monitors.keySet()) {
-                            monitors.get(key).setTriggerMask(bit);
+                            monitors.get(key).setUITriggerMask(bit);
                         }
                     } else {
                         for(String key : monitors.keySet()) {
-                            monitors.get(key).clearTriggerMask(bit);
+                            monitors.get(key).clearUITriggerMask(bit);
                         }
                     };
                 }

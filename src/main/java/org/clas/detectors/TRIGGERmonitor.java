@@ -36,7 +36,7 @@ public class TRIGGERmonitor extends DetectorMonitor {
         this.useSectorButtons(false);
         this.getDetectorCanvas().setActiveCanvas("Trigger Bits");
         this.init(false);
-        this.testTrigger = true;
+//        this.testTrigger = true;
     }
    
     @Override

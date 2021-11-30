@@ -19,6 +19,7 @@ public class BANDmonitor  extends DetectorMonitor {
         
         this.setDetectorTabNames("ADC Occupancies", "TDC Occupancies");
         this.init(false);
+        this.setTriggerMask("0x10000000000");
     }
 
     @Override

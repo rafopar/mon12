@@ -68,9 +68,10 @@ public class DetectorMonitor implements IDataEventListener, ActionListener {
     public int trigFD = 0;
     public int trigCD = 0;
     
-    public boolean testTrigger = false;
-    public boolean TriggerBeam[] = new boolean[32];
-    public int TriggerMask = 0;
+//    public boolean testTrigger = false;
+//    public boolean TriggerBeam[] = new boolean[32];
+    public  int   UITriggerMask = 0;     // trigger mask from UI
+    private long  triggerMask   = 0L;    // monitor specific mask
     
     public double tdcconv  = 0.023456;
     public double period  = 4;
@@ -123,7 +124,6 @@ public class DetectorMonitor implements IDataEventListener, ActionListener {
         this.setNumberOfEvents(this.getNumberOfEvents()+1);
         
         if (event.getType() == DataEventType.EVENT_START) {
-//            resetEventListener();
             processEvent(event);
 	} else if (event.getType() == DataEventType.EVENT_SINGLE) {		   
             processEvent(event);
@@ -143,9 +143,9 @@ public class DetectorMonitor implements IDataEventListener, ActionListener {
     	   this.trigger = trig;
     }
     
-    public void setTestTrigger(boolean test) {
-    	   this.testTrigger = test;
-    }
+//    public void setTestTrigger(boolean test) {
+//    	   this.testTrigger = test;
+//    }
 /*    
     public boolean isGoodCDTrigger()       {return (testTrigger)? isGoodCD():true;}  
     public boolean isGoodHTCCTrigger()     {return (testTrigger)? isGoodHTCC():true;}
@@ -162,36 +162,64 @@ public class DetectorMonitor implements IDataEventListener, ActionListener {
     public boolean isGoodCTOF()            {return  this.trigCD==512;}
     public boolean isGoodCND()             {return  this.trigCD==1024;}   
     public boolean isGoodBMT()             {return  this.trigCD==2048;}       
-    public int     getFDTrigger()          {return (this.trigger>>16)&0x0000ffff;}    
-    public int     getCDTrigger()          {return this.trigger&0x00000fff;} 
+    public int     getL1Trigger()          {return (this.trigger>>16)&0x0000ffff;}    
+    public int     getTSTrigger()          {return this.trigger&0x00000fff;} 
 */
+    public void setTriggerMask(long word) {
+        this.triggerMask = word;
+        System.out.println("["+this.getDetectorName()+"]: trigger mask set to " + Long.toHexString(this.triggerMask));
+    }
     
-    public int     getFDTrigger()            {return (int)(this.trigger)&0x000000000ffffffff;}
-    public int     getCDTrigger()            {return (int)(this.trigger>>32)&0x00000000ffffffff;}
-    public boolean isGoodFD()                {return  getFDTrigger()>0;}    
+    public void setTriggerMask(String hex) {
+        if(hex.startsWith("0x")==true){
+            this.setTriggerMask(Long.parseLong(hex.substring(2), 16));
+        }
+    }
+    
+    public long getTriggerMask() {
+        return this.triggerMask | (this.UITriggerMask & 0x00000000ffffffff);
+    }
+    
+    public int     getL1Trigger()            {return (int)(this.trigger)&0x000000000ffffffff;}
+    public int     getTSTrigger()            {return (int)(this.trigger>>32)&0x00000000ffffffff;}
+
     public boolean isTrigBitSet(int bit)     {int mask=0; mask |= 1<<bit; return isTrigMaskSet(mask);}
-    public boolean isTrigMaskSet(int mask)   {return (getFDTrigger()&mask)!=0;}
-    public boolean isGoodECALTrigger(int is) {return (testTrigger)? is==getECALTriggerSector():true;}    
-    public int           getElecTrigger()    {return getFDTrigger()&0x1;}
-    public int     getElecTriggerSector()    {
+    public boolean isTrigMaskSet(long mask)  {return (this.trigger&mask)!=0L;}
+
+    public boolean isGoodECALTrigger(int is) {return (this.UITriggerMask!=0) ? is==getECALTriggerSector():true;}    
+    
+    
+    public int getElecTrigger() {
+        return (int) this.trigger & 0x1;
+    }
+
+    public int getElecTriggerSector() {
         int sector = 0;
-        for(int i=1; i<=6; i++) {
-            if(this.isTrigBitSet(i)) {
+        for (int i = 1; i <= 6; i++) {
+            if (this.isTrigBitSet(i)) {
                 sector = i;
                 break;
             }
         }
         return sector;
-    } 
-    public int     getECALTriggerSector()    {return (int) (isGoodFD() ? Math.log10(getFDTrigger()>>19)/0.301+1:0);}       
-    public int     getPCALTriggerSector()    {return (int) (isGoodFD() ? Math.log10(getFDTrigger()>>13)/0.301+1:0);}       
-    public int     getHTCCTriggerSector()    {return (int) (isGoodFD() ? Math.log10(getFDTrigger()>>7)/0.301+1:0);} 
+    }
+    public int     getECALTriggerSector()    {return (int) (this.getL1Trigger()!=0 ? Math.log10(getL1Trigger()>>19)/0.301+1:0);}       
+    public int     getPCALTriggerSector()    {return (int) (this.getL1Trigger()!=0 ? Math.log10(getL1Trigger()>>13)/0.301+1:0);}       
+    public int     getHTCCTriggerSector()    {return (int) (this.getL1Trigger()!=0 ? Math.log10(getL1Trigger()>>7)/0.301+1:0);} 
     
-    public int    getTriggerMask()        {return this.TriggerMask;}
-    public void   setTriggerMask(int bit) {this.TriggerMask|=(1<<bit);}  
-    public void clearTriggerMask(int bit) {this.TriggerMask&=~(1<<bit);}  
-    public boolean testTriggerMask()      {return this.TriggerMask!=0 ? isTrigMaskSet(this.TriggerMask):true;}
-    public boolean isGoodTrigger(int bit) {return TriggerBeam[bit] ? isTrigBitSet(bit):true;}
+//    public int    getUITriggerMask()        {return this.UITriggerMask;}
+    public void setUITriggerMask(int bit) {
+        this.UITriggerMask |= (1 << bit);
+    }
+
+    public void clearUITriggerMask(int bit) {
+        this.UITriggerMask &= ~(1 << bit);
+    }
+
+    public boolean testTriggerMask() {
+        return this.UITriggerMask != 0 ? isTrigMaskSet(this.getTriggerMask()) : true;
+    }
+//    public boolean isGoodTrigger(int bit) {return TriggerBeam[bit] ? isTrigBitSet(bit):true;}
 
     public boolean isActive() {
         return active;
