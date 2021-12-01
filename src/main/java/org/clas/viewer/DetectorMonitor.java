@@ -68,7 +68,7 @@ public class DetectorMonitor implements IDataEventListener, ActionListener {
     public int trigFD = 0;
     public int trigCD = 0;
     
-//    public boolean testTrigger = false;
+    public boolean testTrigger = false;
 //    public boolean TriggerBeam[] = new boolean[32];
     public  int   UITriggerMask = 0;     // trigger mask from UI
     private long  triggerMask   = 0L;    // monitor specific mask
@@ -143,9 +143,9 @@ public class DetectorMonitor implements IDataEventListener, ActionListener {
     	   this.trigger = trig;
     }
     
-//    public void setTestTrigger(boolean test) {
-//    	   this.testTrigger = test;
-//    }
+    public void setTestTrigger(boolean test) {
+    	   this.testTrigger = test;
+    }
 /*    
     public boolean isGoodCDTrigger()       {return (testTrigger)? isGoodCD():true;}  
     public boolean isGoodHTCCTrigger()     {return (testTrigger)? isGoodHTCC():true;}
@@ -186,7 +186,7 @@ public class DetectorMonitor implements IDataEventListener, ActionListener {
     public boolean isTrigBitSet(int bit)     {int mask=0; mask |= 1<<bit; return isTrigMaskSet(mask);}
     public boolean isTrigMaskSet(long mask)  {return (this.trigger&mask)!=0L;}
 
-    public boolean isGoodECALTrigger(int is) {return (this.UITriggerMask!=0) ? is==getECALTriggerSector():true;}    
+    public boolean isGoodECALTrigger(int is) {return (this.testTrigger) ? is==getECALTriggerSector():true;}    
     
     
     public int getElecTrigger() {
