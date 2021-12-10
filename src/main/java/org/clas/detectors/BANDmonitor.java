@@ -82,13 +82,13 @@ public class BANDmonitor  extends DetectorMonitor {
         this.getDetectorCanvas().getCanvas("ADC Occupancies").getPad(1).getAxisZ().setLog(getLogZ());
         this.getDetectorCanvas().getCanvas("ADC Occupancies").draw(this.getDataGroup().getItem(0,0,0).getH2F("adc"));
         this.getDetectorCanvas().getCanvas("ADC Occupancies").cd(2);
-//        this.getDetectorCanvas().getCanvas("ADC Occupancies").getPad(2).getAxisZ().setLog(getLogZ());
+        this.getDetectorCanvas().getCanvas("ADC Occupancies").getPad(2).getAxisZ().setLog(getLogZ());
         this.getDetectorCanvas().getCanvas("ADC Occupancies").draw(this.getDataGroup().getItem(0,0,0).getH2F("fadc_time"));
         this.getDetectorCanvas().getCanvas("ADC Occupancies").update();
         this.getDetectorCanvas().getCanvas("TDC Occupancies").cd(0);
         this.getDetectorCanvas().getCanvas("TDC Occupancies").draw(this.getDataGroup().getItem(0,0,0).getH1F("occTDC"));
         this.getDetectorCanvas().getCanvas("TDC Occupancies").cd(1);
-//        this.getDetectorCanvas().getCanvas("TDC Occupancies").getPad(1).getAxisZ().setLog(getLogZ());
+        this.getDetectorCanvas().getCanvas("TDC Occupancies").getPad(1).getAxisZ().setLog(getLogZ());
         this.getDetectorCanvas().getCanvas("TDC Occupancies").draw(this.getDataGroup().getItem(0,0,0).getH2F("tdc"));
         this.getDetectorCanvas().getCanvas("TDC Occupancies").cd(2);
         this.getDetectorCanvas().getCanvas("TDC Occupancies").draw(this.getDataGroup().getItem(0,0,0).getH1F("spectrumTDC"));
