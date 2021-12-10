@@ -36,7 +36,7 @@ public class TRIGGERmonitor extends DetectorMonitor {
         this.useSectorButtons(false);
         this.getDetectorCanvas().setActiveCanvas("Trigger Bits");
         this.init(false);
-        this.testTrigger = true;
+        this.setTestTrigger(false);
     }
    
     @Override
@@ -57,7 +57,7 @@ public class TRIGGERmonitor extends DetectorMonitor {
     }    
        
     public void createTriggerBits(int k) {
-        H1F summary = new H1F("summary","Trigger Bits", 32,-0.5,31.5);
+        H1F summary = new H1F("summary","Trigger Bits", 64,-0.5,63.5);
         summary.setFillColor(4);
         summary.setTitleX("Trigger Bits");
         summary.setTitleY("Counts");
@@ -67,7 +67,7 @@ public class TRIGGERmonitor extends DetectorMonitor {
         this.setDetectorSummary(sum);
         initFTOFGraphs(); updateFTOFGraphTitles();
        
-        H1F trig = new H1F(tbit,tbit, 32,-0.5,31.5);
+        H1F trig = new H1F(tbit,tbit, 64,-0.5,63.5);
         trig.setFillColor(4);      
         trig.setTitleX("Trigger Bits");
         trig.setTitleY("Counts");
@@ -163,8 +163,8 @@ public class TRIGGERmonitor extends DetectorMonitor {
     @Override
     public void processEvent(DataEvent event) {
 
-        for (int i=0; i<32; i++) if(isTrigBitSet(i)) ((H1F) this.getDataGroup().getItem(0,0,0).getData(0).get(0)).fill(i);
-        for (int i=0; i<32; i++) if(isTrigBitSet(i)) this.getDetectorSummary().getH1F("summary").fill(i);
+        for (int i=0; i<64; i++) if(isTrigBitSet(i)) ((H1F) this.getDataGroup().getItem(0,0,0).getData(0).get(0)).fill(i);
+        for (int i=0; i<64; i++) if(isTrigBitSet(i)) this.getDetectorSummary().getH1F("summary").fill(i);
         
         getFTOFMeanTime();
         getFTOFFADCTime();  

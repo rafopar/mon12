@@ -214,7 +214,7 @@ public class ECmonitor  extends DetectorMonitor {
                 int comp   = bank.getShort("component", loop);
                 int adc    = bank.getInt("ADC", loop);
                 float time = bank.getFloat("time",loop);
-                if(adc>0 && time>=0  && isGoodECALTrigger(sector)) {
+                if(adc>0 && time>=0) {
                   	this.getDataGroup().getItem(0,layer,0).getH2F("occADC"+layer).fill(sector*1.0, comp*1.0);
                   	this.getDataGroup().getItem(sector,layer,0).getH2F("datADC"+layer+sector).fill(adc,comp*1.0);
                     if(time > 1) this.getDataGroup().getItem(sector,layer,0).getH2F("timeFADC"+layer+sector).fill(time,comp*1.0);
@@ -243,7 +243,7 @@ public class ECmonitor  extends DetectorMonitor {
                 int      comp = bank.getShort("component",i);
                 int       TDC = bank.getInt("TDC",i);
                 int     order = bank.getByte("order",i); 
-                if(TDC>0 && isGoodECALTrigger(sector)) {
+                if(TDC>0) {
                     this.getDataGroup().getItem(0,layer,0).getH2F("occTDC"+layer).fill(sector*1.0, comp*1.0);
                     this.getDataGroup().getItem(sector,layer,0).getH2F("datTDC"+layer+sector).fill(TDC*this.tdcconv-triggerPhase*this.period,comp*1.0);
                 }
