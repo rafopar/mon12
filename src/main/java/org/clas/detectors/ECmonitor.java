@@ -1,17 +1,16 @@
 package org.clas.detectors;
 
-import java.awt.List;
 
+import java.util.Arrays;
 import org.clas.viewer.DetectorMonitor;
-import org.jlab.groot.base.GStyle;
 import org.jlab.groot.data.GraphErrors;
 import org.jlab.groot.data.H1F;
 import org.jlab.groot.data.H2F;
-import org.jlab.groot.graphics.EmbeddedCanvas;
 import org.jlab.groot.group.DataGroup;
 import org.jlab.groot.math.F1D;
 import org.jlab.io.base.DataBank;
 import org.jlab.io.base.DataEvent;
+import org.jlab.utils.groups.IndexedTable;
 
 
 public class ECmonitor  extends DetectorMonitor {
@@ -26,6 +25,8 @@ public class ECmonitor  extends DetectorMonitor {
         this.setDetectorTabNames("ADC Occupancies","TDC Occupancies", "ADC Histograms", "FADC timing", "TDC Histograms", "ADC sum");
         this.useSectorButtons(true);
         this.init(false);
+        this.getCcdb().setVariation("default");
+        this.getCcdb().init(Arrays.asList(new String[]{"/calibration/ec/time_jitter"}));
     }
 
     @Override
@@ -186,13 +187,21 @@ public class ECmonitor  extends DetectorMonitor {
     @Override
     public void processEvent(DataEvent event) {
         
-        if (this.getNumberOfEvents() >= super.eventResetTime_current && super.eventResetTime_current > 0){
-            resetEventListener();
+        int triggerPhase=0;
+        if(event.hasBank("RUN::config")) {
+            DataBank bank = event.getBank("RUN::config");
+            int runNumber  = bank.getInt("run", 0);
+            long timestamp = bank.getLong("timestamp",0);    
+            IndexedTable jitter = this.getCcdb().getConstants(runNumber, "/calibration/ec/time_jitter");
+            this.period  = jitter.getDoubleValue("period",0,0,0);
+            this.phase   = jitter.getIntValue("phase",0,0,0);
+            this.ncycles = jitter.getIntValue("cycles",0,0,0);           
+//            System.out.println(period + phase + ncycles + " " + timestamp + " " + triggerPhase0);
+            if(ncycles>0){
+                triggerPhase  = (int) ((timestamp+phase)%ncycles); // TI derived phase correction due to TDC and FADC clock differences
+            }
         }
-        
-		//if (!testTriggerMask()) return;
 
-    	   
         double[] pcsum = new double[6];
         double[] ecsum = new double[6];
     	        
@@ -205,7 +214,7 @@ public class ECmonitor  extends DetectorMonitor {
                 int comp   = bank.getShort("component", loop);
                 int adc    = bank.getInt("ADC", loop);
                 float time = bank.getFloat("time",loop);
-                if(adc>0 && time>=0  && isGoodECALTrigger(sector)) {
+                if(adc>0 && time>=0) {
                   	this.getDataGroup().getItem(0,layer,0).getH2F("occADC"+layer).fill(sector*1.0, comp*1.0);
                   	this.getDataGroup().getItem(sector,layer,0).getH2F("datADC"+layer+sector).fill(adc,comp*1.0);
                     if(time > 1) this.getDataGroup().getItem(sector,layer,0).getH2F("timeFADC"+layer+sector).fill(time,comp*1.0);
@@ -234,9 +243,9 @@ public class ECmonitor  extends DetectorMonitor {
                 int      comp = bank.getShort("component",i);
                 int       TDC = bank.getInt("TDC",i);
                 int     order = bank.getByte("order",i); 
-                if(TDC>0 && isGoodECALTrigger(sector)) {
+                if(TDC>0) {
                     this.getDataGroup().getItem(0,layer,0).getH2F("occTDC"+layer).fill(sector*1.0, comp*1.0);
-                    this.getDataGroup().getItem(sector,layer,0).getH2F("datTDC"+layer+sector).fill(TDC*0.02345-triggerPhase*4,comp*1.0);
+                    this.getDataGroup().getItem(sector,layer,0).getH2F("datTDC"+layer+sector).fill(TDC*this.tdcconv-triggerPhase*this.period,comp*1.0);
                 }
 //                if(layer==1)      this.getDetectorSummary().getH1F("sumPCAL").fill(sector*1.0);
 //                else if (layer==2)this.getDetectorSummary().getH1F("sumECin").fill(sector*1.0);
@@ -253,7 +262,7 @@ public class ECmonitor  extends DetectorMonitor {
     }
 
     @Override
-    public void timerUpdate() {
+    public void analysisUpdate() {
  //       System.out.println("Updating FTOF canvas");
     }
 

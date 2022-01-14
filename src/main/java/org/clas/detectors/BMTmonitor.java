@@ -5,9 +5,7 @@ import java.util.List;
 
 import org.clas.viewer.DetectorMonitor;
 import org.jlab.detector.calib.utils.DatabaseConstantProvider;
-import org.jlab.groot.base.GStyle;
 import org.jlab.groot.data.H1F;
-import org.jlab.groot.graphics.EmbeddedCanvas;
 import org.jlab.groot.group.DataGroup;
 import org.jlab.io.base.DataBank;
 import org.jlab.io.base.DataEvent;
@@ -74,7 +72,8 @@ public class BMTmonitor extends DetectorMonitor {
                 this.isZ[layer] = false;
             }
         }
-
+        dbprovider.disconnect();
+        
         this.mask = new boolean[maxNumberSectors + 1][maxNumberLayers + 1][maxNumberStrips + 1];
 
         for (int sector = 1; sector <= maxNumberSectors; sector++) {
@@ -249,25 +248,6 @@ public class BMTmonitor extends DetectorMonitor {
 
     public void processEvent(DataEvent event) {
 
-        if (this.getNumberOfEvents() >= super.eventResetTime_current && super.eventResetTime_current > 0) {
-            resetEventListener();
-        }
-
-        if (this.runNumber == 0) {
-            int numberOfEvents = this.getNumberOfEvents();
-            if (event.hasBank("RUN::config")) {
-                DataBank head = event.getBank("RUN::config");
-                runNumber = head.getInt("run", 0);
-            } else {
-                runNumber = 2284;
-            }
-            this.loadConstantsFromCCDB(runNumber);
-            this.createHistos();
-            this.plotHistos();
-            this.setNumberOfEvents(numberOfEvents); //Cause number of events got reset when re-creating histos
-        }
-
-		//if (!testTriggerMask()) return;
         if (event.hasBank("BMT::adc") == true) {
             DataBank bank = event.getBank("BMT::adc");
 

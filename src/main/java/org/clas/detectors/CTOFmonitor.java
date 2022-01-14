@@ -125,12 +125,6 @@ public class CTOFmonitor  extends DetectorMonitor {
     @Override
     public void processEvent(DataEvent event) {
         
-        if (this.getNumberOfEvents() >= super.eventResetTime_current && super.eventResetTime_current > 0){
-            resetEventListener();
-        }
-        
-		//if (!testTriggerMask()) return;
-                
         if(event.hasBank("CTOF::adc")==true){
 	    DataBank bank = event.getBank("CTOF::adc");
 	    int rows = bank.rows();
@@ -187,7 +181,7 @@ public class CTOFmonitor  extends DetectorMonitor {
     }
 
     @Override
-    public void timerUpdate() {
+    public void analysisUpdate() {
 
     }
 
