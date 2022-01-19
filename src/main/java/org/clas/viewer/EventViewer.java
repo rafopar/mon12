@@ -116,8 +116,14 @@ public class EventViewer implements IDataEventListener, DetectorListener, Action
         monitors.put("RF",          new RFmonitor("RF"));       
         monitors.put("HEL",         new HELmonitor("HEL"));      
         monitors.put("FCUP",        new FCUPmonitor("FCUP")); 
+        monitors.put("TDC",         new TDCmonitor("TDC"));
         monitors.put("Trigger",     new TRIGGERmonitor("Trigger"));
         monitors.put("TimeJitter",  new TJITTERmonitor("TimeJitter"));
+        for(String key : monitors.keySet()) {
+            if(key.equals("FTOF") || key.equals("RF") || key.equals("TDC") || key.equals("Trigger") || key.equals("TimeJitter"))
+                continue;
+            monitors.get(key).setActive(false);
+        }
     }
                     
     public EventViewer(String host, String ip) {  
@@ -919,7 +925,8 @@ public class EventViewer implements IDataEventListener, DetectorListener, Action
     public void timerUpdate() {
 //        System.out.println("Time to update ...");
         for(String key : monitors.keySet()) {
-            this.monitors.get(key).timerUpdate();
+            if(this.monitors.get(key).isActive())
+                this.monitors.get(key).timerUpdate();
         }
         this.plotSummaries();
    }
