@@ -56,6 +56,7 @@ import org.jlab.jnp.hipo4.data.Event;
 import org.jlab.jnp.hipo4.data.SchemaFactory;
 import org.jlab.utils.system.ClasUtilsFile;
 import org.jlab.elog.LogEntry; 
+import org.jlab.logging.DefaultLogger;
 import org.jlab.utils.options.OptionParser;
 
         
@@ -943,6 +944,8 @@ public class EventViewer implements IDataEventListener, DetectorListener, Action
         parser.addOption("-ethost",   "clondaq6",       "Select ET host name");
         parser.addOption("-etip",     "129.57.167.60",  "Select ET host name");
         parser.parse(args);
+            
+        DefaultLogger.debug();
 
         int xSize = 1600;
         int ySize = 1000;        
