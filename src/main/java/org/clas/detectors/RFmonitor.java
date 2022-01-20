@@ -474,7 +474,7 @@ public class RFmonitor extends DetectorMonitor {
         f1rf.setParameter(1, mean);
         f1rf.setParameter(2, 0.02);
         f1rf.setRange(mean-3.*sigma,mean+3.*sigma);
-        DataFitter.fit(f1rf, hirf, "Q"); //No options uses error for sigma        
+        if(amp>100) DataFitter.fit(f1rf, hirf, "Q"); //No options uses error for sigma        
     }
     
 }

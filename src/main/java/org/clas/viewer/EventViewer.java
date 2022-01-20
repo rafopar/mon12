@@ -16,6 +16,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 
 import javax.swing.ImageIcon;
@@ -56,7 +59,6 @@ import org.jlab.jnp.hipo4.data.Event;
 import org.jlab.jnp.hipo4.data.SchemaFactory;
 import org.jlab.utils.system.ClasUtilsFile;
 import org.jlab.elog.LogEntry; 
-import org.jlab.logging.DefaultLogger;
 import org.jlab.utils.options.OptionParser;
 
         
@@ -147,7 +149,7 @@ public class EventViewer implements IDataEventListener, DetectorListener, Action
         this.initMonitors();
         
     }
-    
+
     public void init() {
         this.initsPaths();
         this.initSummary();
@@ -930,8 +932,20 @@ public class EventViewer implements IDataEventListener, DetectorListener, Action
                 this.monitors.get(key).timerUpdate();
         }
         this.plotSummaries();
-   }
+        this.setLogLevel("org.freehep.math.minuit", Level.WARNING);
+    }
 
+    public void setLogLevel(String logger, Level targetLevel) {
+        Logger root = Logger.getLogger("org.freehep.math.minuit");
+        if(root!=null && root.getLevel()!=targetLevel) {
+            root.setLevel(targetLevel);
+            for (Handler handler : root.getHandlers()) {
+                handler.setLevel(targetLevel);
+            }
+            System.out.println(logger + " log level set to " + targetLevel.getName());
+        }
+    }
+    
     public static void main(String[] args){
         
         OptionParser parser = new OptionParser("mon12");
@@ -944,9 +958,7 @@ public class EventViewer implements IDataEventListener, DetectorListener, Action
         parser.addOption("-ethost",   "clondaq6",       "Select ET host name");
         parser.addOption("-etip",     "129.57.167.60",  "Select ET host name");
         parser.parse(args);
-            
-        DefaultLogger.debug();
-
+                           
         int xSize = 1600;
         int ySize = 1000;        
         String geometry = parser.getOption("-geometry").stringValue();
