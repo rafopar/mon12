@@ -673,28 +673,32 @@ public class EventViewer implements IDataEventListener, DetectorListener, Action
         if(this.CLAS12Canvas.getCanvas("FD")!=null) {
             // DC
             this.CLAS12Canvas.getCanvas("FD").cd(0);
-            if(this.monitors.get("DC").getDetectorSummary()!=null) this.CLAS12Canvas.getCanvas("FD").draw(this.monitors.get("DC").getDetectorSummary().getH1F("summary")); 
+            if(this.monitors.get("DC").isActive() && this.monitors.get("DC").getDetectorSummary()!=null) 
+                this.CLAS12Canvas.getCanvas("FD").draw(this.monitors.get("DC").getDetectorSummary().getH1F("summary")); 
             // HTTC
             this.CLAS12Canvas.getCanvas("FD").cd(1);
-            if(this.monitors.get("HTCC").getDetectorSummary()!=null) this.CLAS12Canvas.getCanvas("FD").draw(this.monitors.get("HTCC").getDetectorSummary().getH1F("summary"));
+            if(this.monitors.get("HTCC").isActive() && this.monitors.get("HTCC").getDetectorSummary()!=null) 
+                this.CLAS12Canvas.getCanvas("FD").draw(this.monitors.get("HTCC").getDetectorSummary().getH1F("summary"));
             // LTTC
             this.CLAS12Canvas.getCanvas("FD").cd(2);
-            if(this.monitors.get("LTCC").getDetectorSummary()!=null) this.CLAS12Canvas.getCanvas("FD").draw(this.monitors.get("LTCC").getDetectorSummary().getH1F("summary"));
+            if(this.monitors.get("LTCC").isActive() && this.monitors.get("LTCC").getDetectorSummary()!=null) 
+                this.CLAS12Canvas.getCanvas("FD").draw(this.monitors.get("LTCC").getDetectorSummary().getH1F("summary"));
             // RICH
             this.CLAS12Canvas.getCanvas("FD").cd(3);
             this.CLAS12Canvas.getCanvas("FD").getPad(3).getAxisY().setLog(true);
-            if(this.monitors.get("RICH").getDetectorSummary()!=null) this.CLAS12Canvas.getCanvas("FD").draw(this.monitors.get("RICH").getDetectorSummary().getH1F("summary"));
+            if(this.monitors.get("RICH").isActive() && this.monitors.get("RICH").getDetectorSummary()!=null) 
+                this.CLAS12Canvas.getCanvas("FD").draw(this.monitors.get("RICH").getDetectorSummary().getH1F("summary"));
 
             // ECAL 
             this.CLAS12Canvas.getCanvas("FD").cd(4); this.CLAS12Canvas.getCanvas("FD").getPad(4).setAxisRange(0.5,6.5,0.5,1.5);
-            if(this.monitors.get("ECAL").getDetectorSummary()!=null) { 
+            if(this.monitors.get("ECAL").isActive() && this.monitors.get("ECAL").getDetectorSummary()!=null) { 
                     this.CLAS12Canvas.getCanvas("FD").draw(this.monitors.get("ECAL").getDetectorSummary().getGraph("PCALu"));
                     this.CLAS12Canvas.getCanvas("FD").draw(this.monitors.get("ECAL").getDetectorSummary().getGraph("PCALv"),"same");
                     this.CLAS12Canvas.getCanvas("FD").draw(this.monitors.get("ECAL").getDetectorSummary().getGraph("PCALw"),"same");
                     this.CLAS12Canvas.getCanvas("FD").draw(this.monitors.get("ECAL").getDetectorSummary().getF1D("p0"),"same");
             }
             this.CLAS12Canvas.getCanvas("FD").cd(5); this.CLAS12Canvas.getCanvas("FD").getPad(5).setAxisRange(0.5,6.5,0.5,1.5);
-            if(this.monitors.get("ECAL").getDetectorSummary()!=null) {
+            if(this.monitors.get("ECAL").isActive() && this.monitors.get("ECAL").getDetectorSummary()!=null) {
                     this.CLAS12Canvas.getCanvas("FD").draw(this.monitors.get("ECAL").getDetectorSummary().getGraph("ECinu"));
                     this.CLAS12Canvas.getCanvas("FD").draw(this.monitors.get("ECAL").getDetectorSummary().getGraph("ECinv"),"same");
                     this.CLAS12Canvas.getCanvas("FD").draw(this.monitors.get("ECAL").getDetectorSummary().getGraph("ECinw"),"same");
@@ -706,13 +710,16 @@ public class EventViewer implements IDataEventListener, DetectorListener, Action
             // FTOF:
             this.CLAS12Canvas.getCanvas("FD").cd(6);
             this.CLAS12Canvas.getCanvas("FD").getPad(6).getAxisZ().setLog(true);
-            if(this.monitors.get("FTOF").getDetectorSummary()!=null) this.CLAS12Canvas.getCanvas("FD").draw(this.monitors.get("FTOF").getDetectorSummary().getH1F("sum_p1"));
+            if(this.monitors.get("FTOF").isActive() && this.monitors.get("FTOF").getDetectorSummary()!=null) 
+                this.CLAS12Canvas.getCanvas("FD").draw(this.monitors.get("FTOF").getDetectorSummary().getH1F("sum_p1"));
             this.CLAS12Canvas.getCanvas("FD").cd(7);
             this.CLAS12Canvas.getCanvas("FD").getPad(7).getAxisZ().setLog(true);
-            if(this.monitors.get("FTOF").getDetectorSummary()!=null) this.CLAS12Canvas.getCanvas("FD").draw(this.monitors.get("FTOF").getDetectorSummary().getH1F("sum_p2"));
+            if(this.monitors.get("FTOF").isActive() && this.monitors.get("FTOF").getDetectorSummary()!=null) 
+                this.CLAS12Canvas.getCanvas("FD").draw(this.monitors.get("FTOF").getDetectorSummary().getH1F("sum_p2"));
             this.CLAS12Canvas.getCanvas("FD").cd(8);
             this.CLAS12Canvas.getCanvas("FD").getPad(8).getAxisZ().setLog(true);
-            if(this.monitors.get("FTOF").getDetectorSummary()!=null) this.CLAS12Canvas.getCanvas("FD").draw(this.monitors.get("FTOF").getDetectorSummary().getH1F("sum_p3"));
+            if(this.monitors.get("FTOF").isActive() && this.monitors.get("FTOF").getDetectorSummary()!=null) 
+                this.CLAS12Canvas.getCanvas("FD").draw(this.monitors.get("FTOF").getDetectorSummary().getH1F("sum_p3"));
         }
         
         //////////////////////////////////////////////////
@@ -720,10 +727,12 @@ public class EventViewer implements IDataEventListener, DetectorListener, Action
             if(this.CLAS12Canvas.getCanvas("CD")!=null) {
             // CND
             this.CLAS12Canvas.getCanvas("CD").cd(0);
-            if(this.monitors.get("CND").getDetectorSummary()!=null) this.CLAS12Canvas.getCanvas("CD").draw(this.monitors.get("CND").getDetectorSummary().getH1F("summary"));
+            if(this.monitors.get("CND").isActive() && this.monitors.get("CND").getDetectorSummary()!=null) 
+                this.CLAS12Canvas.getCanvas("CD").draw(this.monitors.get("CND").getDetectorSummary().getH1F("summary"));
             // CTOF
             this.CLAS12Canvas.getCanvas("CD").cd(1);
-            if(this.monitors.get("CTOF").getDetectorSummary()!=null) this.CLAS12Canvas.getCanvas("CD").draw(this.monitors.get("CTOF").getDetectorSummary().getH1F("summary"));
+            if(this.monitors.get("CTOF").isActive() && this.monitors.get("CTOF").getDetectorSummary()!=null) 
+                this.CLAS12Canvas.getCanvas("CD").draw(this.monitors.get("CTOF").getDetectorSummary().getH1F("summary"));
     //        // RTPC
     //        this.CLAS12Canvas.getCanvas("CD").cd(2);
     //        if(this.monitors.get("RTPC").getDetectorSummary()!=null) this.CLAS12Canvas.getCanvas("CD").draw(this.monitors.get("RTPC").getDetectorSummary().getH1F("summary"));
@@ -733,11 +742,13 @@ public class EventViewer implements IDataEventListener, DetectorListener, Action
             // BMT
             this.CLAS12Canvas.getCanvas("CD").cd(2);
             this.CLAS12Canvas.getCanvas("CD").getPad(2).getAxisZ().setLog(true);
-            if(this.monitors.get("BMT").getDetectorSummary()!=null) this.CLAS12Canvas.getCanvas("CD").draw(this.monitors.get("BMT").getDetectorSummary().getH1F("summary"));
+            if(this.monitors.get("BMT").isActive() && this.monitors.get("BMT").getDetectorSummary()!=null) 
+                this.CLAS12Canvas.getCanvas("CD").draw(this.monitors.get("BMT").getDetectorSummary().getH1F("summary"));
             // BST
             this.CLAS12Canvas.getCanvas("CD").cd(3);
             this.CLAS12Canvas.getCanvas("CD").getPad(3).getAxisZ().setLog(true);
-            if(this.monitors.get("BST").getDetectorSummary()!=null) this.CLAS12Canvas.getCanvas("CD").draw(this.monitors.get("BST").getDetectorSummary().getH2F("summary"));
+            if(this.monitors.get("BST").isActive() && this.monitors.get("BST").getDetectorSummary()!=null) 
+                this.CLAS12Canvas.getCanvas("CD").draw(this.monitors.get("BST").getDetectorSummary().getH2F("summary"));
         }
         
         
@@ -746,13 +757,16 @@ public class EventViewer implements IDataEventListener, DetectorListener, Action
         if(this.CLAS12Canvas.getCanvas("FT")!=null) {
             // FTCAL
             this.CLAS12Canvas.getCanvas("FT").cd(0);
-            if(this.monitors.get("FTCAL").getDetectorSummary()!=null) this.CLAS12Canvas.getCanvas("FT").draw(this.monitors.get("FTCAL").getDetectorSummary().getH1F("summary"));
+            if(this.monitors.get("FTCAL").isActive() && this.monitors.get("FTCAL").getDetectorSummary()!=null) 
+                this.CLAS12Canvas.getCanvas("FT").draw(this.monitors.get("FTCAL").getDetectorSummary().getH1F("summary"));
             // FTHODO
             this.CLAS12Canvas.getCanvas("FT").cd(1);
-            if(this.monitors.get("FTHODO").getDetectorSummary()!=null) this.CLAS12Canvas.getCanvas("FT").draw(this.monitors.get("FTHODO").getDetectorSummary().getH1F("summary"));
+            if(this.monitors.get("FTHODO").isActive() && this.monitors.get("FTHODO").getDetectorSummary()!=null) 
+                this.CLAS12Canvas.getCanvas("FT").draw(this.monitors.get("FTHODO").getDetectorSummary().getH1F("summary"));
             // FTTRK
             this.CLAS12Canvas.getCanvas("FT").cd(2);
-            if(this.monitors.get("FTTRK").getDetectorSummary()!=null) this.CLAS12Canvas.getCanvas("FT").draw(this.monitors.get("FTTRK").getDetectorSummary().getH1F("summary"));
+            if(this.monitors.get("FTTRK").isActive() && this.monitors.get("FTTRK").getDetectorSummary()!=null) 
+                this.CLAS12Canvas.getCanvas("FT").draw(this.monitors.get("FTTRK").getDetectorSummary().getH1F("summary"));
         }
         ////////////////////////////////////////////////////
       
@@ -761,17 +775,21 @@ public class EventViewer implements IDataEventListener, DetectorListener, Action
         if(this.CLAS12Canvas.getCanvas("RF/HEL/JITTER/TRIGGER")!=null) {
             // RF
             this.CLAS12Canvas.getCanvas("RF/HEL/JITTER/TRIGGER").cd(0);
-            if(this.monitors.get("RF").getDetectorSummary()!=null) this.CLAS12Canvas.getCanvas("RF/HEL/JITTER/TRIGGER").draw(this.monitors.get("RF").getDetectorSummary().getH1F("summary"));
+            if(this.monitors.get("RF").isActive() && this.monitors.get("RF").getDetectorSummary()!=null) 
+                this.CLAS12Canvas.getCanvas("RF/HEL/JITTER/TRIGGER").draw(this.monitors.get("RF").getDetectorSummary().getH1F("summary"));
             // HEL
             this.CLAS12Canvas.getCanvas("RF/HEL/JITTER/TRIGGER").cd(1);
-            if(this.monitors.get("HEL").getDetectorSummary()!=null) this.CLAS12Canvas.getCanvas("RF/HEL/JITTER/TRIGGER").draw(this.monitors.get("HEL").getDetectorSummary().getH1F("summary"));
+            if(this.monitors.get("HEL").isActive() && this.monitors.get("HEL").getDetectorSummary()!=null) 
+                this.CLAS12Canvas.getCanvas("RF/HEL/JITTER/TRIGGER").draw(this.monitors.get("HEL").getDetectorSummary().getH1F("summary"));
             // FCUP
             this.CLAS12Canvas.getCanvas("RF/HEL/JITTER/TRIGGER").cd(2);
-            if(this.monitors.get("TimeJitter").getDetectorSummary()!=null) this.CLAS12Canvas.getCanvas("RF/HEL/JITTER/TRIGGER").draw(this.monitors.get("TimeJitter").getDetectorSummary().getH1F("summary"));
+            if(this.monitors.get("TimeJitter").isActive() && this.monitors.get("TimeJitter").getDetectorSummary()!=null) 
+                this.CLAS12Canvas.getCanvas("RF/HEL/JITTER/TRIGGER").draw(this.monitors.get("TimeJitter").getDetectorSummary().getH1F("summary"));
             // TRIGGER
             this.CLAS12Canvas.getCanvas("RF/HEL/JITTER/TRIGGER").cd(3);
             this.CLAS12Canvas.getCanvas("RF/HEL/JITTER/TRIGGER").getPad(3).getAxisY().setLog(true);
-            if(this.monitors.get("Trigger").getDetectorSummary()!=null) this.CLAS12Canvas.getCanvas("RF/HEL/JITTER/TRIGGER").draw(this.monitors.get("Trigger").getDetectorSummary().getH1F("summary"));
+            if(this.monitors.get("Trigger").isActive() && this.monitors.get("Trigger").getDetectorSummary()!=null) 
+                this.CLAS12Canvas.getCanvas("RF/HEL/JITTER/TRIGGER").draw(this.monitors.get("Trigger").getDetectorSummary().getH1F("summary"));
         }
         ////////////////////////////////////////////////////
       
