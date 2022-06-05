@@ -17,7 +17,7 @@ public class DCmonitor extends DetectorMonitor {
 
     public DCmonitor(String name) {
         super(name);
-        this.setDetectorTabNames("occupancy", "occupancyNorm", "occupancyPercent", "tdc2d", "tdc1d_s", "multiplicity");
+        this.setDetectorTabNames("occupancy", "occupancyNorm", "occupancyPercent", "multiplicity", "tdc2d", "tdc1d_s");
         this.useSectorButtons(true);
         this.init(false);
     }
