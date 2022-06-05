@@ -390,7 +390,6 @@ public class DetectorMonitor implements IDataEventListener, ActionListener {
         for (String name : names) {
             this.detectorTabNames.add(name);
             String canvasName = this.getCanvasTabName(name);
-            System.out.println(canvasName);
             if(canvas == null) 
                 canvas = new EmbeddedCanvasTabbed(canvasName);
             else
