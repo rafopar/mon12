@@ -26,7 +26,7 @@ public class FTOFmonitor  extends DetectorMonitor {
     public FTOFmonitor(String name) {
         super(name);
         
-        this.setDetectorTabNames("ADC Occupancies", "TDC Occupancies","ADC Histograms", "FADC timing", "TDC Histograms","GMEAN");
+        this.setDetectorTabNames("adcOccupancy", "tdcOccupancy","adcEnergySector", "adcTimeSector", "tdcSector","miscSector");
         this.useSectorButtons(true);
         this.init(false);   // set to true for picture on left side
         ftofHits[0] = new FTOFHits("PANEL1A");
@@ -40,24 +40,24 @@ public class FTOFmonitor  extends DetectorMonitor {
     public void createHistos() {
         // initialize canvas and create histograms
         this.setNumberOfEvents(0);
-        this.getDetectorCanvas().getCanvas("ADC Occupancies").divide(2, 3);
-        this.getDetectorCanvas().getCanvas("ADC Occupancies").setGridX(false);
-        this.getDetectorCanvas().getCanvas("ADC Occupancies").setGridY(false);
-        this.getDetectorCanvas().getCanvas("TDC Occupancies").divide(2, 3);
-        this.getDetectorCanvas().getCanvas("TDC Occupancies").setGridX(false);
-        this.getDetectorCanvas().getCanvas("TDC Occupancies").setGridY(false);
-        this.getDetectorCanvas().getCanvas("ADC Histograms").divide(2, 3);
-        this.getDetectorCanvas().getCanvas("ADC Histograms").setGridX(false);
-        this.getDetectorCanvas().getCanvas("ADC Histograms").setGridY(false);
-        this.getDetectorCanvas().getCanvas("FADC timing").divide(2, 3);
-        this.getDetectorCanvas().getCanvas("FADC timing").setGridX(false);
-        this.getDetectorCanvas().getCanvas("FADC timing").setGridY(false);
-        this.getDetectorCanvas().getCanvas("TDC Histograms").divide(2, 3);
-        this.getDetectorCanvas().getCanvas("TDC Histograms").setGridX(false);
-        this.getDetectorCanvas().getCanvas("TDC Histograms").setGridY(false);
-        this.getDetectorCanvas().getCanvas("GMEAN").divide(2, 3);
-        this.getDetectorCanvas().getCanvas("GMEAN").setGridX(false);
-        this.getDetectorCanvas().getCanvas("GMEAN").setGridY(false);
+        this.getDetectorCanvas().getCanvas("adcOccupancy").divide(2, 3);
+        this.getDetectorCanvas().getCanvas("adcOccupancy").setGridX(false);
+        this.getDetectorCanvas().getCanvas("adcOccupancy").setGridY(false);
+        this.getDetectorCanvas().getCanvas("tdcOccupancy").divide(2, 3);
+        this.getDetectorCanvas().getCanvas("tdcOccupancy").setGridX(false);
+        this.getDetectorCanvas().getCanvas("tdcOccupancy").setGridY(false);
+        this.getDetectorCanvas().getCanvas("adcEnergy").divide(2, 3);
+        this.getDetectorCanvas().getCanvas("adcEnergy").setGridX(false);
+        this.getDetectorCanvas().getCanvas("adcEnergy").setGridY(false);
+        this.getDetectorCanvas().getCanvas("adcTime").divide(2, 3);
+        this.getDetectorCanvas().getCanvas("adcTime").setGridX(false);
+        this.getDetectorCanvas().getCanvas("adcTime").setGridY(false);
+        this.getDetectorCanvas().getCanvas("tdc").divide(2, 3);
+        this.getDetectorCanvas().getCanvas("tdc").setGridX(false);
+        this.getDetectorCanvas().getCanvas("tdc").setGridY(false);
+        this.getDetectorCanvas().getCanvas("misc").divide(2, 3);
+        this.getDetectorCanvas().getCanvas("misc").setGridX(false);
+        this.getDetectorCanvas().getCanvas("misc").setGridY(false);
         
         String[] stacks = new String[]{"P1A","P1B","P2"};
         String[] views = new String[]{"Left","Right"};   
@@ -111,7 +111,7 @@ public class FTOFmonitor  extends DetectorMonitor {
             datADC.setTitle("Sector "+sec);
             H2F timeFADC = new H2F("timeFADC"+sec+lay+ord, "sec/lay/ord "+sec+lay+ord+" FADC", 80, 0., 400., npaddles[lay], 1, npaddles[lay]+1);
             timeFADC.setTitleY(stacks[lay] + " " + views[ord] + " PMTS");
-            timeFADC.setTitleX("FADC timing");
+            timeFADC.setTitleX("adcTime");
             timeFADC.setTitle("Sector "+sec);
             H2F datTDC = new H2F("datTDC"+sec+lay+ord, "sec/lay/ord "+sec+lay+ord+" TDC", 100, 0., 600., npaddles[lay], 1, npaddles[lay]+1);
             datTDC.setTitleY(stacks[lay] + " " + views[ord] + " PMTS");
@@ -121,11 +121,11 @@ public class FTOFmonitor  extends DetectorMonitor {
             dg.addDataSet(timeFADC, 1);
             dg.addDataSet(datTDC, 2);
         }
-            H2F GMEAN = new H2F("GMEAN"+sec+lay, "sec/lay"+sec+lay+" GMEAN", 100, 0., 6000.,this.npaddles[lay], 1, npaddles[lay]+1 );
-            GMEAN.setTitleY(stacks[lay] +" PMTS");
-            GMEAN.setTitleX("GMEAN");
-            GMEAN.setTitle("Sector "+sec);
-            dg.addDataSet(GMEAN, 3);
+            H2F misc = new H2F("misc"+sec+lay, "sec/lay"+sec+lay+" misc", 100, 0., 6000.,this.npaddles[lay], 1, npaddles[lay]+1 );
+            misc.setTitleY(stacks[lay] +" PMTS");
+            misc.setTitleX("misc");
+            misc.setTitle("Sector "+sec);
+            dg.addDataSet(misc, 3);
             H2F TDIF = new H2F("TDIF"+sec+lay, "sec/lay"+sec+lay+" TDIF", 100, -40., 40.,this.npaddles[lay], 1, npaddles[lay]+1 );
             TDIF.setTitleY(stacks[lay] +" PMTS");
             TDIF.setTitleX("TLeft-TRight");
@@ -171,12 +171,12 @@ public class FTOFmonitor  extends DetectorMonitor {
     	
         for (int lay = 0; lay < 3; lay++) {
             for (int ord = 0; ord < 2; ord++) {
-                this.getDetectorCanvas().getCanvas("ADC Occupancies").cd(lay * 2 + ord);
-                this.getDetectorCanvas().getCanvas("ADC Occupancies").getPad(lay * 2 + ord).getAxisZ().setLog(getLogZ());
-                this.getDetectorCanvas().getCanvas("ADC Occupancies").draw(this.getDataGroup().getItem(0, lay, 0).getH2F("occADC" + lay + ord));
-                this.getDetectorCanvas().getCanvas("TDC Occupancies").cd(lay * 2 + ord);
-                this.getDetectorCanvas().getCanvas("TDC Occupancies").getPad(lay * 2 + ord).getAxisZ().setLog(getLogZ());
-                this.getDetectorCanvas().getCanvas("TDC Occupancies").draw(this.getDataGroup().getItem(0, lay, 0).getH2F("occTDC" + lay + ord));
+                this.getDetectorCanvas().getCanvas("adcOccupancy").cd(lay * 2 + ord);
+                this.getDetectorCanvas().getCanvas("adcOccupancy").getPad(lay * 2 + ord).getAxisZ().setLog(getLogZ());
+                this.getDetectorCanvas().getCanvas("adcOccupancy").draw(this.getDataGroup().getItem(0, lay, 0).getH2F("occADC" + lay + ord));
+                this.getDetectorCanvas().getCanvas("tdcOccupancy").cd(lay * 2 + ord);
+                this.getDetectorCanvas().getCanvas("tdcOccupancy").getPad(lay * 2 + ord).getAxisZ().setLog(getLogZ());
+                this.getDetectorCanvas().getCanvas("tdcOccupancy").draw(this.getDataGroup().getItem(0, lay, 0).getH2F("occTDC" + lay + ord));
             }
         }
 
@@ -184,31 +184,31 @@ public class FTOFmonitor  extends DetectorMonitor {
             if (getActiveSector() == sec) {
                 for (int lay = 0; lay < 3; lay++) {
                     for (int ord = 0; ord < 2; ord++) {
-                        this.getDetectorCanvas().getCanvas("ADC Histograms").cd(lay * 2 + ord);
-                        this.getDetectorCanvas().getCanvas("ADC Histograms").getPad(lay * 2 + ord).getAxisZ().setLog(getLogZ());
-                        this.getDetectorCanvas().getCanvas("ADC Histograms").draw(this.getDataGroup().getItem(sec, lay, 0).getH2F("datADC" + sec + lay + ord));
-                        this.getDetectorCanvas().getCanvas("FADC timing").cd(lay * 2 + ord);
-                        this.getDetectorCanvas().getCanvas("FADC timing").getPad(lay * 2 + ord).getAxisZ().setLog(getLogZ());
-                        this.getDetectorCanvas().getCanvas("FADC timing").draw(this.getDataGroup().getItem(sec, lay, 0).getH2F("timeFADC" + sec + lay + ord));
-                        this.getDetectorCanvas().getCanvas("TDC Histograms").cd(lay * 2 + ord);
-                        this.getDetectorCanvas().getCanvas("TDC Histograms").getPad(lay * 2 + ord).getAxisZ().setLog(getLogZ());
-                        this.getDetectorCanvas().getCanvas("TDC Histograms").draw(this.getDataGroup().getItem(sec, lay, 0).getH2F("datTDC" + sec + lay + ord));
+                        this.getDetectorCanvas().getCanvas("adcEnergy").cd(lay * 2 + ord);
+                        this.getDetectorCanvas().getCanvas("adcEnergy").getPad(lay * 2 + ord).getAxisZ().setLog(getLogZ());
+                        this.getDetectorCanvas().getCanvas("adcEnergy").draw(this.getDataGroup().getItem(sec, lay, 0).getH2F("datADC" + sec + lay + ord));
+                        this.getDetectorCanvas().getCanvas("adcTime").cd(lay * 2 + ord);
+                        this.getDetectorCanvas().getCanvas("adcTime").getPad(lay * 2 + ord).getAxisZ().setLog(getLogZ());
+                        this.getDetectorCanvas().getCanvas("adcTime").draw(this.getDataGroup().getItem(sec, lay, 0).getH2F("timeFADC" + sec + lay + ord));
+                        this.getDetectorCanvas().getCanvas("tdc").cd(lay * 2 + ord);
+                        this.getDetectorCanvas().getCanvas("tdc").getPad(lay * 2 + ord).getAxisZ().setLog(getLogZ());
+                        this.getDetectorCanvas().getCanvas("tdc").draw(this.getDataGroup().getItem(sec, lay, 0).getH2F("datTDC" + sec + lay + ord));
                     }
-                    this.getDetectorCanvas().getCanvas("GMEAN").cd(lay * 2 + 0);
-                    this.getDetectorCanvas().getCanvas("GMEAN").getPad(lay * 2 + 0).getAxisZ().setLog(getLogZ());
-                    this.getDetectorCanvas().getCanvas("GMEAN").draw(this.getDataGroup().getItem(sec, lay, 0).getH2F("GMEAN" + sec + lay));
-                    this.getDetectorCanvas().getCanvas("GMEAN").cd(lay * 2 + 1);
-                    this.getDetectorCanvas().getCanvas("GMEAN").getPad(lay * 2 + 1).getAxisZ().setLog(getLogZ());
-                    this.getDetectorCanvas().getCanvas("GMEAN").draw(this.getDataGroup().getItem(sec, lay, 0).getH2F("TDIF" + sec + lay));
+                    this.getDetectorCanvas().getCanvas("misc").cd(lay * 2 + 0);
+                    this.getDetectorCanvas().getCanvas("misc").getPad(lay * 2 + 0).getAxisZ().setLog(getLogZ());
+                    this.getDetectorCanvas().getCanvas("misc").draw(this.getDataGroup().getItem(sec, lay, 0).getH2F("misc" + sec + lay));
+                    this.getDetectorCanvas().getCanvas("misc").cd(lay * 2 + 1);
+                    this.getDetectorCanvas().getCanvas("misc").getPad(lay * 2 + 1).getAxisZ().setLog(getLogZ());
+                    this.getDetectorCanvas().getCanvas("misc").draw(this.getDataGroup().getItem(sec, lay, 0).getH2F("TDIF" + sec + lay));
                 }
             }
         }
         
-        this.getDetectorCanvas().getCanvas("ADC Occupancies").update();
-        this.getDetectorCanvas().getCanvas("TDC Occupancies").update();
-        this.getDetectorCanvas().getCanvas("ADC Histograms").update();
-        this.getDetectorCanvas().getCanvas("TDC Histograms").update();
-        this.getDetectorCanvas().getCanvas("GMEAN").update();
+        this.getDetectorCanvas().getCanvas("adcOccupancy").update();
+        this.getDetectorCanvas().getCanvas("tdcOccupancy").update();
+        this.getDetectorCanvas().getCanvas("adcEnergy").update();
+        this.getDetectorCanvas().getCanvas("tdc").update();
+        this.getDetectorCanvas().getCanvas("misc").update();
     }           
 
     @Override
@@ -293,7 +293,7 @@ public class FTOFmonitor  extends DetectorMonitor {
         /*
         for(int sec=1; sec<7; sec++) {
            for(int il=0; il<3; il++) {
-		        getGM(il,sec-1,this.getDataGroup().getItem(sec,il,0).getH2F("GMEAN"+sec+il));
+		        getGM(il,sec-1,this.getDataGroup().getItem(sec,il,0).getH2F("misc"+sec+il));
 		        getTD(il,sec-1,this.getDataGroup().getItem(sec,il,0).getH2F("TDIF"+sec+il));
 
            }
@@ -314,7 +314,7 @@ public class FTOFmonitor  extends DetectorMonitor {
          	   if(fadcs.hasItem(is,il,0,ip)&&fadcs.hasItem(is,il,1,ip)) {
                  float gm = (float) Math.sqrt(fadcs.getItem(is,il,0,ip).get(0)*
                                               fadcs.getItem(is,il,1,ip).get(0));
-                 this.getDataGroup().getItem(is,il-1,0).getH2F("GMEAN"+is+(il-1)).fill(gm,ip);
+                 this.getDataGroup().getItem(is,il-1,0).getH2F("misc"+is+(il-1)).fill(gm,ip);
          	   }
         }        
     }

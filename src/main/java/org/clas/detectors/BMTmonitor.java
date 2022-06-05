@@ -35,7 +35,7 @@ public class BMTmonitor extends DetectorMonitor {
 
         this.loadConstantsFromCCDB(defaultRunNumber);
 
-        this.setDetectorTabNames("Occupancy C", "Occupancy Z", "TimeMax", "Multiplicity");
+        this.setDetectorTabNames("cOccupancy", "zOccupancy", "tmax", "multiplicity");
         this.init(false);
     }
 
@@ -105,7 +105,7 @@ public class BMTmonitor extends DetectorMonitor {
         H1F histmulti = new H1F("multi", "multi", 100, -0.5, 999.5);
         histmulti.setTitleX("hit multiplicity");
         histmulti.setTitleY("counts");
-        histmulti.setTitle("Multiplicity of BMT channels");
+        histmulti.setTitle("multiplicity of BMT channels");
         histmulti.setFillColor(34);
         histmulti.setOptStat("111110");
         DataGroup occupancyGroup = new DataGroup("");
@@ -127,17 +127,17 @@ public class BMTmonitor extends DetectorMonitor {
                 hitmapGroup.addDataSet(hitmapHisto, 0);
                 this.getDataGroup().add(hitmapGroup, sector, layer, 2);
 
-                H1F timeMaxHisto = new H1F("TimeOfMax : Layer " + layer + " Sector " + sector, "TimeOfMax : Layer " + layer + " Sector " + sector,
+                H1F tmaxHisto = new H1F("TimeOfMax : Layer " + layer + " Sector " + sector, "TimeOfMax : Layer " + layer + " Sector " + sector,
                         samplingTime * numberOfSamples, 1., samplingTime * numberOfSamples);
-                timeMaxHisto.setTitleX("Time of max (Layer " + layer + " Sector " + sector + ")");
-                timeMaxHisto.setTitleY("Nb hits");
+                tmaxHisto.setTitleX("Time of max (Layer " + layer + " Sector " + sector + ")");
+                tmaxHisto.setTitleY("Nb hits");
                 if (isZ[layer]) {
-                    timeMaxHisto.setFillColor(4);
+                    tmaxHisto.setFillColor(4);
                 } else {
-                    timeMaxHisto.setFillColor(8);
+                    tmaxHisto.setFillColor(8);
                 }
                 DataGroup timeOfMaxGroup = new DataGroup("");
-                timeOfMaxGroup.addDataSet(timeMaxHisto, 0);
+                timeOfMaxGroup.addDataSet(tmaxHisto, 0);
                 this.getDataGroup().add(timeOfMaxGroup, sector, layer, 1);
             }
         }
@@ -147,30 +147,30 @@ public class BMTmonitor extends DetectorMonitor {
     @Override
     public void plotHistos() {
 
-        this.getDetectorCanvas().getCanvas("Occupancy C").divide(maxNumberSectors, maxNumberLayers / 2);
-        this.getDetectorCanvas().getCanvas("Occupancy C").setGridX(false);
-        this.getDetectorCanvas().getCanvas("Occupancy C").setGridY(false);
-        this.getDetectorCanvas().getCanvas("Occupancy C").setAxisTitleSize(12);
-        this.getDetectorCanvas().getCanvas("Occupancy C").setAxisLabelSize(12);
+        this.getDetectorCanvas().getCanvas("cOccupancy").divide(maxNumberSectors, maxNumberLayers / 2);
+        this.getDetectorCanvas().getCanvas("cOccupancy").setGridX(false);
+        this.getDetectorCanvas().getCanvas("cOccupancy").setGridY(false);
+        this.getDetectorCanvas().getCanvas("cOccupancy").setAxisTitleSize(12);
+        this.getDetectorCanvas().getCanvas("cOccupancy").setAxisLabelSize(12);
 
-        this.getDetectorCanvas().getCanvas("Occupancy Z").divide(maxNumberSectors, maxNumberLayers / 2);
-        this.getDetectorCanvas().getCanvas("Occupancy Z").setGridX(false);
-        this.getDetectorCanvas().getCanvas("Occupancy Z").setGridY(false);
-        this.getDetectorCanvas().getCanvas("Occupancy Z").setAxisTitleSize(12);
-        this.getDetectorCanvas().getCanvas("Occupancy Z").setAxisLabelSize(12);
+        this.getDetectorCanvas().getCanvas("zOccupancy").divide(maxNumberSectors, maxNumberLayers / 2);
+        this.getDetectorCanvas().getCanvas("zOccupancy").setGridX(false);
+        this.getDetectorCanvas().getCanvas("zOccupancy").setGridY(false);
+        this.getDetectorCanvas().getCanvas("zOccupancy").setAxisTitleSize(12);
+        this.getDetectorCanvas().getCanvas("zOccupancy").setAxisLabelSize(12);
 
-        this.getDetectorCanvas().getCanvas("TimeMax").divide(maxNumberSectors, maxNumberLayers);
-        this.getDetectorCanvas().getCanvas("TimeMax").setGridX(false);
-        this.getDetectorCanvas().getCanvas("TimeMax").setGridY(false);
-        this.getDetectorCanvas().getCanvas("TimeMax").setAxisTitleSize(12);
-        this.getDetectorCanvas().getCanvas("TimeMax").setAxisLabelSize(12);
+        this.getDetectorCanvas().getCanvas("tmax").divide(maxNumberSectors, maxNumberLayers);
+        this.getDetectorCanvas().getCanvas("tmax").setGridX(false);
+        this.getDetectorCanvas().getCanvas("tmax").setGridY(false);
+        this.getDetectorCanvas().getCanvas("tmax").setAxisTitleSize(12);
+        this.getDetectorCanvas().getCanvas("tmax").setAxisLabelSize(12);
 
-        this.getDetectorCanvas().getCanvas("Multiplicity").setGridX(false);
-        this.getDetectorCanvas().getCanvas("Multiplicity").setGridY(false);
-        this.getDetectorCanvas().getCanvas("Multiplicity").setAxisTitleSize(24);
-        this.getDetectorCanvas().getCanvas("Multiplicity").setAxisLabelSize(18);
-        this.getDetectorCanvas().getCanvas("Multiplicity").setTitleSize(18);
-        this.getDetectorCanvas().getCanvas("Multiplicity").setStatBoxFontSize(18);
+        this.getDetectorCanvas().getCanvas("multiplicity").setGridX(false);
+        this.getDetectorCanvas().getCanvas("multiplicity").setGridY(false);
+        this.getDetectorCanvas().getCanvas("multiplicity").setAxisTitleSize(24);
+        this.getDetectorCanvas().getCanvas("multiplicity").setAxisLabelSize(18);
+        this.getDetectorCanvas().getCanvas("multiplicity").setTitleSize(18);
+        this.getDetectorCanvas().getCanvas("multiplicity").setStatBoxFontSize(18);
         
         for (int sector = 1; sector <= maxNumberSectors; sector++) {
             for (int layer = 1; layer <= maxNumberLayers; layer++) {
@@ -201,12 +201,12 @@ public class BMTmonitor extends DetectorMonitor {
                         break;
                 }
                 if (isZ[layer]) {
-                    this.getDetectorCanvas().getCanvas("Occupancy Z").cd(column + numberOfColumns * row);
-                    this.getDetectorCanvas().getCanvas("Occupancy Z").draw(
+                    this.getDetectorCanvas().getCanvas("zOccupancy").cd(column + numberOfColumns * row);
+                    this.getDetectorCanvas().getCanvas("zOccupancy").draw(
                             this.getDataGroup().getItem(sector, layer, 2).getH1F("Occupancy Layer " + layer + " Sector " + sector));
                 } else {
-                    this.getDetectorCanvas().getCanvas("Occupancy C").cd(column + numberOfColumns * row);
-                    this.getDetectorCanvas().getCanvas("Occupancy C").draw(
+                    this.getDetectorCanvas().getCanvas("cOccupancy").cd(column + numberOfColumns * row);
+                    this.getDetectorCanvas().getCanvas("cOccupancy").draw(
                             this.getDataGroup().getItem(sector, layer, 2).getH1F("Occupancy Layer " + layer + " Sector " + sector));
                 }
                 switch (layer) {
@@ -233,17 +233,17 @@ public class BMTmonitor extends DetectorMonitor {
                         break;
                 }
 
-                this.getDetectorCanvas().getCanvas("TimeMax").cd(column + numberOfColumns * row);
-                this.getDetectorCanvas().getCanvas("TimeMax").draw(
+                this.getDetectorCanvas().getCanvas("tmax").cd(column + numberOfColumns * row);
+                this.getDetectorCanvas().getCanvas("tmax").draw(
                         this.getDataGroup().getItem(sector, layer, 1).getH1F("TimeOfMax : Layer " + layer + " Sector " + sector));
             }
         }
-        this.getDetectorCanvas().getCanvas("Multiplicity").draw(this.getDataGroup().getItem(0, 0, 0).getH1F("multi"));
+        this.getDetectorCanvas().getCanvas("multiplicity").draw(this.getDataGroup().getItem(0, 0, 0).getH1F("multi"));
         
-        this.getDetectorCanvas().getCanvas("Occupancy Z").update();
-        this.getDetectorCanvas().getCanvas("Occupancy C").update();
-        this.getDetectorCanvas().getCanvas("TimeMax").update();
-        this.getDetectorCanvas().getCanvas("Multiplicity").update();
+        this.getDetectorCanvas().getCanvas("zOccupancy").update();
+        this.getDetectorCanvas().getCanvas("cOccupancy").update();
+        this.getDetectorCanvas().getCanvas("tmax").update();
+        this.getDetectorCanvas().getCanvas("multiplicity").update();
     }
 
     public void processEvent(DataEvent event) {

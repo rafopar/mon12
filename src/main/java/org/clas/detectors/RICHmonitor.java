@@ -54,7 +54,7 @@ public class RICHmonitor  extends DetectorMonitor {
     public RICHmonitor(String name) {
         super(name);
 
-        this.setDetectorTabNames("Occupancy and time - RICH1","Occupancy and time - RICH2","Occupancy Maps");
+            this.setDetectorTabNames("rich1","rich2","occupancy2d");
         for(int i=0; i<NRICH; i++) this.tileToPMT[i] = this.setTiletoPMTMap(i+1);
         this.init(false);
     }
@@ -120,9 +120,9 @@ public class RICHmonitor  extends DetectorMonitor {
 
     @Override
     public void plotHistos() {
-        this.getDetectorCanvas().getCanvas("Occupancy Maps").divide(2, 1);
+        this.getDetectorCanvas().getCanvas("occupancy2d").divide(2, 1);
         for(int i=0; i<NRICH; i++) {
-            this.getDetectorCanvas().getCanvas("Occupancy and time - RICH" + (i+1)).divide(2, 2);
+            this.getDetectorCanvas().getCanvas("rich" + (i+1)).divide(2, 2);
             for(String tab: this.getDetectorTabNames()) {
                 this.getDetectorCanvas().getCanvas(tab).setGridX(false);
                 this.getDetectorCanvas().getCanvas(tab).setGridY(false);
@@ -133,29 +133,29 @@ public class RICHmonitor  extends DetectorMonitor {
             DataLine lineLE  = new DataLine(pmtAxis.min(),LE,  pmtAxis.max(), LE);
             DataLine lineTOT = new DataLine(pmtAxis.min(),TOT, pmtAxis.max(), TOT);
             DataLine lineXT  = new DataLine(pmtAxis.min(),XT,  pmtAxis.max(), XT);
-            this.getDetectorCanvas().getCanvas("Occupancy and time - RICH" + (i+1)).cd(0);
-            this.getDetectorCanvas().getCanvas("Occupancy and time - RICH" + (i+1)).getPad(0).getAxisY().setLog(true);
-            this.getDetectorCanvas().getCanvas("Occupancy and time - RICH" + (i+1)).draw(this.getDataGroup().getItem(i+1,0,0).getH1F("hi_pmt_occupancy"));
-            this.getDetectorCanvas().getCanvas("Occupancy and time - RICH" + (i+1)).draw(this.getDataGroup().getItem(i+1,0,0).getH1F("hi_pmt_max"),"same");
-            this.getDetectorCanvas().getCanvas("Occupancy and time - RICH" + (i+1)).cd(1);
-            this.getDetectorCanvas().getCanvas("Occupancy and time - RICH" + (i+1)).getPad(1).getAxisY().setLog(true);
-            this.getDetectorCanvas().getCanvas("Occupancy and time - RICH" + (i+1)).draw(this.getDataGroup().getItem(i+1,0,0).getH1F("hi_pix_occupancy"));
-            this.getDetectorCanvas().getCanvas("Occupancy and time - RICH" + (i+1)).draw(this.getDataGroup().getItem(i+1,0,0).getH1F("hi_pix_max"),"same");
-            this.getDetectorCanvas().getCanvas("Occupancy and time - RICH" + (i+1)).cd(2);
-            this.getDetectorCanvas().getCanvas("Occupancy and time - RICH" + (i+1)).getPad(2).getAxisZ().setLog(getLogZ());
-            this.getDetectorCanvas().getCanvas("Occupancy and time - RICH" + (i+1)).draw(this.getDataGroup().getItem(i+1,0,0).getH2F("hi_pmt_leading_edge"));
-            this.getDetectorCanvas().getCanvas("Occupancy and time - RICH" + (i+1)).draw(lineLE);
-            this.getDetectorCanvas().getCanvas("Occupancy and time - RICH" + (i+1)).cd(3);
-            this.getDetectorCanvas().getCanvas("Occupancy and time - RICH" + (i+1)).getPad(3).getAxisZ().setLog(getLogZ());
-            this.getDetectorCanvas().getCanvas("Occupancy and time - RICH" + (i+1)).draw(this.getDataGroup().getItem(i+1,0,0).getH2F("hi_pmt_duration"));
-            this.getDetectorCanvas().getCanvas("Occupancy and time - RICH" + (i+1)).draw(lineXT);
-            this.getDetectorCanvas().getCanvas("Occupancy and time - RICH" + (i+1)).draw(lineTOT);
-            this.getDetectorCanvas().getCanvas("Occupancy and time - RICH" + (i+1)).update();
-            this.getDetectorCanvas().getCanvas("Occupancy Maps").cd(i);
-            this.getDetectorCanvas().getCanvas("Occupancy Maps").getPad(i).setPalette("kRainBow");
-            this.getDetectorCanvas().getCanvas("Occupancy Maps").draw(this.getDataGroup().getItem(i+1,0,0).getH2F("hi_scaler"));
-            this.getDetectorCanvas().getCanvas("Occupancy Maps").getPad(i).getAxisZ().setLog(true);
-            this.getDetectorCanvas().getCanvas("Occupancy Maps").update();
+            this.getDetectorCanvas().getCanvas("rich" + (i+1)).cd(0);
+            this.getDetectorCanvas().getCanvas("rich" + (i+1)).getPad(0).getAxisY().setLog(true);
+            this.getDetectorCanvas().getCanvas("rich" + (i+1)).draw(this.getDataGroup().getItem(i+1,0,0).getH1F("hi_pmt_occupancy"));
+            this.getDetectorCanvas().getCanvas("rich" + (i+1)).draw(this.getDataGroup().getItem(i+1,0,0).getH1F("hi_pmt_max"),"same");
+            this.getDetectorCanvas().getCanvas("rich" + (i+1)).cd(1);
+            this.getDetectorCanvas().getCanvas("rich" + (i+1)).getPad(1).getAxisY().setLog(true);
+            this.getDetectorCanvas().getCanvas("rich" + (i+1)).draw(this.getDataGroup().getItem(i+1,0,0).getH1F("hi_pix_occupancy"));
+            this.getDetectorCanvas().getCanvas("rich" + (i+1)).draw(this.getDataGroup().getItem(i+1,0,0).getH1F("hi_pix_max"),"same");
+            this.getDetectorCanvas().getCanvas("rich" + (i+1)).cd(2);
+            this.getDetectorCanvas().getCanvas("rich" + (i+1)).getPad(2).getAxisZ().setLog(getLogZ());
+            this.getDetectorCanvas().getCanvas("rich" + (i+1)).draw(this.getDataGroup().getItem(i+1,0,0).getH2F("hi_pmt_leading_edge"));
+            this.getDetectorCanvas().getCanvas("rich" + (i+1)).draw(lineLE);
+            this.getDetectorCanvas().getCanvas("rich" + (i+1)).cd(3);
+            this.getDetectorCanvas().getCanvas("rich" + (i+1)).getPad(3).getAxisZ().setLog(getLogZ());
+            this.getDetectorCanvas().getCanvas("rich" + (i+1)).draw(this.getDataGroup().getItem(i+1,0,0).getH2F("hi_pmt_duration"));
+            this.getDetectorCanvas().getCanvas("rich" + (i+1)).draw(lineXT);
+            this.getDetectorCanvas().getCanvas("rich" + (i+1)).draw(lineTOT);
+            this.getDetectorCanvas().getCanvas("rich" + (i+1)).update();
+            this.getDetectorCanvas().getCanvas("occupancy2d").cd(i);
+            this.getDetectorCanvas().getCanvas("occupancy2d").getPad(i).setPalette("kRainBow");
+            this.getDetectorCanvas().getCanvas("occupancy2d").draw(this.getDataGroup().getItem(i+1,0,0).getH2F("hi_scaler"));
+            this.getDetectorCanvas().getCanvas("occupancy2d").getPad(i).getAxisZ().setLog(true);
+            this.getDetectorCanvas().getCanvas("occupancy2d").update();
             this.DrawTiles(i+1);
         }
     }
@@ -237,11 +237,11 @@ public class RICHmonitor  extends DetectorMonitor {
             double average  = nentries/NPMT/NANODE;
             this.getDataGroup().getItem(im+1,0,0).getH1F("hi_pmt_max").setBinContent(0, average*MAXPMT);
             this.getDataGroup().getItem(im+1,0,0).getH1F("hi_pix_max").setBinContent(0, average*MAXPIXEL);
-            this.setYAxisMin(this.getDetectorCanvas().getCanvas("Occupancy and time - RICH" + (im+1)).getPad(0),average*MINPMT);
-            this.setYAxisMin(this.getDetectorCanvas().getCanvas("Occupancy and time - RICH" + (im+1)).getPad(1),average*MINPIXEL);
-            this.getDetectorCanvas().getCanvas("Occupancy and time - RICH" + (im+1)).getPad(2).getAxisZ().setRange(0, average*MAXTIME);
-            this.getDetectorCanvas().getCanvas("Occupancy and time - RICH" + (im+1)).getPad(3).getAxisZ().setRange(0, average*MAXTIME);
-            this.getDetectorCanvas().getCanvas("Occupancy Maps").getPad(im).getAxisZ().setRange(0, average*MAXMAP);
+            this.setYAxisMin(this.getDetectorCanvas().getCanvas("rich" + (im+1)).getPad(0),average*MINPMT);
+            this.setYAxisMin(this.getDetectorCanvas().getCanvas("rich" + (im+1)).getPad(1),average*MINPIXEL);
+            this.getDetectorCanvas().getCanvas("rich" + (im+1)).getPad(2).getAxisZ().setRange(0, average*MAXTIME);
+            this.getDetectorCanvas().getCanvas("rich" + (im+1)).getPad(3).getAxisZ().setRange(0, average*MAXTIME);
+            this.getDetectorCanvas().getCanvas("occupancy2d").getPad(im).getAxisZ().setRange(0, average*MAXMAP);
         }
     }
     
@@ -292,10 +292,10 @@ public class RICHmonitor  extends DetectorMonitor {
             DataLine line2 = new DataLine(p2.x()-0.5, p2.y()-0.5, p3.x()+1.5, p3.y()-0.5);
             DataLine line3 = new DataLine(p3.x()+1.5, p3.y()-0.5, p4.x()+1.5, p4.y()+1.5);
             DataLine line4 = new DataLine(p4.x()+1.5, p4.y()+1.5, p1.x()-0.5, p1.y()+1.5);
-            this.getDetectorCanvas().getCanvas("Occupancy Maps").draw(line1);
-            this.getDetectorCanvas().getCanvas("Occupancy Maps").draw(line2);
-            this.getDetectorCanvas().getCanvas("Occupancy Maps").draw(line3);
-            this.getDetectorCanvas().getCanvas("Occupancy Maps").draw(line4);
+            this.getDetectorCanvas().getCanvas("occupancy2d").draw(line1);
+            this.getDetectorCanvas().getCanvas("occupancy2d").draw(line2);
+            this.getDetectorCanvas().getCanvas("occupancy2d").draw(line3);
+            this.getDetectorCanvas().getCanvas("occupancy2d").draw(line4);
         }
     }
         

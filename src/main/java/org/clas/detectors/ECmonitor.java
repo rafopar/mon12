@@ -22,7 +22,7 @@ public class ECmonitor  extends DetectorMonitor {
     public ECmonitor(String name) {
         super(name);
 
-        this.setDetectorTabNames("ADC Occupancies","TDC Occupancies", "ADC Histograms", "FADC timing", "TDC Histograms", "ADC sum");
+        this.setDetectorTabNames("adcOccupancy","tdcOccupancy", "adcEnergySector", "adcTimeSector", "tdcSector", "adcSumSector");
         this.useSectorButtons(true);
         this.init(false);
         this.getCcdb().setVariation("default");
@@ -33,24 +33,24 @@ public class ECmonitor  extends DetectorMonitor {
     public void createHistos() {
         // initialize canvas and create histograms
         this.setNumberOfEvents(0);
-        this.getDetectorCanvas().getCanvas("ADC Occupancies").divide(3, 3);
-        this.getDetectorCanvas().getCanvas("ADC Occupancies").setGridX(false);
-        this.getDetectorCanvas().getCanvas("ADC Occupancies").setGridY(false);
-        this.getDetectorCanvas().getCanvas("TDC Occupancies").divide(3, 3);
-        this.getDetectorCanvas().getCanvas("TDC Occupancies").setGridX(false);
-        this.getDetectorCanvas().getCanvas("TDC Occupancies").setGridY(false);
-        this.getDetectorCanvas().getCanvas("ADC Histograms").divide(3, 3);
-        this.getDetectorCanvas().getCanvas("ADC Histograms").setGridX(false);
-        this.getDetectorCanvas().getCanvas("ADC Histograms").setGridY(false);
-        this.getDetectorCanvas().getCanvas("FADC timing").divide(3, 3);
-        this.getDetectorCanvas().getCanvas("FADC timing").setGridX(false);
-        this.getDetectorCanvas().getCanvas("FADC timing").setGridY(false);
-        this.getDetectorCanvas().getCanvas("TDC Histograms").divide(3, 3);
-        this.getDetectorCanvas().getCanvas("TDC Histograms").setGridX(false);
-        this.getDetectorCanvas().getCanvas("TDC Histograms").setGridY(false);
-        this.getDetectorCanvas().getCanvas("ADC sum").divide(3, 2);
-        this.getDetectorCanvas().getCanvas("ADC sum").setGridX(false);
-        this.getDetectorCanvas().getCanvas("ADC sum").setGridY(false);
+        this.getDetectorCanvas().getCanvas("adcOccupancy").divide(3, 3);
+        this.getDetectorCanvas().getCanvas("adcOccupancy").setGridX(false);
+        this.getDetectorCanvas().getCanvas("adcOccupancy").setGridY(false);
+        this.getDetectorCanvas().getCanvas("tdcOccupancy").divide(3, 3);
+        this.getDetectorCanvas().getCanvas("tdcOccupancy").setGridX(false);
+        this.getDetectorCanvas().getCanvas("tdcOccupancy").setGridY(false);
+        this.getDetectorCanvas().getCanvas("adcEnergy").divide(3, 3);
+        this.getDetectorCanvas().getCanvas("adcEnergy").setGridX(false);
+        this.getDetectorCanvas().getCanvas("adcEnergy").setGridY(false);
+        this.getDetectorCanvas().getCanvas("adcTime").divide(3, 3);
+        this.getDetectorCanvas().getCanvas("adcTime").setGridX(false);
+        this.getDetectorCanvas().getCanvas("adcTime").setGridY(false);
+        this.getDetectorCanvas().getCanvas("tdc").divide(3, 3);
+        this.getDetectorCanvas().getCanvas("tdc").setGridX(false);
+        this.getDetectorCanvas().getCanvas("tdc").setGridY(false);
+        this.getDetectorCanvas().getCanvas("adcSum").divide(3, 2);
+        this.getDetectorCanvas().getCanvas("adcSum").setGridX(false);
+        this.getDetectorCanvas().getCanvas("adcSum").setGridY(false);
         
         DataGroup sum = new DataGroup(1,1);
        
@@ -104,7 +104,7 @@ public class ECmonitor  extends DetectorMonitor {
             datADC.setTitle("Sector "+sector);
             H2F timeFADC = new H2F("timeFADC"+layer+sector, "lay/sec " + layer + sector+" FADC", 80, 0., 400., this.npaddles[layer-1], 1, npaddles[layer-1]+1);
             timeFADC.setTitleY(stacks[stack-1] + " " + views[view-1] + " strip");
-            timeFADC.setTitleX("FADC timing");
+            timeFADC.setTitleX("adcTime");
             datADC.setTitle("Sector "+sector);
             H2F datTDC = new H2F("datTDC"+layer+sector, "lay/sec " + layer + sector+" TDC", 100, 0., 600., this.npaddles[layer-1], 1, npaddles[layer-1]+1);
             datTDC.setTitleY(stacks[stack-1] + " " + views[view-1] + " strip");
@@ -153,34 +153,34 @@ public class ECmonitor  extends DetectorMonitor {
     	fillDetectorSummary();
     	
         for(int layer=1; layer <=9; layer++) {
-            this.getDetectorCanvas().getCanvas("ADC Occupancies").cd((layer-1)+0);
-            this.getDetectorCanvas().getCanvas("ADC Occupancies").getPad((layer-1)).getAxisZ().setLog(getLogZ());
-            this.getDetectorCanvas().getCanvas("ADC Occupancies").draw(this.getDataGroup().getItem(0,layer,0).getH2F("occADC"+layer));
-            this.getDetectorCanvas().getCanvas("TDC Occupancies").cd((layer-1)+0);
-            this.getDetectorCanvas().getCanvas("TDC Occupancies").getPad((layer-1)).getAxisZ().setLog(getLogZ());
-            this.getDetectorCanvas().getCanvas("TDC Occupancies").draw(this.getDataGroup().getItem(0,layer,0).getH2F("occTDC"+layer));
+            this.getDetectorCanvas().getCanvas("adcOccupancy").cd((layer-1)+0);
+            this.getDetectorCanvas().getCanvas("adcOccupancy").getPad((layer-1)).getAxisZ().setLog(getLogZ());
+            this.getDetectorCanvas().getCanvas("adcOccupancy").draw(this.getDataGroup().getItem(0,layer,0).getH2F("occADC"+layer));
+            this.getDetectorCanvas().getCanvas("tdcOccupancy").cd((layer-1)+0);
+            this.getDetectorCanvas().getCanvas("tdcOccupancy").getPad((layer-1)).getAxisZ().setLog(getLogZ());
+            this.getDetectorCanvas().getCanvas("tdcOccupancy").draw(this.getDataGroup().getItem(0,layer,0).getH2F("occTDC"+layer));
         }
         
         for(int sector=1; sector<7; sector++) {
-            this.getDetectorCanvas().getCanvas("ADC sum").cd(sector-1);
-            this.getDetectorCanvas().getCanvas("ADC sum").getPad(sector-1).getAxisZ().setLog(getLogZ());
-            this.getDetectorCanvas().getCanvas("ADC sum").draw(this.getDataGroup().getItem(sector,0,0).getH2F("mipADC"+sector));
+            this.getDetectorCanvas().getCanvas("adcSum").cd(sector-1);
+            this.getDetectorCanvas().getCanvas("adcSum").getPad(sector-1).getAxisZ().setLog(getLogZ());
+            this.getDetectorCanvas().getCanvas("adcSum").draw(this.getDataGroup().getItem(sector,0,0).getH2F("mipADC"+sector));
             if(getActiveSector()==sector) {
                for(int layer=1; layer <= 9; layer++) {
-                   this.getDetectorCanvas().getCanvas("ADC Histograms").cd((layer-1)+0);
-                   this.getDetectorCanvas().getCanvas("ADC Histograms").getPad((layer-1)).getAxisZ().setLog(getLogZ());
-                   this.getDetectorCanvas().getCanvas("ADC Histograms").draw(this.getDataGroup().getItem(sector,layer,0).getH2F("datADC"+layer+sector));
-                   this.getDetectorCanvas().getCanvas("FADC timing").cd((layer-1)+0);
-                   this.getDetectorCanvas().getCanvas("FADC timing").getPad((layer-1)).getAxisZ().setLog(getLogZ());
-                   this.getDetectorCanvas().getCanvas("FADC timing").draw(this.getDataGroup().getItem(sector,layer,0).getH2F("timeFADC"+layer+sector));
-                   this.getDetectorCanvas().getCanvas("TDC Histograms").cd((layer-1)+0);
-                   this.getDetectorCanvas().getCanvas("TDC Histograms").getPad((layer-1)).getAxisZ().setLog(getLogZ());
-                   this.getDetectorCanvas().getCanvas("TDC Histograms").draw(this.getDataGroup().getItem(sector,layer,0).getH2F("datTDC"+layer+sector));
+                   this.getDetectorCanvas().getCanvas("adcEnergy").cd((layer-1)+0);
+                   this.getDetectorCanvas().getCanvas("adcEnergy").getPad((layer-1)).getAxisZ().setLog(getLogZ());
+                   this.getDetectorCanvas().getCanvas("adcEnergy").draw(this.getDataGroup().getItem(sector,layer,0).getH2F("datADC"+layer+sector));
+                   this.getDetectorCanvas().getCanvas("adcTime").cd((layer-1)+0);
+                   this.getDetectorCanvas().getCanvas("adcTime").getPad((layer-1)).getAxisZ().setLog(getLogZ());
+                   this.getDetectorCanvas().getCanvas("adcTime").draw(this.getDataGroup().getItem(sector,layer,0).getH2F("timeFADC"+layer+sector));
+                   this.getDetectorCanvas().getCanvas("tdc").cd((layer-1)+0);
+                   this.getDetectorCanvas().getCanvas("tdc").getPad((layer-1)).getAxisZ().setLog(getLogZ());
+                   this.getDetectorCanvas().getCanvas("tdc").draw(this.getDataGroup().getItem(sector,layer,0).getH2F("datTDC"+layer+sector));
                }
         	   }
         }   
         
-        this.getDetectorCanvas().getCanvas("ADC Occupancies").update();
+        this.getDetectorCanvas().getCanvas("adcOccupancy").update();
                 
     }
 
@@ -219,8 +219,8 @@ public class ECmonitor  extends DetectorMonitor {
                   	this.getDataGroup().getItem(sector,layer,0).getH2F("datADC"+layer+sector).fill(adc,comp*1.0);
                     if(time > 1) this.getDataGroup().getItem(sector,layer,0).getH2F("timeFADC"+layer+sector).fill(time,comp*1.0);
                 }
-                if (layer<4) pcsum[sector-1]+=adc; //raw ADC sum in PCAL
-                if (layer>3) ecsum[sector-1]+=adc; //raw ADC sum in EC
+                if (layer<4) pcsum[sector-1]+=adc; //raw adcSum in PCAL
+                if (layer>3) ecsum[sector-1]+=adc; //raw adcSum in EC
                 if(adc>0 && time>=0) {
                     if(layer <= 3)               this.getDetectorSummary().getH2F("sumPCAL").fill(sector, layer);
                     if(layer >= 4 && layer <= 6) this.getDetectorSummary().getH2F("sumECin").fill(sector, layer-3);

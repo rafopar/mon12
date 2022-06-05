@@ -19,7 +19,7 @@ public class HTCCmonitor  extends DetectorMonitor {
     public HTCCmonitor(String name) {
         super(name);
         
-        this.setDetectorTabNames("Occupancies", "ADC spectra", "FADC timing spectra"/*, "TDC spectra"*/);
+        this.setDetectorTabNames("occupancy", "adcEnergy", "adcTime"/*, "TDC spectra"*/);
         this.init(false);
     }
 
@@ -27,15 +27,15 @@ public class HTCCmonitor  extends DetectorMonitor {
     public void createHistos() {
         // initialize canvas and create histograms
         this.setNumberOfEvents(0);
-        this.getDetectorCanvas().getCanvas("Occupancies").divide(1, 2);
-        this.getDetectorCanvas().getCanvas("Occupancies").setGridX(false);
-        this.getDetectorCanvas().getCanvas("Occupancies").setGridY(false);
-        this.getDetectorCanvas().getCanvas("ADC spectra").divide(3, 2);
-        this.getDetectorCanvas().getCanvas("ADC spectra").setGridX(false);
-        this.getDetectorCanvas().getCanvas("ADC spectra").setGridY(false);
-        this.getDetectorCanvas().getCanvas("FADC timing spectra").divide(3, 2);
-        this.getDetectorCanvas().getCanvas("FADC timing spectra").setGridX(false);
-        this.getDetectorCanvas().getCanvas("FADC timing spectra").setGridY(false);
+        this.getDetectorCanvas().getCanvas("occupancy").divide(1, 2);
+        this.getDetectorCanvas().getCanvas("occupancy").setGridX(false);
+        this.getDetectorCanvas().getCanvas("occupancy").setGridY(false);
+        this.getDetectorCanvas().getCanvas("adcEnergy").divide(3, 2);
+        this.getDetectorCanvas().getCanvas("adcEnergy").setGridX(false);
+        this.getDetectorCanvas().getCanvas("adcEnergy").setGridY(false);
+        this.getDetectorCanvas().getCanvas("adcTime").divide(3, 2);
+        this.getDetectorCanvas().getCanvas("adcTime").setGridX(false);
+        this.getDetectorCanvas().getCanvas("adcTime").setGridY(false);
 //        this.getDetectorCanvas().getCanvas("TDC spectra").divide(3, 2);
 //        this.getDetectorCanvas().getCanvas("TDC spectra").setGridX(false);
 //        this.getDetectorCanvas().getCanvas("TDC spectra").setGridY(false);
@@ -164,53 +164,53 @@ public class HTCCmonitor  extends DetectorMonitor {
     @Override
     public void plotHistos() {
         // plotting histos
-        this.getDetectorCanvas().getCanvas("Occupancies").cd(0);
-        this.getDetectorCanvas().getCanvas("Occupancies").getPad(0).getAxisZ().setLog(getLogZ());
-        this.getDetectorCanvas().getCanvas("Occupancies").draw(this.getDataGroup().getItem(0,0,0).getH2F("occADC"));
-        this.getDetectorCanvas().getCanvas("Occupancies").cd(1);
-        this.getDetectorCanvas().getCanvas("Occupancies").getPad(1).getAxisY().setLog(true);
-        this.getDetectorCanvas().getCanvas("Occupancies").draw(this.getDataGroup().getItem(0,0,0).getH1F("occADC1D"));
-        this.getDetectorCanvas().getCanvas("Occupancies").update();
+        this.getDetectorCanvas().getCanvas("occupancy").cd(0);
+        this.getDetectorCanvas().getCanvas("occupancy").getPad(0).getAxisZ().setLog(getLogZ());
+        this.getDetectorCanvas().getCanvas("occupancy").draw(this.getDataGroup().getItem(0,0,0).getH2F("occADC"));
+        this.getDetectorCanvas().getCanvas("occupancy").cd(1);
+        this.getDetectorCanvas().getCanvas("occupancy").getPad(1).getAxisY().setLog(true);
+        this.getDetectorCanvas().getCanvas("occupancy").draw(this.getDataGroup().getItem(0,0,0).getH1F("occADC1D"));
+        this.getDetectorCanvas().getCanvas("occupancy").update();
         
-        this.getDetectorCanvas().getCanvas("ADC spectra").cd(0);
-        this.getDetectorCanvas().getCanvas("ADC spectra").getPad(0).getAxisZ().setLog(getLogZ());
-        this.getDetectorCanvas().getCanvas("ADC spectra").draw(this.getDataGroup().getItem(0,0,0).getH2F("adc_s1"));
-        this.getDetectorCanvas().getCanvas("ADC spectra").cd(1);
-        this.getDetectorCanvas().getCanvas("ADC spectra").getPad(1).getAxisZ().setLog(getLogZ());
-        this.getDetectorCanvas().getCanvas("ADC spectra").draw(this.getDataGroup().getItem(0,0,0).getH2F("adc_s2"));
-        this.getDetectorCanvas().getCanvas("ADC spectra").cd(2);
-        this.getDetectorCanvas().getCanvas("ADC spectra").getPad(2).getAxisZ().setLog(getLogZ());
-        this.getDetectorCanvas().getCanvas("ADC spectra").draw(this.getDataGroup().getItem(0,0,0).getH2F("adc_s3"));
-        this.getDetectorCanvas().getCanvas("ADC spectra").cd(3);
-        this.getDetectorCanvas().getCanvas("ADC spectra").getPad(3).getAxisZ().setLog(getLogZ());
-        this.getDetectorCanvas().getCanvas("ADC spectra").draw(this.getDataGroup().getItem(0,0,0).getH2F("adc_s4"));
-        this.getDetectorCanvas().getCanvas("ADC spectra").cd(4);
-        this.getDetectorCanvas().getCanvas("ADC spectra").getPad(4).getAxisZ().setLog(getLogZ());
-        this.getDetectorCanvas().getCanvas("ADC spectra").draw(this.getDataGroup().getItem(0,0,0).getH2F("adc_s5"));
-        this.getDetectorCanvas().getCanvas("ADC spectra").cd(5);
-        this.getDetectorCanvas().getCanvas("ADC spectra").getPad(5).getAxisZ().setLog(getLogZ());
-        this.getDetectorCanvas().getCanvas("ADC spectra").draw(this.getDataGroup().getItem(0,0,0).getH2F("adc_s6"));
-        this.getDetectorCanvas().getCanvas("ADC spectra").update();
+        this.getDetectorCanvas().getCanvas("adcEnergy").cd(0);
+        this.getDetectorCanvas().getCanvas("adcEnergy").getPad(0).getAxisZ().setLog(getLogZ());
+        this.getDetectorCanvas().getCanvas("adcEnergy").draw(this.getDataGroup().getItem(0,0,0).getH2F("adc_s1"));
+        this.getDetectorCanvas().getCanvas("adcEnergy").cd(1);
+        this.getDetectorCanvas().getCanvas("adcEnergy").getPad(1).getAxisZ().setLog(getLogZ());
+        this.getDetectorCanvas().getCanvas("adcEnergy").draw(this.getDataGroup().getItem(0,0,0).getH2F("adc_s2"));
+        this.getDetectorCanvas().getCanvas("adcEnergy").cd(2);
+        this.getDetectorCanvas().getCanvas("adcEnergy").getPad(2).getAxisZ().setLog(getLogZ());
+        this.getDetectorCanvas().getCanvas("adcEnergy").draw(this.getDataGroup().getItem(0,0,0).getH2F("adc_s3"));
+        this.getDetectorCanvas().getCanvas("adcEnergy").cd(3);
+        this.getDetectorCanvas().getCanvas("adcEnergy").getPad(3).getAxisZ().setLog(getLogZ());
+        this.getDetectorCanvas().getCanvas("adcEnergy").draw(this.getDataGroup().getItem(0,0,0).getH2F("adc_s4"));
+        this.getDetectorCanvas().getCanvas("adcEnergy").cd(4);
+        this.getDetectorCanvas().getCanvas("adcEnergy").getPad(4).getAxisZ().setLog(getLogZ());
+        this.getDetectorCanvas().getCanvas("adcEnergy").draw(this.getDataGroup().getItem(0,0,0).getH2F("adc_s5"));
+        this.getDetectorCanvas().getCanvas("adcEnergy").cd(5);
+        this.getDetectorCanvas().getCanvas("adcEnergy").getPad(5).getAxisZ().setLog(getLogZ());
+        this.getDetectorCanvas().getCanvas("adcEnergy").draw(this.getDataGroup().getItem(0,0,0).getH2F("adc_s6"));
+        this.getDetectorCanvas().getCanvas("adcEnergy").update();
         
-        this.getDetectorCanvas().getCanvas("FADC timing spectra").cd(0);
-        this.getDetectorCanvas().getCanvas("FADC timing spectra").getPad(0).getAxisZ().setLog(getLogZ());
-        this.getDetectorCanvas().getCanvas("FADC timing spectra").draw(this.getDataGroup().getItem(0,0,0).getH2F("fadc_time_s1"));
-        this.getDetectorCanvas().getCanvas("FADC timing spectra").cd(1);
-        this.getDetectorCanvas().getCanvas("FADC timing spectra").getPad(1).getAxisZ().setLog(getLogZ());
-        this.getDetectorCanvas().getCanvas("FADC timing spectra").draw(this.getDataGroup().getItem(0,0,0).getH2F("fadc_time_s2"));
-        this.getDetectorCanvas().getCanvas("FADC timing spectra").cd(2);
-        this.getDetectorCanvas().getCanvas("FADC timing spectra").getPad(2).getAxisZ().setLog(getLogZ());
-        this.getDetectorCanvas().getCanvas("FADC timing spectra").draw(this.getDataGroup().getItem(0,0,0).getH2F("fadc_time_s3"));
-        this.getDetectorCanvas().getCanvas("FADC timing spectra").cd(3);
-        this.getDetectorCanvas().getCanvas("FADC timing spectra").getPad(3).getAxisZ().setLog(getLogZ());
-        this.getDetectorCanvas().getCanvas("FADC timing spectra").draw(this.getDataGroup().getItem(0,0,0).getH2F("fadc_time_s4"));
-        this.getDetectorCanvas().getCanvas("FADC timing spectra").cd(4);
-        this.getDetectorCanvas().getCanvas("FADC timing spectra").getPad(4).getAxisZ().setLog(getLogZ());
-        this.getDetectorCanvas().getCanvas("FADC timing spectra").draw(this.getDataGroup().getItem(0,0,0).getH2F("fadc_time_s5"));
-        this.getDetectorCanvas().getCanvas("FADC timing spectra").cd(5);
-        this.getDetectorCanvas().getCanvas("FADC timing spectra").getPad(5).getAxisZ().setLog(getLogZ());
-        this.getDetectorCanvas().getCanvas("FADC timing spectra").draw(this.getDataGroup().getItem(0,0,0).getH2F("fadc_time_s6"));
-        this.getDetectorCanvas().getCanvas("FADC timing spectra").update();
+        this.getDetectorCanvas().getCanvas("adcTime").cd(0);
+        this.getDetectorCanvas().getCanvas("adcTime").getPad(0).getAxisZ().setLog(getLogZ());
+        this.getDetectorCanvas().getCanvas("adcTime").draw(this.getDataGroup().getItem(0,0,0).getH2F("fadc_time_s1"));
+        this.getDetectorCanvas().getCanvas("adcTime").cd(1);
+        this.getDetectorCanvas().getCanvas("adcTime").getPad(1).getAxisZ().setLog(getLogZ());
+        this.getDetectorCanvas().getCanvas("adcTime").draw(this.getDataGroup().getItem(0,0,0).getH2F("fadc_time_s2"));
+        this.getDetectorCanvas().getCanvas("adcTime").cd(2);
+        this.getDetectorCanvas().getCanvas("adcTime").getPad(2).getAxisZ().setLog(getLogZ());
+        this.getDetectorCanvas().getCanvas("adcTime").draw(this.getDataGroup().getItem(0,0,0).getH2F("fadc_time_s3"));
+        this.getDetectorCanvas().getCanvas("adcTime").cd(3);
+        this.getDetectorCanvas().getCanvas("adcTime").getPad(3).getAxisZ().setLog(getLogZ());
+        this.getDetectorCanvas().getCanvas("adcTime").draw(this.getDataGroup().getItem(0,0,0).getH2F("fadc_time_s4"));
+        this.getDetectorCanvas().getCanvas("adcTime").cd(4);
+        this.getDetectorCanvas().getCanvas("adcTime").getPad(4).getAxisZ().setLog(getLogZ());
+        this.getDetectorCanvas().getCanvas("adcTime").draw(this.getDataGroup().getItem(0,0,0).getH2F("fadc_time_s5"));
+        this.getDetectorCanvas().getCanvas("adcTime").cd(5);
+        this.getDetectorCanvas().getCanvas("adcTime").getPad(5).getAxisZ().setLog(getLogZ());
+        this.getDetectorCanvas().getCanvas("adcTime").draw(this.getDataGroup().getItem(0,0,0).getH2F("fadc_time_s6"));
+        this.getDetectorCanvas().getCanvas("adcTime").update();
 
 //        this.getDetectorCanvas().getCanvas("TDC spectra").cd(0);
 //        this.getDetectorCanvas().getCanvas("TDC spectra").getPad(0).getAxisZ().setLog(getLogZ());

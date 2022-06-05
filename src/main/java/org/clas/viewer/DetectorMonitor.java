@@ -5,6 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,30 +36,27 @@ import org.jlab.utils.groups.IndexedList;
 public class DetectorMonitor implements IDataEventListener, ActionListener {
 
     private final String detectorName;
-    private ConstantsManager ccdb = new ConstantsManager();
-    private ArrayList<String> detectorTabNames = new ArrayList();
-    private IndexedList<DataGroup> detectorData = new IndexedList<DataGroup>(3);
+    private final ConstantsManager ccdb = new ConstantsManager();
+    private final ArrayList<String> detectorTabNames = new ArrayList();
+    private final IndexedList<DataGroup> detectorData = new IndexedList<>(3);
     private DataGroup detectorSummary = null;
-    private DetectorOccupancy detectorOccupancy = new DetectorOccupancy();
     private JPanel detectorPanel = null;
     private EmbeddedCanvasTabbed detectorCanvas = null;
     private DetectorPane2D detectorView = null;
     private ButtonGroup buttonGroup = null;
     private int numberOfEvents;
-    private Boolean sectorButtons = false;
+    private boolean sectorButtons = false;
     private int detectorActiveSector = 1;
-    private Boolean detectorLogZ = true;
-    private Boolean detectorLogY = false;
-    private Boolean isTB = false;
+    private boolean detectorLogZ = true;
+    private boolean detectorLogY = false;
     private boolean active = true;
-    private JRadioButton[] bS = new JRadioButton[6];
-    private JCheckBox tbBtn;
+    private final JRadioButton[] bS = new JRadioButton[6];
 
-    public IndexedList<List<Float>> ttdcs = new IndexedList<List<Float>>(4);
-    public IndexedList<List<Float>> fadcs = new IndexedList<List<Float>>(4);
-    public IndexedList<List<Float>> ftdcs = new IndexedList<List<Float>>(4);
-    public IndexedList<List<Integer>> fapmt = new IndexedList<List<Integer>>(3);
-    public IndexedList<List<Integer>> ftpmt = new IndexedList<List<Integer>>(3);
+    public IndexedList<List<Float>> ttdcs = new IndexedList<>(4);
+    public IndexedList<List<Float>> fadcs = new IndexedList<>(4);
+    public IndexedList<List<Float>> ftdcs = new IndexedList<>(4);
+    public IndexedList<List<Integer>> fapmt = new IndexedList<>(3);
+    public IndexedList<List<Integer>> ftpmt = new IndexedList<>(3);
 
     public int bitsec = 0;
     public long trigger = 0;
@@ -236,10 +234,6 @@ public class DetectorMonitor implements IDataEventListener, ActionListener {
         return detectorName;
     }
 
-    public DetectorOccupancy getDetectorOccupancy() {
-        return detectorOccupancy;
-    }
-
     public JPanel getDetectorPanel() {
         return detectorPanel;
     }
@@ -254,6 +248,10 @@ public class DetectorMonitor implements IDataEventListener, ActionListener {
 
     public void useSectorButtons(boolean flag) {
         this.sectorButtons = flag;
+    }
+
+    public void setActiveSector(int sector) {
+        detectorActiveSector = sector;
     }
 
     public int getActiveSector() {
@@ -316,6 +314,7 @@ public class DetectorMonitor implements IDataEventListener, ActionListener {
         return buttonPane;
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
         // TODO Auto-generated method stub
         this.detectorActiveSector = Integer.parseInt(buttonGroup.getSelection().getActionCommand());
@@ -339,12 +338,25 @@ public class DetectorMonitor implements IDataEventListener, ActionListener {
     public LinkedHashMap<String, String> printCanvas(String dir, String timestamp) {
         // print canvas to files
         LinkedHashMap<String, String> prints = new LinkedHashMap<>();
-        for (int tab = 0; tab < this.detectorTabNames.size(); tab++) {
-            String fileName = dir + "/" + this.detectorName + "_canvas" + tab + "_" + timestamp + ".png";
-            System.out.println(fileName);
-            this.detectorCanvas.getCanvas(this.detectorTabNames.get(tab)).save(fileName);
-            prints.put(fileName, this.detectorTabNames.get(tab));
+        int nsec = 2;
+        if(this.sectorButtons) nsec = 7;
+        for(int sec=1; sec<nsec; sec++) {
+            this.setActiveSector(sec);
+            this.plotHistos();
+            for (int tab = 0; tab < this.detectorTabNames.size(); tab++) {
+                String name = this.detectorTabNames.get(tab);
+                if(name.contains("Sector")) name += sec;
+                String fileName = dir + "/" + this.detectorName + "_" + name + ".png";
+                if(!prints.containsKey(fileName)) {
+                    System.out.println(fileName);
+                    String canvasName = this.detectorTabNames.get(tab);
+                    canvasName = canvasName.replace("Sector", "");
+                    this.detectorCanvas.getCanvas(canvasName).save(fileName);
+                    prints.put(fileName, name);
+                }
+            }
         }
+        if(this.sectorButtons) bS[1].doClick();
         return prints;
     }
 
@@ -357,7 +369,8 @@ public class DetectorMonitor implements IDataEventListener, ActionListener {
 
     public void setCanvasUpdate(int time) {
         for (int tab = 0; tab < this.detectorTabNames.size(); tab++) {
-            this.detectorCanvas.getCanvas(this.detectorTabNames.get(tab)).initTimer(time);
+            String name = this.detectorTabNames.get(tab).replace("Sector", "");
+            this.detectorCanvas.getCanvas(name).initTimer(time);
         }
     }
 
@@ -370,13 +383,18 @@ public class DetectorMonitor implements IDataEventListener, ActionListener {
     }
 
     public void setDetectorTabNames(String... names) {
+        EmbeddedCanvasTabbed canvas = null;
         for (String name : names) {
             this.detectorTabNames.add(name);
+            String canvasName = name.replace("Sector", "");
+            if(canvas == null) 
+                canvas = new EmbeddedCanvasTabbed(canvasName);
+            else
+                canvas.addCanvas(canvasName);
         }
-        EmbeddedCanvasTabbed canvas = new EmbeddedCanvasTabbed(names);
         this.setDetectorCanvas(canvas);
     }
-
+    
     public void setDetectorSummary(DataGroup group) {
         this.detectorSummary = group;
     }

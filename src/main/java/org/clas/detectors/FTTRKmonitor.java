@@ -30,7 +30,7 @@ public class FTTRKmonitor extends DetectorMonitor {
 
         this.loadConstantsFromCCDB(defaultRunNumber);
 
-        this.setDetectorTabNames("Occupancies_2D", "Occupancies_1D", "TimeMax", "ADC and time spectra");
+        this.setDetectorTabNames("occupancy2d", "occupancy1d", "tmax", "adc");
         this.init(false);
     }
 
@@ -106,38 +106,38 @@ public class FTTRKmonitor extends DetectorMonitor {
     @Override
     public void plotHistos() {
         // plotting histos
-        this.getDetectorCanvas().getCanvas("Occupancies_2D").divide(1, 1);
-        this.getDetectorCanvas().getCanvas("Occupancies_2D").setGridX(false);
-        this.getDetectorCanvas().getCanvas("Occupancies_2D").setGridY(false);
-        this.getDetectorCanvas().getCanvas("Occupancies_2D").cd(0);
-        this.getDetectorCanvas().getCanvas("Occupancies_2D").getPad(0).getAxisZ().setLog(getLogZ());
-        this.getDetectorCanvas().getCanvas("Occupancies_2D").draw(this.getDataGroup().getItem(0, 0, 0).getH2F("occADC_2D"));
-        this.getDetectorCanvas().getCanvas("Occupancies_1D").divide(2, 2);
-        this.getDetectorCanvas().getCanvas("Occupancies_1D").setGridX(false);
-        this.getDetectorCanvas().getCanvas("Occupancies_1D").setGridY(false);
+        this.getDetectorCanvas().getCanvas("occupancy2d").divide(1, 1);
+        this.getDetectorCanvas().getCanvas("occupancy2d").setGridX(false);
+        this.getDetectorCanvas().getCanvas("occupancy2d").setGridY(false);
+        this.getDetectorCanvas().getCanvas("occupancy2d").cd(0);
+        this.getDetectorCanvas().getCanvas("occupancy2d").getPad(0).getAxisZ().setLog(getLogZ());
+        this.getDetectorCanvas().getCanvas("occupancy2d").draw(this.getDataGroup().getItem(0, 0, 0).getH2F("occADC_2D"));
+        this.getDetectorCanvas().getCanvas("occupancy1d").divide(2, 2);
+        this.getDetectorCanvas().getCanvas("occupancy1d").setGridX(false);
+        this.getDetectorCanvas().getCanvas("occupancy1d").setGridY(false);
         for (int ilayer = 1; ilayer <= nlayer; ilayer++) {
-            this.getDetectorCanvas().getCanvas("Occupancies_1D").cd(0 + ilayer - 1);
-            this.getDetectorCanvas().getCanvas("Occupancies_1D").draw(this.getDataGroup().getItem(0, ilayer, 0).getH1F("occADC_layer" + ilayer));
+            this.getDetectorCanvas().getCanvas("occupancy1d").cd(0 + ilayer - 1);
+            this.getDetectorCanvas().getCanvas("occupancy1d").draw(this.getDataGroup().getItem(0, ilayer, 0).getH1F("occADC_layer" + ilayer));
         }
-        this.getDetectorCanvas().getCanvas("TimeMax").divide(nlayer / 2, nlayer / 2);
-        this.getDetectorCanvas().getCanvas("TimeMax").setGridX(false);
-        this.getDetectorCanvas().getCanvas("TimeMax").setGridY(false);
+        this.getDetectorCanvas().getCanvas("tmax").divide(nlayer / 2, nlayer / 2);
+        this.getDetectorCanvas().getCanvas("tmax").setGridX(false);
+        this.getDetectorCanvas().getCanvas("tmax").setGridY(false);
         for (int ilayer = 1; ilayer <= nlayer; ilayer++) {
-            this.getDetectorCanvas().getCanvas("TimeMax").cd(0 + ilayer - 1);
+            this.getDetectorCanvas().getCanvas("tmax").cd(0 + ilayer - 1);
             int sector = 1;
-            this.getDetectorCanvas().getCanvas("TimeMax").draw(this.getDataGroup().getItem(0, ilayer, 0).getH1F("TimeOfMax : Layer " + ilayer + " Sector " + sector));
+            this.getDetectorCanvas().getCanvas("tmax").draw(this.getDataGroup().getItem(0, ilayer, 0).getH1F("TimeOfMax : Layer " + ilayer + " Sector " + sector));
         }
-        this.getDetectorCanvas().getCanvas("TimeMax").update();
-        this.getDetectorCanvas().getCanvas("ADC and time spectra").divide(1, 2);
-        this.getDetectorCanvas().getCanvas("ADC and time spectra").setGridX(false);
-        this.getDetectorCanvas().getCanvas("ADC and time spectra").setGridY(false);
-        this.getDetectorCanvas().getCanvas("ADC and time spectra").cd(0);
-        this.getDetectorCanvas().getCanvas("ADC and time spectra").getPad(0).getAxisZ().setLog(getLogZ());
-        this.getDetectorCanvas().getCanvas("ADC and time spectra").draw(this.getDataGroup().getItem(0, 0, 0).getH2F("adc"));
-        this.getDetectorCanvas().getCanvas("ADC and time spectra").cd(1);
-        this.getDetectorCanvas().getCanvas("ADC and time spectra").getPad(1).getAxisZ().setLog(getLogZ());
-        this.getDetectorCanvas().getCanvas("ADC and time spectra").draw(this.getDataGroup().getItem(0, 0, 0).getH2F("tdc"));
-        this.getDetectorCanvas().getCanvas("ADC and time spectra").update();
+        this.getDetectorCanvas().getCanvas("tmax").update();
+        this.getDetectorCanvas().getCanvas("adc").divide(1, 2);
+        this.getDetectorCanvas().getCanvas("adc").setGridX(false);
+        this.getDetectorCanvas().getCanvas("adc").setGridY(false);
+        this.getDetectorCanvas().getCanvas("adc").cd(0);
+        this.getDetectorCanvas().getCanvas("adc").getPad(0).getAxisZ().setLog(getLogZ());
+        this.getDetectorCanvas().getCanvas("adc").draw(this.getDataGroup().getItem(0, 0, 0).getH2F("adc"));
+        this.getDetectorCanvas().getCanvas("adc").cd(1);
+        this.getDetectorCanvas().getCanvas("adc").getPad(1).getAxisZ().setLog(getLogZ());
+        this.getDetectorCanvas().getCanvas("adc").draw(this.getDataGroup().getItem(0, 0, 0).getH2F("tdc"));
+        this.getDetectorCanvas().getCanvas("adc").update();
     }
 
     @Override
