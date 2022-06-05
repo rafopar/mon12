@@ -22,7 +22,7 @@ public class ECmonitor  extends DetectorMonitor {
     public ECmonitor(String name) {
         super(name);
 
-        this.setDetectorTabNames("adcOccupancy","tdcOccupancy", "adcEnergySector", "adcTimeSector", "tdcSector", "adcSumSector");
+        this.setDetectorTabNames("adcOccupancy","tdcOccupancy", "adcEnergy_s", "adcTime_s", "tdc_s", "adcSum_s");
         this.useSectorButtons(true);
         this.init(false);
         this.getCcdb().setVariation("default");

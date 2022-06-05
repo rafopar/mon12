@@ -26,7 +26,7 @@ public class FTOFmonitor  extends DetectorMonitor {
     public FTOFmonitor(String name) {
         super(name);
         
-        this.setDetectorTabNames("adcOccupancy", "tdcOccupancy","adcEnergySector", "adcTimeSector", "tdcSector","miscSector");
+        this.setDetectorTabNames("adcOccupancy", "tdcOccupancy","adcEnergy_s", "adcTime_s", "tdc_s","misc_s");
         this.useSectorButtons(true);
         this.init(false);   // set to true for picture on left side
         ftofHits[0] = new FTOFHits("PANEL1A");

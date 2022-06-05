@@ -345,13 +345,11 @@ public class DetectorMonitor implements IDataEventListener, ActionListener {
             this.plotHistos();
             for (int tab = 0; tab < this.detectorTabNames.size(); tab++) {
                 String name = this.detectorTabNames.get(tab);
-                if(name.contains("Sector")) name += sec;
+                if(name.endsWith("_s")) name += sec;
                 String fileName = dir + "/" + this.detectorName + "_" + name + ".png";
                 if(!prints.containsKey(fileName)) {
                     System.out.println(fileName);
-                    String canvasName = this.detectorTabNames.get(tab);
-                    canvasName = canvasName.replace("Sector", "");
-                    this.detectorCanvas.getCanvas(canvasName).save(fileName);
+                    this.detectorCanvas.getCanvas(this.getCanvasTabName(this.detectorTabNames.get(tab))).save(fileName);
                     prints.put(fileName, name);
                 }
             }
@@ -369,7 +367,7 @@ public class DetectorMonitor implements IDataEventListener, ActionListener {
 
     public void setCanvasUpdate(int time) {
         for (int tab = 0; tab < this.detectorTabNames.size(); tab++) {
-            String name = this.detectorTabNames.get(tab).replace("Sector", "");
+            String name = this.getCanvasTabName(this.detectorTabNames.get(tab));
             this.detectorCanvas.getCanvas(name).initTimer(time);
         }
     }
@@ -382,11 +380,17 @@ public class DetectorMonitor implements IDataEventListener, ActionListener {
         this.detectorCanvas = canvas;
     }
 
+    private String getCanvasTabName(String name) {
+        if(name.endsWith("_s")) name = name.substring(0, name.length()-2);
+        return name;
+    }
+    
     public void setDetectorTabNames(String... names) {
         EmbeddedCanvasTabbed canvas = null;
         for (String name : names) {
             this.detectorTabNames.add(name);
-            String canvasName = name.replace("Sector", "");
+            String canvasName = this.getCanvasTabName(name);
+            System.out.println(canvasName);
             if(canvas == null) 
                 canvas = new EmbeddedCanvasTabbed(canvasName);
             else
@@ -406,7 +410,7 @@ public class DetectorMonitor implements IDataEventListener, ActionListener {
     @Override
     public final void timerUpdate() {
         this.analysisUpdate();
-        this.resetStreams();
+        DetectorMonitor.resetStreams();
     }
 
     public void analysisUpdate() {
