@@ -78,27 +78,27 @@ public class RICHmonitor  extends DetectorMonitor {
     @Override
     public void createHistos() {
         for(int i=0; i<NRICH; i++) {
-            H2F hi_pmt_leading_edge = new H2F("hi_pmt_leading_edge", "TDC Hit Leading Edge Time", NPMT, +0.5, NPMT+0.5, 100, 0, 300);
+            H2F hi_pmt_leading_edge = new H2F("hi_pmt_leading_edge_" + (i+1), "TDC Hit Leading Edge Time", NPMT, +0.5, NPMT+0.5, 100, 0, 300);
             hi_pmt_leading_edge.setTitleX("PMT");
             hi_pmt_leading_edge.setTitleY("Time (ns)");
-            H2F hi_pmt_duration     = new H2F("hi_pmt_duration", "TDC Hit Time Over Threshold",   NPMT, +0.5, NPMT+0.5, 100, 0,  100);
+            H2F hi_pmt_duration     = new H2F("hi_pmt_duration_" + (i+1), "TDC Hit Time Over Threshold",   NPMT, +0.5, NPMT+0.5, 100, 0,  100);
             hi_pmt_duration.setTitleX("PMT");
             hi_pmt_duration.setTitleY("Time (ns)");
-            H1F hi_pmt_occupancy    = new H1F("hi_pmt_occupancy", "PMT",   "Counts", NPMT, +0.5, NPMT+0.5);
+            H1F hi_pmt_occupancy    = new H1F("hi_pmt_occupancy_" + (i+1), "PMT",   "Counts", NPMT, +0.5, NPMT+0.5);
             hi_pmt_occupancy.setTitle("PMT Hit Occupancy");
             hi_pmt_occupancy.setFillColor(25);
             hi_pmt_occupancy.setOptStat("10");
-            H1F hi_pmt_max          = new H1F("hi_pmt_max", " ", 1, 0.5, NPMT+0.5);
+            H1F hi_pmt_max          = new H1F("hi_pmt_max_" + (i+1), " ", 1, 0.5, NPMT+0.5);
             hi_pmt_max.setLineWidth(2);
             hi_pmt_max.setLineColor(2);        
-            H1F hi_pix_occupancy    = new H1F("hi_pix_occupancy", "Pixel", "Counts", NPMT*NANODE, -0.5, NPMT*NANODE-0.5);
+            H1F hi_pix_occupancy    = new H1F("hi_pix_occupancy_" + (i+1), "Pixel", "Counts", NPMT*NANODE, -0.5, NPMT*NANODE-0.5);
             hi_pix_occupancy.setTitle("Pixel Hit Occupancy");
             hi_pix_occupancy.setFillColor(25);
             hi_pix_occupancy.setOptStat("10");
-            H1F hi_pix_max          = new H1F("hi_pix_max", " ", 1, 0.5, NPMT*NANODE+0.5);        
+            H1F hi_pix_max          = new H1F("hi_pix_max_" + (i+1), " ", 1, 0.5, NPMT*NANODE+0.5);        
             hi_pix_max.setLineWidth(2);
             hi_pix_max.setLineColor(2);        
-            H2F hi_scaler           = new H2F("hi_scaler", "TDC Hit Map",260, -130, 130, 207, 0, 207); 
+            H2F hi_scaler           = new H2F("hi_scaler_" + (i+1), "TDC Hit Map",260, -130, 130, 207, 0, 207); 
             DataGroup dg = new DataGroup(2,5); 
             dg.addDataSet(hi_pmt_leading_edge, 0);
             dg.addDataSet(hi_pmt_duration,     1);
@@ -129,31 +129,31 @@ public class RICHmonitor  extends DetectorMonitor {
             }
         }
         for(int i=0; i<NRICH; i++) {
-            Axis pmtAxis = this.getDataGroup().getItem(i+1,0,0).getH2F("hi_pmt_duration").getXAxis();
+            Axis pmtAxis = this.getDataGroup().getItem(i+1,0,0).getH2F("hi_pmt_duration_" + (i+1)).getXAxis();
             DataLine lineLE  = new DataLine(pmtAxis.min(),LE,  pmtAxis.max(), LE);
             DataLine lineTOT = new DataLine(pmtAxis.min(),TOT, pmtAxis.max(), TOT);
             DataLine lineXT  = new DataLine(pmtAxis.min(),XT,  pmtAxis.max(), XT);
             this.getDetectorCanvas().getCanvas("rich" + (i+1)).cd(0);
             this.getDetectorCanvas().getCanvas("rich" + (i+1)).getPad(0).getAxisY().setLog(true);
-            this.getDetectorCanvas().getCanvas("rich" + (i+1)).draw(this.getDataGroup().getItem(i+1,0,0).getH1F("hi_pmt_occupancy"));
-            this.getDetectorCanvas().getCanvas("rich" + (i+1)).draw(this.getDataGroup().getItem(i+1,0,0).getH1F("hi_pmt_max"),"same");
+            this.getDetectorCanvas().getCanvas("rich" + (i+1)).draw(this.getDataGroup().getItem(i+1,0,0).getH1F("hi_pmt_occupancy_" + (i+1)));
+            this.getDetectorCanvas().getCanvas("rich" + (i+1)).draw(this.getDataGroup().getItem(i+1,0,0).getH1F("hi_pmt_max_" + (i+1)),"same");
             this.getDetectorCanvas().getCanvas("rich" + (i+1)).cd(1);
             this.getDetectorCanvas().getCanvas("rich" + (i+1)).getPad(1).getAxisY().setLog(true);
-            this.getDetectorCanvas().getCanvas("rich" + (i+1)).draw(this.getDataGroup().getItem(i+1,0,0).getH1F("hi_pix_occupancy"));
-            this.getDetectorCanvas().getCanvas("rich" + (i+1)).draw(this.getDataGroup().getItem(i+1,0,0).getH1F("hi_pix_max"),"same");
+            this.getDetectorCanvas().getCanvas("rich" + (i+1)).draw(this.getDataGroup().getItem(i+1,0,0).getH1F("hi_pix_occupancy_" + (i+1)));
+            this.getDetectorCanvas().getCanvas("rich" + (i+1)).draw(this.getDataGroup().getItem(i+1,0,0).getH1F("hi_pix_max_" + (i+1)),"same");
             this.getDetectorCanvas().getCanvas("rich" + (i+1)).cd(2);
             this.getDetectorCanvas().getCanvas("rich" + (i+1)).getPad(2).getAxisZ().setLog(getLogZ());
-            this.getDetectorCanvas().getCanvas("rich" + (i+1)).draw(this.getDataGroup().getItem(i+1,0,0).getH2F("hi_pmt_leading_edge"));
+            this.getDetectorCanvas().getCanvas("rich" + (i+1)).draw(this.getDataGroup().getItem(i+1,0,0).getH2F("hi_pmt_leading_edge_" + (i+1)));
             this.getDetectorCanvas().getCanvas("rich" + (i+1)).draw(lineLE);
             this.getDetectorCanvas().getCanvas("rich" + (i+1)).cd(3);
             this.getDetectorCanvas().getCanvas("rich" + (i+1)).getPad(3).getAxisZ().setLog(getLogZ());
-            this.getDetectorCanvas().getCanvas("rich" + (i+1)).draw(this.getDataGroup().getItem(i+1,0,0).getH2F("hi_pmt_duration"));
+            this.getDetectorCanvas().getCanvas("rich" + (i+1)).draw(this.getDataGroup().getItem(i+1,0,0).getH2F("hi_pmt_duration_" + (i+1)));
             this.getDetectorCanvas().getCanvas("rich" + (i+1)).draw(lineXT);
             this.getDetectorCanvas().getCanvas("rich" + (i+1)).draw(lineTOT);
             this.getDetectorCanvas().getCanvas("rich" + (i+1)).update();
             this.getDetectorCanvas().getCanvas("occupancy2d").cd(i);
             this.getDetectorCanvas().getCanvas("occupancy2d").getPad(i).setPalette("kRainBow");
-            this.getDetectorCanvas().getCanvas("occupancy2d").draw(this.getDataGroup().getItem(i+1,0,0).getH2F("hi_scaler"));
+            this.getDetectorCanvas().getCanvas("occupancy2d").draw(this.getDataGroup().getItem(i+1,0,0).getH2F("hi_scaler_" + (i+1)));
             this.getDetectorCanvas().getCanvas("occupancy2d").getPad(i).getAxisZ().setLog(true);
             this.getDetectorCanvas().getCanvas("occupancy2d").update();
             this.DrawTiles(i+1);
@@ -210,15 +210,15 @@ public class RICHmonitor  extends DetectorMonitor {
                         if(hit.getDuration()>0) {
                             int pmt   = pixel/NANODE + 1;
                             int anode = pixel%NANODE + 1;
-                            this.getDataGroup().getItem(im+1,0,0).getH2F("hi_pmt_leading_edge").fill(pmt,hit.getLedingEdge());
-                            this.getDataGroup().getItem(im+1,0,0).getH2F("hi_pmt_duration").fill(pmt,hit.getDuration());
+                            this.getDataGroup().getItem(im+1,0,0).getH2F("hi_pmt_leading_edge_" + (im+1)).fill(pmt,hit.getLedingEdge());
+                            this.getDataGroup().getItem(im+1,0,0).getH2F("hi_pmt_duration_" + (im+1)).fill(pmt,hit.getDuration());
 
                             Point3D pxy = this.getCoordinates(pmt, anode);
-                            this.getDataGroup().getItem(im+1,0,0).getH2F("hi_scaler").fill(pxy.x(), pxy.y());
+                            this.getDataGroup().getItem(im+1,0,0).getH2F("hi_scaler_" + (im+1)).fill(pxy.x(), pxy.y());
 
                             this.getDetectorSummary().getH1F("summary").fill(im*NPMT+pmt);
-                            this.getDataGroup().getItem(im+1,0,0).getH1F("hi_pmt_occupancy").fill(pmt);
-                            this.getDataGroup().getItem(im+1,0,0).getH1F("hi_pix_occupancy").fill(pixel);
+                            this.getDataGroup().getItem(im+1,0,0).getH1F("hi_pmt_occupancy_" + (im+1)).fill(pmt);
+                            this.getDataGroup().getItem(im+1,0,0).getH1F("hi_pix_occupancy_" + (im+1)).fill(pixel);
                         }
                     }
                 }
@@ -233,10 +233,10 @@ public class RICHmonitor  extends DetectorMonitor {
     @Override
     public void analysisUpdate() {
         for(int im=0; im<NRICH; im++) {
-            double nentries = this.getDataGroup().getItem(im+1,0,0).getH2F("hi_scaler").getEntries();
+            double nentries = this.getDataGroup().getItem(im+1,0,0).getH2F("hi_scaler_" + (im+1)).getEntries();
             double average  = nentries/NPMT/NANODE;
-            this.getDataGroup().getItem(im+1,0,0).getH1F("hi_pmt_max").setBinContent(0, average*MAXPMT);
-            this.getDataGroup().getItem(im+1,0,0).getH1F("hi_pix_max").setBinContent(0, average*MAXPIXEL);
+            this.getDataGroup().getItem(im+1,0,0).getH1F("hi_pmt_max_" + (im+1)).setBinContent(0, average*MAXPMT);
+            this.getDataGroup().getItem(im+1,0,0).getH1F("hi_pix_max_" + (im+1)).setBinContent(0, average*MAXPIXEL);
             this.setYAxisMin(this.getDetectorCanvas().getCanvas("rich" + (im+1)).getPad(0),average*MINPMT);
             this.setYAxisMin(this.getDetectorCanvas().getCanvas("rich" + (im+1)).getPad(1),average*MINPIXEL);
             this.getDetectorCanvas().getCanvas("rich" + (im+1)).getPad(2).getAxisZ().setRange(0, average*MAXTIME);
