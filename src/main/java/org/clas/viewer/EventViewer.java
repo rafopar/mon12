@@ -328,7 +328,7 @@ public class EventViewer implements IDataEventListener, DetectorListener, Action
         splitPanel.setLeftComponent(CLAS12View);
         splitPanel.setRightComponent(CLAS12Canvas);
         JTextPane clas12Text   = new JTextPane();
-        clas12Text.setText("CLAS12\n monitoring plots\n V5.0\n");
+        clas12Text.setText("CLAS12\n monitoring plots\n V6.0\n");
         clas12Text.setEditable(false);       
         this.clas12Textinfo.setEditable(false);
         this.clas12Textinfo.setFont(new Font("Avenir",Font.PLAIN,16));
@@ -686,8 +686,10 @@ public class EventViewer implements IDataEventListener, DetectorListener, Action
             // RICH
             this.CLAS12Canvas.getCanvas("FD").cd(3);
             this.CLAS12Canvas.getCanvas("FD").getPad(3).getAxisY().setLog(true);
-            if(this.monitors.get("RICH").isActive() && this.monitors.get("RICH").getDetectorSummary()!=null) 
-                this.CLAS12Canvas.getCanvas("FD").draw(this.monitors.get("RICH").getDetectorSummary().getH1F("summary"));
+            if(this.monitors.get("RICH").isActive() && this.monitors.get("RICH").getDetectorSummary()!=null) {
+                this.CLAS12Canvas.getCanvas("FD").draw(this.monitors.get("RICH").getDetectorSummary().getH1F("summary_1"));
+                this.CLAS12Canvas.getCanvas("FD").draw(this.monitors.get("RICH").getDetectorSummary().getH1F("summary_4"), "same");
+            }
 
             // ECAL 
             this.CLAS12Canvas.getCanvas("FD").cd(4); this.CLAS12Canvas.getCanvas("FD").getPad(4).setAxisRange(0.5,6.5,0.5,1.5);

@@ -12,4 +12,4 @@ echo "INSTALLATION DIRECTORY = " $DISTRO_DIR
 
 LIB=`ls $DISTRO_DIR/target/clas12mon-*-jar-with-dependencies.jar`; export LIB
 
-java -Dsun.java2d.pmoffscreen=false -Xmx2048m -Xms1024m -cp $LIB org.clas.viewer.EventViewer $*
+java -Dsun.java2d.pmoffscreen=false -Djava.util.logging.config.file=$CLAS12DIR/etc/logging/debug.properties -Xmx2048m -Xms1024m -cp $LIB org.clas.viewer.EventViewer $*
