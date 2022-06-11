@@ -108,7 +108,7 @@ public class RICHmonitor  extends DetectorMonitor {
             dg.addDataSet(hi_pix_max,          3);
             dg.addDataSet(hi_scaler,           4);
             this.getDataGroup().add(dg,i+1,0,0); 
-            H1F hi_summary = new H1F("summary_" + SECTOR[i], "PMT",   "Counts", 2*NPMT, +0.5, 2*NPMT+0.5);
+            H1F hi_summary = new H1F("summary_" + SECTOR[i], "Sector 1-4 PMT",   "Counts", 2*NPMT, +0.5, 2*NPMT+0.5);
             hi_summary.setTitle("RICH");
             hi_summary.setFillColor(4-i);
             sum.addDataSet(hi_summary, 0);
