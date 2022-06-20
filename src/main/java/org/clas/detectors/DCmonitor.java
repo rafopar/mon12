@@ -86,7 +86,7 @@ public class DCmonitor extends DetectorMonitor {
             mult.setTitle("multiplicity sector " + sector);
             mult.setFillColor(3);
             
-            H2F raster_occ = new H2F("raster_occ" + sector, "Sector " + sector + " Occupancy vs. raster", 50, 0, 1, 50, 0, 10);
+            H2F raster_occ = new H2F("raster_occ" + sector, "Sector " + sector + " Occupancy vs. raster", 50, 0, 1, 50, 0, 20);
             raster_occ.setTitleX("raster radius (cm)");
             raster_occ.setTitleY("R1 occupancy (%)");
             raster_occ.setTitle("sector "+sector);
@@ -230,7 +230,7 @@ public class DCmonitor extends DetectorMonitor {
             }
             for(int sec=1; sec<=6; sec++) {
                 this.getDataGroup().getItem(sec,0,0).getH1F("multiplicity_sec"+ sec).fill(nHitSector[sec-1]*1.0);
-                this.getDataGroup().getItem(sec,0,0).getH2F("raster_occ"+ sec).fill(Math.sqrt(rasterX*rasterX+rasterY*rasterY), nR1HitSector[sec-1]*100.0/NWIRES/NLAYERS);
+                this.getDataGroup().getItem(sec,0,0).getH2F("raster_occ"+ sec).fill(Math.sqrt(rasterX*rasterX+rasterY*rasterY), nR1HitSector[sec-1]*100.0/NWIRES/(NLAYERS/3));
             }
             
        }   
