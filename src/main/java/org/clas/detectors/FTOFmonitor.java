@@ -121,9 +121,9 @@ public class FTOFmonitor  extends DetectorMonitor {
             dg.addDataSet(timeFADC, 1);
             dg.addDataSet(datTDC, 2);
         }
-            H2F misc = new H2F("misc"+sec+lay, "sec/lay"+sec+lay+" misc", 100, 0., 6000.,this.npaddles[lay], 1, npaddles[lay]+1 );
+            H2F misc = new H2F("GMean"+sec+lay, "sec/lay"+sec+lay+" GMean", 100, 0., 6000.,this.npaddles[lay], 1, npaddles[lay]+1 );
             misc.setTitleY(stacks[lay] +" PMTS");
-            misc.setTitleX("misc");
+            misc.setTitleX("GMean");
             misc.setTitle("Sector "+sec);
             dg.addDataSet(misc, 3);
             H2F TDIF = new H2F("TDIF"+sec+lay, "sec/lay"+sec+lay+" TDIF", 100, -40., 40.,this.npaddles[lay], 1, npaddles[lay]+1 );
@@ -196,7 +196,7 @@ public class FTOFmonitor  extends DetectorMonitor {
                     }
                     this.getDetectorCanvas().getCanvas("misc").cd(lay * 2 + 0);
                     this.getDetectorCanvas().getCanvas("misc").getPad(lay * 2 + 0).getAxisZ().setLog(getLogZ());
-                    this.getDetectorCanvas().getCanvas("misc").draw(this.getDataGroup().getItem(sec, lay, 0).getH2F("misc" + sec + lay));
+                    this.getDetectorCanvas().getCanvas("misc").draw(this.getDataGroup().getItem(sec, lay, 0).getH2F("GMean" + sec + lay));
                     this.getDetectorCanvas().getCanvas("misc").cd(lay * 2 + 1);
                     this.getDetectorCanvas().getCanvas("misc").getPad(lay * 2 + 1).getAxisZ().setLog(getLogZ());
                     this.getDetectorCanvas().getCanvas("misc").draw(this.getDataGroup().getItem(sec, lay, 0).getH2F("TDIF" + sec + lay));
@@ -314,8 +314,8 @@ public class FTOFmonitor  extends DetectorMonitor {
          	   if(fadcs.hasItem(is,il,0,ip)&&fadcs.hasItem(is,il,1,ip)) {
                  float gm = (float) Math.sqrt(fadcs.getItem(is,il,0,ip).get(0)*
                                               fadcs.getItem(is,il,1,ip).get(0));
-                 this.getDataGroup().getItem(is,il-1,0).getH2F("misc"+is+(il-1)).fill(gm,ip);
-         	   }
+                 this.getDataGroup().getItem(is,il-1,0).getH2F("GMean"+is+(il-1)).fill(gm,ip);
+            }
         }        
     }
     

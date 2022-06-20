@@ -1,11 +1,13 @@
 package org.clas.detectors;
 
+import java.util.Arrays;
 import org.clas.viewer.DetectorMonitor;
 import org.jlab.groot.data.H1F;
 import org.jlab.groot.data.H2F;
 import org.jlab.groot.group.DataGroup;
 import org.jlab.io.base.DataBank;
 import org.jlab.io.base.DataEvent;
+import org.jlab.utils.groups.IndexedTable;
 
 /**
  *
@@ -14,12 +16,16 @@ import org.jlab.io.base.DataEvent;
 
 public class DCmonitor extends DetectorMonitor {
     
-
+    private static int NLAYERS = 36;
+    private static int NWIRES  = 112;
+    
     public DCmonitor(String name) {
         super(name);
-        this.setDetectorTabNames("occupancy", "occupancyNorm", "occupancyPercent", "multiplicity", "tdc2d", "tdc1d_s");
+        this.setDetectorTabNames("occupancy", "occupancyNorm", "occupancyPercent", "multiplicity", "tdc2d", "tdc1d_s", "raster");
         this.useSectorButtons(true);
         this.init(false);
+        this.getCcdb().setVariation("default");
+        this.getCcdb().init(Arrays.asList(new String[]{"/calibration/raster/adc_to_position"}));
     }
 
     
@@ -80,7 +86,12 @@ public class DCmonitor extends DetectorMonitor {
             mult.setTitle("multiplicity sector " + sector);
             mult.setFillColor(3);
             
-            DataGroup dg = new DataGroup(6,1);
+            H2F raster_occ = new H2F("raster_occ" + sector, "Sector " + sector + " Occupancy vs. raster", 50, 0, 1, 50, 0, 10);
+            raster_occ.setTitleX("raster radius (cm)");
+            raster_occ.setTitleY("R1 occupancy (%)");
+            raster_occ.setTitle("sector "+sector);
+            
+            DataGroup dg = new DataGroup(7,1);
             dg.addDataSet(raw, 0);
             dg.addDataSet(occ, 1);
             dg.addDataSet(reg_occ, 2);
@@ -88,6 +99,7 @@ public class DCmonitor extends DetectorMonitor {
             dg.addDataSet(tdc_raw, 4);
             dg.addDataSet(mult, 5);
             dg.addDataSet(raw_summary, 6);
+            dg.addDataSet(raster_occ, 7);
             this.getDataGroup().add(dg, sector,0,0);
         }
         
@@ -120,6 +132,9 @@ public class DCmonitor extends DetectorMonitor {
         this.getDetectorCanvas().getCanvas("multiplicity").divide(2, 3);
         this.getDetectorCanvas().getCanvas("multiplicity").setGridX(false);
         this.getDetectorCanvas().getCanvas("multiplicity").setGridY(false);
+        this.getDetectorCanvas().getCanvas("raster").divide(2, 3);
+        this.getDetectorCanvas().getCanvas("raster").setGridX(false);
+        this.getDetectorCanvas().getCanvas("raster").setGridY(false);
         
         for(int sector=1; sector <=6; sector++) {
             this.getDetectorCanvas().getCanvas("occupancy").getPad(sector-1).getAxisZ().setRange(0.01, max_occ);
@@ -140,6 +155,8 @@ public class DCmonitor extends DetectorMonitor {
             this.getDetectorCanvas().getCanvas("tdc2d").draw(this.getDataGroup().getItem(sector,0,0).getH2F("tdc_raw" + sector));
             this.getDetectorCanvas().getCanvas("multiplicity").cd(sector-1);
             this.getDetectorCanvas().getCanvas("multiplicity").draw(this.getDataGroup().getItem(sector,0,0).getH1F("multiplicity_sec"+ sector));
+            this.getDetectorCanvas().getCanvas("raster").cd(sector-1);
+            this.getDetectorCanvas().getCanvas("raster").draw(this.getDataGroup().getItem(sector,0,0).getH2F("raster_occ"+ sector));
             if(getActiveSector()==sector) {
                for(int sl=1; sl <=6; sl++) {
                    this.getDetectorCanvas().getCanvas("tdc1d").cd(sl-1);
@@ -154,6 +171,7 @@ public class DCmonitor extends DetectorMonitor {
         this.getDetectorCanvas().getCanvas("occupancyPercent").update();
         this.getDetectorCanvas().getCanvas("tdc2d").update();
         this.getDetectorCanvas().getCanvas("multiplicity").update();
+        this.getDetectorCanvas().getCanvas("raster").update();
         
     }
 
@@ -161,17 +179,26 @@ public class DCmonitor extends DetectorMonitor {
     public void processEvent(DataEvent event) {
                 
         // process event info and save into data group
+        IndexedTable adc2position = null;
+        if(event.hasBank("RUN::config")) {
+            DataBank bank = event.getBank("RUN::config");
+            int runNumber = bank.getInt("run", 0);
+            adc2position  = this.getCcdb().getConstants(runNumber, "/calibration/raster/adc_to_position");
+        }
+        else {
+            return;
+        }
         if(event.hasBank("DC::tdc")==true){
             DataBank  bank = event.getBank("DC::tdc");
             int rows = bank.rows();
-            int[] nEventSector = {0,0,0,0,0,0};
+            int[] nHitSector = {0,0,0,0,0,0};
+            int[] nR1HitSector = {0,0,0,0,0,0};
             
             for(int i = 0; i < rows; i++){
                 int    sector = bank.getByte("sector",i);
                 int     layer = bank.getByte("layer",i);
                 int      wire = bank.getShort("component",i);
                 int       TDC = bank.getInt("TDC",i);
-                int     order = bank.getByte("order",i); 
                 int    region = (int) (layer-1)/12+1;
                 int        sl = (int) (layer-1)/6+1;
                 
@@ -187,34 +214,24 @@ public class DCmonitor extends DetectorMonitor {
                 }
                 
                 
-                nEventSector[sector-1]++;
-                
-//                if(sector == 1 && sec1_check == 0){
-//                    this.getDataGroup().getItem(sector,0,0).getH1F("multiplicity_sec"+ sector).fill(rows);
-//                    sec1_check += 1;
-//                }
-//                if(sector == 2 && sec2_check == 0){
-//                    this.getDataGroup().getItem(sector,0,0).getH1F("multiplicity_sec"+ sector).fill(rows);
-//                    sec2_check += 1;
-//                }
-//                if(sector == 3 && sec3_check == 0){
-//                    this.getDataGroup().getItem(sector,0,0).getH1F("multiplicity_sec"+ sector).fill(rows);
-//                    sec3_check += 1;
-//                }
-//                if(sector == 4 && sec4_check == 0){
-//                    this.getDataGroup().getItem(sector,0,0).getH1F("multiplicity_sec"+ sector).fill(rows);
-//                    sec4_check += 1;
-//                }
-//                if(sector == 5 && sec5_check == 0){
-//                    this.getDataGroup().getItem(sector,0,0).getH1F("multiplicity_sec"+ sector).fill(rows);
-//                    sec5_check += 1;
-//                }
-//                if(sector == 6 && sec6_check == 0){
-//                    this.getDataGroup().getItem(sector,0,0).getH1F("multiplicity_sec"+ sector).fill(rows);
-//                    sec6_check += 1;
-//                }              
+                nHitSector[sector-1]++;
+                if(sl<=2) nR1HitSector[sector-1]++;
             }
-            for(int sec=1; sec<=6; sec++) this.getDataGroup().getItem(sec,0,0).getH1F("multiplicity_sec"+ sec).fill(nEventSector[sec-1]*1.0);
+            double rasterX = -999;
+            double rasterY = -999;
+            if(event.hasBank("RASTER::adc") && adc2position!=null) {
+                DataBank raster = event.getBank("RASTER::adc");
+                for(int i=0; i<raster.rows(); i++) {
+                    int component = raster.getShort("component", i);
+                    int adc       = raster.getInt("ped", i);
+                    if(component == 1) rasterX = this.convertADC(adc2position, component, adc);
+                    if(component == 2) rasterY = this.convertADC(adc2position, component, adc);
+                }
+            }
+            for(int sec=1; sec<=6; sec++) {
+                this.getDataGroup().getItem(sec,0,0).getH1F("multiplicity_sec"+ sec).fill(nHitSector[sec-1]*1.0);
+                this.getDataGroup().getItem(sec,0,0).getH2F("raster_occ"+ sec).fill(Math.sqrt(rasterX*rasterX+rasterY*rasterY), nR1HitSector[sec-1]*100.0/NWIRES/NLAYERS);
+            }
             
        }   
     }
@@ -252,6 +269,12 @@ public class DCmonitor extends DetectorMonitor {
                 
             }
         }   
+    }
+    
+    private double convertADC(IndexedTable adc2pos, int component, int ADC) {
+        double pos = adc2pos.getDoubleValue("p0", 0, 0, component)+
+                     adc2pos.getDoubleValue("p1", 0, 0, component)*ADC;
+        return pos;
     }
 
 }
