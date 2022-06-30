@@ -60,10 +60,10 @@
     </plugin>
   </plugins>
 </build>
-    <repositories>
-      <repository>
+<repositories>
+	<repository>
         <id>clas12maven</id>
-        <url>file:///Users/devita/NetBeansProjects/aiTracking/clas12-offline-software/myLocalMvnRepo</url>
+        <url>https://clasweb.jlab.org/clas12maven</url>
       </repository>
       <repository>
         <id>clas12maven1</id>
