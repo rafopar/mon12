@@ -174,6 +174,7 @@ public class RICHmonitor  extends DetectorMonitor {
             for(int i = 0; i < rows; i++) {
                 int sector = bank.getByte("sector",i);     //4 by default (only 1 RICH at the time of writing)
                 int  layer = bank.getByte("layer",i);      //byte variable, ranges from -127 to 127
+                if(layer<0) layer += 256;
                 int   tile = layer & 0xFF;                 //conversion of byte to int variable, ranges from 1 to 138 (Tile Number)
                 int   comp = bank.getShort("component",i); //short variable, comp is the MAROC ID shifted by 1 (ranges 1-192)
                 int    tdc = bank.getInt("TDC",i);         //TDC value
@@ -195,7 +196,7 @@ public class RICHmonitor  extends DetectorMonitor {
                         if(order==1) {
                             tdcMap[imod].get(pixel).add(new TDCHit(tdc));
                         }
-                        else {
+                        else if(tdcMap[imod].containsKey(pixel)) {
                             TDCHit last = tdcMap[imod].get(pixel).get(tdcMap[imod].get(pixel).size()-1);
                             if(last.getDuration()==0) last.setTrailingEdge(tdc);
                         }

@@ -22,7 +22,7 @@ public class ECmonitor  extends DetectorMonitor {
     public ECmonitor(String name) {
         super(name);
 
-        this.setDetectorTabNames("adcOccupancy","tdcOccupancy", "adcEnergy_s", "adcTime_s", "tdc_s", "adcSum_s");
+        this.setDetectorTabNames("adcOccupancy","tdcOccupancy", "adcSum", "adcEnergy_s", "adcTime_s", "tdc_s");
         this.useSectorButtons(true);
         this.init(false);
         this.getCcdb().setVariation("default");
@@ -95,27 +95,27 @@ public class ECmonitor  extends DetectorMonitor {
         }
         
         for(int sector=1; sector<7; sector++) {
-        for(int layer=1; layer <= 9; layer++) {
-            int stack = (int) ((layer-1)/3) + 1;
-            int view  = layer - (stack-1)*3;
-            H2F datADC = new H2F("datADC"+layer+sector, "lay/sec " + layer + sector+" ADC", 100, 0., 2000., this.npaddles[layer-1], 1, npaddles[layer-1]+1);
-            datADC.setTitleY(stacks[stack-1] + " " + views[view-1] + " strip");
-            datADC.setTitleX("ADC Channel");
-            datADC.setTitle("Sector "+sector);
-            H2F timeFADC = new H2F("timeFADC"+layer+sector, "lay/sec " + layer + sector+" FADC", 80, 0., 400., this.npaddles[layer-1], 1, npaddles[layer-1]+1);
-            timeFADC.setTitleY(stacks[stack-1] + " " + views[view-1] + " strip");
-            timeFADC.setTitleX("adcTime");
-            datADC.setTitle("Sector "+sector);
-            H2F datTDC = new H2F("datTDC"+layer+sector, "lay/sec " + layer + sector+" TDC", 100, 0., 600., this.npaddles[layer-1], 1, npaddles[layer-1]+1);
-            datTDC.setTitleY(stacks[stack-1] + " " + views[view-1] + " strip");
-            datTDC.setTitleX("TDC Channel");
-            datTDC.setTitle("Sector "+sector);
-            DataGroup dg = new DataGroup(2,3);
-            dg.addDataSet(datADC, 0);
-            dg.addDataSet(timeFADC, 1);
-            dg.addDataSet(datTDC, 2);
-            this.getDataGroup().add(dg,sector,layer,0);
-        }
+            for(int layer=1; layer <= 9; layer++) {
+                int stack = (int) ((layer-1)/3) + 1;
+                int view  = layer - (stack-1)*3;
+                H2F datADC = new H2F("datADC"+layer+sector, "lay/sec " + layer + sector+" ADC", 100, 0., 2000., this.npaddles[layer-1], 1, npaddles[layer-1]+1);
+                datADC.setTitleY(stacks[stack-1] + " " + views[view-1] + " strip");
+                datADC.setTitleX("ADC Channel");
+                datADC.setTitle("Sector "+sector);
+                H2F timeFADC = new H2F("timeFADC"+layer+sector, "lay/sec " + layer + sector+" FADC", 80, 0., 400., this.npaddles[layer-1], 1, npaddles[layer-1]+1);
+                timeFADC.setTitleY(stacks[stack-1] + " " + views[view-1] + " strip");
+                timeFADC.setTitleX("adcTime");
+                datADC.setTitle("Sector "+sector);
+                H2F datTDC = new H2F("datTDC"+layer+sector, "lay/sec " + layer + sector+" TDC", 100, 0., 600., this.npaddles[layer-1], 1, npaddles[layer-1]+1);
+                datTDC.setTitleY(stacks[stack-1] + " " + views[view-1] + " strip");
+                datTDC.setTitleX("TDC Channel");
+                datTDC.setTitle("Sector "+sector);
+                DataGroup dg = new DataGroup(2,3);
+                dg.addDataSet(datADC, 0);
+                dg.addDataSet(timeFADC, 1);
+                dg.addDataSet(datTDC, 2);
+                this.getDataGroup().add(dg,sector,layer,0);
+            }
             DataGroup dg = new DataGroup(1,1);      
             H2F mipADC = new H2F("mipADC"+sector, "sec" +sector+" MIP", 60, 1., 90000., 60, 1., 120000.);
             mipADC.setTitleY("ECin+ECout ADC SUM");

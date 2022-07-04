@@ -5,17 +5,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.swing.ButtonGroup;
-import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JSplitPane;
-import org.jlab.detector.base.DetectorOccupancy;
 import org.jlab.detector.calib.utils.ConstantsManager;
 import org.jlab.detector.view.DetectorPane2D;
 import org.jlab.groot.base.GStyle;
