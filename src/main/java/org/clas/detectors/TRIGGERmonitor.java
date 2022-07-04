@@ -8,7 +8,6 @@ import org.jlab.groot.fitter.DataFitter;
 import org.jlab.groot.group.DataGroup;
 import org.jlab.groot.math.F1D;
 import org.jlab.io.base.DataEvent;
-import org.jlab.groot.graphics.EmbeddedCanvas;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +15,7 @@ import java.util.List;
 import org.jlab.utils.groups.IndexedList;
 import org.jlab.utils.groups.IndexedList.IndexGenerator;
 import java.util.Map;
+import org.jlab.groot.graphics.EmbeddedCanvas;
 
 public class TRIGGERmonitor extends DetectorMonitor {
 	
@@ -24,15 +24,16 @@ public class TRIGGERmonitor extends DetectorMonitor {
 	
 	
 //	String tbit = "bits: EC.PC.HTCC(0)    EC.PC.HTCC(1-6)    EC.PC OR noDC>300(7)  EC.PC>10(8)    FTOF.PC.EC(19-21)    FT.* (24-27)    1K Pulser(31)";
-	String tbit = "bits: EC.PC.HTCC(0)    EC.PC.HTCC(1-6)    FTOFxPCALxECALxDC14(7)   FTOFxPCALxECALxDC25(8)   FTOFxPCALxECALxDC36(9)   Electron OR no DC(10)  1K Pulser(31)";
+//	String tbit = "bits: EC.PC.HTCC(0)    EC.PC.HTCC(1-6)    FTOFxPCALxECALxDC14(7)   FTOFxPCALxECALxDC25(8)   FTOFxPCALxECALxDC36(9)   Electron OR no DC(10)  1K Pulser(31)";
+    private String tbit = "Trigger bits";
     int bit[][] = {{1,2,3,4,5,6},{7,8,9,10,11,12}};
-	double[] refm = new double[2];
-	double[] refs = new double[2];
-	boolean datataking = false;
+    double[] refm = new double[2];
+    double[] refs = new double[2];
+    boolean datataking = false;
 	
     public TRIGGERmonitor(String name) {
         super(name);
-        this.setDetectorTabNames("bits","time","difference");
+        this.setDetectorTabNames("bits");//,"time","difference");
         this.useSectorButtons(false);
         this.getDetectorCanvas().setActiveCanvas("bits");
         this.init(false);
@@ -43,17 +44,17 @@ public class TRIGGERmonitor extends DetectorMonitor {
     public void createHistos() {
         this.setNumberOfEvents(0);
          createTriggerBits(0);
-         createFTOFHistos(1,50,50,200,"tdc","MTIME (ns)" );   
+//         createFTOFHistos(1,50,50,200,"tdc","MTIME (ns)" );   
     }
     
     @Override
     public void plotHistos() {
     	setLogY(true); plot1DSummary(0); setLogY(false);
-        plot1DSummary(1); 
-        if (datataking) {
-          fillFTOFGraphs();
-          plotFTOFGraphs(2);
-        }
+//        plot1DSummary(1); 
+//        if (datataking) {
+//          fillFTOFGraphs();
+//          plotFTOFGraphs(2);
+//        }
     }    
        
     public void createTriggerBits(int k) {
@@ -63,9 +64,9 @@ public class TRIGGERmonitor extends DetectorMonitor {
         summary.setTitleY("Counts");
         DataGroup sum = new DataGroup(1,1);
         sum.addDataSet(summary, 0);
-        createFTOFGraphs(sum); 
+//        createFTOFGraphs(sum); 
         this.setDetectorSummary(sum);
-        initFTOFGraphs(); updateFTOFGraphTitles();
+//        initFTOFGraphs(); updateFTOFGraphTitles();
        
         H1F trig = new H1F(tbit,tbit, 64,-0.5,63.5);
         trig.setFillColor(4);      
@@ -145,19 +146,19 @@ public class TRIGGERmonitor extends DetectorMonitor {
   	}
 
     public void plotTriggerBits(int index) {
-//      	EmbeddedCanvas c = getDetectorCanvas().getCanvas(getDetectorTabNames().get(index));    	
-//    	if(this.getDataGroup().getItem(0,0,0).getH1F(tbit)==null) return; //lcs To prevent exceptions if histo missing from archive
-//        c.divide(1, 1);
-//        c.setGridX(false);
-//        c.setGridY(false);
-//        c.cd(0);
-//        c.getPad().getAxisY().setLog(true);
-//        c.draw(this.getDataGroup().getItem(0,0,0).getH1F(tbit));
-//        c.update(); 	
+      	EmbeddedCanvas c = getDetectorCanvas().getCanvas(getDetectorTabNames().get(index));    	
+    	if(this.getDataGroup().getItem(0,0,0).getH1F(tbit)==null) return; //lcs To prevent exceptions if histo missing from archive
+        c.divide(1, 1);
+        c.setGridX(false);
+        c.setGridY(false);
+        c.cd(0);
+        c.getPad().getAxisY().setLog(true);
+        c.draw(this.getDataGroup().getItem(0,0,0).getH1F(tbit));
+        c.update(); 	
     }
     
     public void plot1DSummary(int index) {
-//      	drawGroup(getDetectorCanvas().getCanvas(getDetectorTabNames().get(index)),getDataGroup().getItem(0,0,index));
+      	drawGroup(getDetectorCanvas().getCanvas(getDetectorTabNames().get(index)),getDataGroup().getItem(0,0,index));
     }
     
     @Override
@@ -166,10 +167,10 @@ public class TRIGGERmonitor extends DetectorMonitor {
         for (int i=0; i<64; i++) if(isTrigBitSet(i)) ((H1F) this.getDataGroup().getItem(0,0,0).getData(0).get(0)).fill(i);
         for (int i=0; i<64; i++) if(isTrigBitSet(i)) this.getDetectorSummary().getH1F("summary").fill(i);
         
-        getFTOFMeanTime();
-        getFTOFFADCTime();  
+//        getFTOFMeanTime();
+//        getFTOFFADCTime();  
         
-        datataking = true;
+//        datataking = true;
 
     } 
     

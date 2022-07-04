@@ -111,6 +111,7 @@ public class EventViewer implements IDataEventListener, DetectorListener, Action
         monitors.put("FTTRK",       new FTTRKmonitor("FTTRK"));   
         monitors.put("HTCC",        new HTCCmonitor("HTCC"));     
         monitors.put("LTCC",        new LTCCmonitor("LTCC")); 
+        monitors.put("RASTER",      new RASTERmonitor("RASTER"));    
         monitors.put("RICH",        new RICHmonitor("RICH"));    
         monitors.put("RTPC",        new RTPCmonitor("RTPC"));    
         monitors.put("RF",          new RFmonitor("RF"));       
