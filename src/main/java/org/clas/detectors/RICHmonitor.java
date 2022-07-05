@@ -180,7 +180,7 @@ public class RICHmonitor  extends DetectorMonitor {
                 int    tdc = bank.getInt("TDC",i);         //TDC value
                 int  order = bank.getByte("order",i);      // order specifies leading or trailing edge
 
-                int imod  = MODULE[sector-1];
+                int imod  = MODULE[sector-1]-1;
                 int anode = CHAN2PIX[(comp-1) % NANODE];//from 1 to 64
                 int asic  = (comp-1) / NANODE;
                 int pmt   = this.tileToPMT[imod].getItem(tile, asic);
