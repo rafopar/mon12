@@ -43,18 +43,18 @@ public class RASTERmonitor extends DetectorMonitor {
         
         for(int sector=1; sector <= 6; sector++) {
             
-            H2F eve = new H2F("eve" + sector, "Sector " + sector, 50, -1, 1, 50, -1, 1);
-            eve.setTitleX("raster x (cm)");
+            H2F eve = new H2F("eve" + sector, "Sector " + sector, 30, -1.2, 1.2, 30, -1.2, 1.2);
+            eve.setTitleX("raster -x (cm)");
             eve.setTitleY("raster y (cm)");
             eve.setTitle("sector "+sector);
             
-            H2F raw = new H2F("raw" + sector, "Sector " + sector, 50, -1, 1, 50, -1, 1);
-            raw.setTitleX("raster x (cm)");
+            H2F raw = new H2F("raw" + sector, "Sector " + sector, 30, -1.2, 1.2, 30, -1.2, 1.2);
+            raw.setTitleX("raster -x (cm)");
             raw.setTitleY("raster y (cm)");
             raw.setTitle("sector "+sector);
             
-            H2F occ = new H2F("occ" + sector, "Sector " + sector + " Occupancy vs. raster xy", 50, -1, 1, 50, -1, 1);
-            occ.setTitleX("raster x (cm)");
+            H2F occ = new H2F("occ" + sector, "Sector " + sector + " Occupancy vs. raster xy", 30, -1.2, 1.2, 30, -1.2, 1.2);
+            occ.setTitleX("raster -x (cm)");
             occ.setTitleY("raster y (cm)");
             occ.setTitle("sector "+sector);
             
@@ -108,7 +108,7 @@ public class RASTERmonitor extends DetectorMonitor {
                 if(component == 1) rasterX = this.convertADC(adc2position, component, adc);
                 if(component == 2) rasterY = this.convertADC(adc2position, component, adc);
             }
-            for(int sector=1; sector <=6; sector++) this.getDataGroup().getItem(sector,0,0).getH2F("eve"+ sector).fill(rasterX, rasterY);
+            for(int sector=1; sector <=6; sector++) this.getDataGroup().getItem(sector,0,0).getH2F("eve"+ sector).fill(-rasterX, rasterY);
         
             if(event.hasBank("DC::tdc")==true){
                 DataBank  bank = event.getBank("DC::tdc");
@@ -118,7 +118,7 @@ public class RASTERmonitor extends DetectorMonitor {
                     int    sector = bank.getByte("sector",i);
                     int     layer = bank.getByte("layer",i);
                     int        sl = (int) (layer-1)/6+1;
-                    if(sl<=2) this.getDataGroup().getItem(sector,0,0).getH2F("raw"+ sector).fill(rasterX, rasterY);
+                    if(sl<=2) this.getDataGroup().getItem(sector,0,0).getH2F("raw"+ sector).fill(-rasterX, rasterY);
                 }
             }
         }   

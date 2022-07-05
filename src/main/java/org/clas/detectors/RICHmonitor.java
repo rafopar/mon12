@@ -47,7 +47,8 @@ public class RICHmonitor  extends DetectorMonitor {
     private final Integer[] TWOTILERS = {3, 5, 7, 12, 15, 19, 24, 28, 33, 39, 44, 50, 57, 63, 70, 78, 85, 93, 102, 110, 119, 129, 138};
     private final int[] FIRSTPMTS = {1, 7, 14, 22, 31, 41, 52, 64, 77, 91, 106, 122, 139, 157, 176, 196, 217, 239, 262, 286, 311, 337, 364};   
     private final int[] SECTOR = {1, 4};
-            
+    private final int[] MODULE = {2, 0, 0, 1, 0, 0 };
+    
     private final IndexedList<Integer>[] tileToPMT = new IndexedList[2];
     
     public RICHmonitor(String name) {
@@ -174,13 +175,12 @@ public class RICHmonitor  extends DetectorMonitor {
             for(int i = 0; i < rows; i++) {
                 int sector = bank.getByte("sector",i);     //4 by default (only 1 RICH at the time of writing)
                 int  layer = bank.getByte("layer",i);      //byte variable, ranges from -127 to 127
-                if(layer<0) layer += 256;
                 int   tile = layer & 0xFF;                 //conversion of byte to int variable, ranges from 1 to 138 (Tile Number)
                 int   comp = bank.getShort("component",i); //short variable, comp is the MAROC ID shifted by 1 (ranges 1-192)
                 int    tdc = bank.getInt("TDC",i);         //TDC value
                 int  order = bank.getByte("order",i);      // order specifies leading or trailing edge
 
-                int imod  = (sector-1)/3;
+                int imod  = MODULE[sector-1];
                 int anode = CHAN2PIX[(comp-1) % NANODE];//from 1 to 64
                 int asic  = (comp-1) / NANODE;
                 int pmt   = this.tileToPMT[imod].getItem(tile, asic);
