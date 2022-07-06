@@ -47,15 +47,15 @@ public class RICHmonitor  extends DetectorMonitor {
     private final Integer[] TWOTILERS = {3, 5, 7, 12, 15, 19, 24, 28, 33, 39, 44, 50, 57, 63, 70, 78, 85, 93, 102, 110, 119, 129, 138};
     private final int[] FIRSTPMTS = {1, 7, 14, 22, 31, 41, 52, 64, 77, 91, 106, 122, 139, 157, 176, 196, 217, 239, 262, 286, 311, 337, 364};   
     private final int[] SECTOR = {1, 4};
-    private final int[] MODULE = {2, 0, 0, 1, 0, 0 };
+    private final int[] VIEW = {1, 0, 0, 2, 0, 0 }; //determines the order in which the two modules are plotted
     
-    private final IndexedList<Integer>[] tileToPMT = new IndexedList[2];
+    private IndexedList<Integer> tileToPMT = null;
     
     public RICHmonitor(String name) {
         super(name);
 
         this.setDetectorTabNames("s1","s4","occupancy2d");
-        for(int i=0; i<NRICH; i++) this.tileToPMT[i] = this.setTiletoPMTMap();
+        this.tileToPMT = this.setTiletoPMTMap();
         this.init(false);
     }
     
@@ -180,24 +180,24 @@ public class RICHmonitor  extends DetectorMonitor {
                 int    tdc = bank.getInt("TDC",i);         //TDC value
                 int  order = bank.getByte("order",i);      // order specifies leading or trailing edge
 
-                int imod  = MODULE[sector-1]-1;
+                int idet  = VIEW[sector-1]-1;
                 int anode = CHAN2PIX[(comp-1) % NANODE];//from 1 to 64
                 int asic  = (comp-1) / NANODE;
-                int pmt   = this.tileToPMT[imod].getItem(tile, asic);
+                int pmt   = this.tileToPMT.getItem(tile, asic);
                 int pixel = (pmt-1)*NANODE + anode-1;//from 0 to 25023
 
                 if(tdc>0) {
 
-                    if(!tdcMap[imod].containsKey(pixel) && order==1) {
-                        tdcMap[imod].put(pixel, new ArrayList<>());
-                        tdcMap[imod].get(pixel).add(new TDCHit(tdc));
+                    if(!tdcMap[idet].containsKey(pixel) && order==1) {
+                        tdcMap[idet].put(pixel, new ArrayList<>());
+                        tdcMap[idet].get(pixel).add(new TDCHit(tdc));
                     }
                     else {
                         if(order==1) {
-                            tdcMap[imod].get(pixel).add(new TDCHit(tdc));
+                            tdcMap[idet].get(pixel).add(new TDCHit(tdc));
                         }
-                        else if(tdcMap[imod].containsKey(pixel)) {
-                            TDCHit last = tdcMap[imod].get(pixel).get(tdcMap[imod].get(pixel).size()-1);
+                        else if(tdcMap[idet].containsKey(pixel)) {
+                            TDCHit last = tdcMap[idet].get(pixel).get(tdcMap[idet].get(pixel).size()-1);
                             if(last.getDuration()==0) last.setTrailingEdge(tdc);
                         }
                     }
@@ -282,8 +282,8 @@ public class RICHmonitor  extends DetectorMonitor {
     private void DrawTiles(int module) {
         for(int i=0; i<NTILE; i++) {
             int tile = i+1;
-            int pmt0 = this.tileToPMT[module-1].getItem(tile,2);
-            int pmt2 = this.tileToPMT[module-1].getItem(tile,0);
+            int pmt0 = this.tileToPMT.getItem(tile,2);
+            int pmt2 = this.tileToPMT.getItem(tile,0);
             Point3D p1 = this.getCoordinates(pmt0, 1);
             Point3D p2 = this.getCoordinates(pmt0, 57);
             Point3D p3 = this.getCoordinates(pmt2, 64);
