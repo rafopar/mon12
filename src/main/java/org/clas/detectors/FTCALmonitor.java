@@ -19,7 +19,7 @@ public class FTCALmonitor  extends DetectorMonitor {
     public FTCALmonitor(String name) {
         super(name);
         
-        this.setDetectorTabNames("FADC Occupancies");
+        this.setDetectorTabNames("adc");
         this.init(false);
         this.initCrystalArray();
     }
@@ -92,22 +92,22 @@ public class FTCALmonitor  extends DetectorMonitor {
     @Override
     public void plotHistos() {        
         // plotting histos
-        this.getDetectorCanvas().getCanvas("FADC Occupancies").divide(2, 2);
-        this.getDetectorCanvas().getCanvas("FADC Occupancies").setGridX(false);
-        this.getDetectorCanvas().getCanvas("FADC Occupancies").setGridY(false);
-        this.getDetectorCanvas().getCanvas("FADC Occupancies").cd(0);
-//        this.getDetectorCanvas().getCanvas("FADC Occupancies").getPad(0).getAxisZ().setLog(getLogZ());
-        this.getDetectorCanvas().getCanvas("FADC Occupancies").draw(this.getDataGroup().getItem(0,0,0).getH2F("occFADC_2D"));
-        this.getDetectorCanvas().getCanvas("FADC Occupancies").cd(1);
-        this.getDetectorCanvas().getCanvas("FADC Occupancies").getPad(1).getAxisZ().setRange(0.01, 2.0);
-        this.getDetectorCanvas().getCanvas("FADC Occupancies").draw(this.getDataGroup().getItem(0,0,0).getH2F("pedFADC_2D"));
-        this.getDetectorCanvas().getCanvas("FADC Occupancies").cd(2);
-        this.getDetectorCanvas().getCanvas("FADC Occupancies").getPad(2).getAxisZ().setLog(getLogZ());
-        this.getDetectorCanvas().getCanvas("FADC Occupancies").draw(this.getDataGroup().getItem(0,0,0).getH2F("fadc"));
-        this.getDetectorCanvas().getCanvas("FADC Occupancies").cd(3);
-        this.getDetectorCanvas().getCanvas("FADC Occupancies").getPad(3).getAxisZ().setLog(getLogZ());
-        this.getDetectorCanvas().getCanvas("FADC Occupancies").draw(this.getDataGroup().getItem(0,0,0).getH2F("fadc_time"));
-        this.getDetectorCanvas().getCanvas("FADC Occupancies").update();
+        this.getDetectorCanvas().getCanvas("adc").divide(2, 2);
+        this.getDetectorCanvas().getCanvas("adc").setGridX(false);
+        this.getDetectorCanvas().getCanvas("adc").setGridY(false);
+        this.getDetectorCanvas().getCanvas("adc").cd(0);
+//        this.getDetectorCanvas().getCanvas("adc").getPad(0).getAxisZ().setLog(getLogZ());
+        this.getDetectorCanvas().getCanvas("adc").draw(this.getDataGroup().getItem(0,0,0).getH2F("occFADC_2D"));
+        this.getDetectorCanvas().getCanvas("adc").cd(1);
+        this.getDetectorCanvas().getCanvas("adc").getPad(1).getAxisZ().setRange(0.01, 2.0);
+        this.getDetectorCanvas().getCanvas("adc").draw(this.getDataGroup().getItem(0,0,0).getH2F("pedFADC_2D"));
+        this.getDetectorCanvas().getCanvas("adc").cd(2);
+        this.getDetectorCanvas().getCanvas("adc").getPad(2).getAxisZ().setLog(getLogZ());
+        this.getDetectorCanvas().getCanvas("adc").draw(this.getDataGroup().getItem(0,0,0).getH2F("fadc"));
+        this.getDetectorCanvas().getCanvas("adc").cd(3);
+        this.getDetectorCanvas().getCanvas("adc").getPad(3).getAxisZ().setLog(getLogZ());
+        this.getDetectorCanvas().getCanvas("adc").draw(this.getDataGroup().getItem(0,0,0).getH2F("fadc_time"));
+        this.getDetectorCanvas().getCanvas("adc").update();
     }
 
     @Override

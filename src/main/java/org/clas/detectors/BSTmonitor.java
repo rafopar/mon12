@@ -22,10 +22,10 @@ public class BSTmonitor extends DetectorMonitor {
 
     public BSTmonitor(String name) {
         super(name);
-        this.setDetectorTabNames("Hit Maps", "Layer Hits", "Hit Multiplicity");
-        addCanvas("Hit Maps", NREGIONS, 2, false, true);
-        addCanvas("Layer Hits", NREGIONS, 2, true, false);
-        addCanvas("Hit Multiplicity", NREGIONS + 1, 2, false, false);
+        this.setDetectorTabNames("hits2d", "hits1d", "multiplicity");
+        addCanvas("hits2d", NREGIONS, 2, false, true);
+        addCanvas("hits1d", NREGIONS, 2, true, false);
+        addCanvas("multiplicity", NREGIONS + 1, 2, false, false);
         this.init(false);
     }
 
@@ -88,7 +88,7 @@ public class BSTmonitor extends DetectorMonitor {
 
     @Override
     public void plotHistos() {
-        EmbeddedCanvas canvas = this.getDetectorCanvas().getCanvas("Hit Maps");
+        EmbeddedCanvas canvas = this.getDetectorCanvas().getCanvas("hits2d");
         for (int i = 0; i < NREGIONS; ++i) {
             canvas.cd(i);
             int j = 2 * i + 1;
@@ -98,7 +98,7 @@ public class BSTmonitor extends DetectorMonitor {
         }
         canvas.update();
 
-        canvas = this.getDetectorCanvas().getCanvas("Layer Hits");
+        canvas = this.getDetectorCanvas().getCanvas("hits1d");
         for (int i = 0; i < NREGIONS; ++i) {
             canvas.cd(i);
             int j = 2 * i + 1;
@@ -108,7 +108,7 @@ public class BSTmonitor extends DetectorMonitor {
         }
         canvas.update();
 
-        canvas = this.getDetectorCanvas().getCanvas("Hit Multiplicity");
+        canvas = this.getDetectorCanvas().getCanvas("multiplicity");
         for (int i = 0; i < NREGIONS; ++i) {
             canvas.cd(i);
             int j = 2 * i + 1;
@@ -146,7 +146,6 @@ public class BSTmonitor extends DetectorMonitor {
 
         if (event.hasBank("BST::adc") == true) {
             DataBank bank = event.getBank("BST::adc");
-            this.getDetectorOccupancy().addTDCBank(bank);
             int rows = bank.rows();
 
             for (int i = 0; i < rows; i++) {

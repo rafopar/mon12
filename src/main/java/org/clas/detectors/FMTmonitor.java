@@ -34,7 +34,7 @@ public class FMTmonitor extends DetectorMonitor {
 
         this.loadConstantsFromCCDB(defaultRunNumber);
 
-        this.setDetectorTabNames("Occupancy", "TimeMax", "Amplitude", "Multiplicity");
+        this.setDetectorTabNames("occupancy", "tmax", "amplitude", "multiplicity");
         this.init(false);
     }
 
@@ -98,7 +98,7 @@ public class FMTmonitor extends DetectorMonitor {
         H1F histmulti = new H1F("multi", "multi", 100, -0.5, 199.5);
         histmulti.setTitleX("hit multiplicity");
         histmulti.setTitleY("counts");
-        histmulti.setTitle("Multiplicity of FMT channels");
+        histmulti.setTitle("multiplicity of FMT channels");
         histmulti.setFillColor(34);
         histmulti.setOptStat("111110");
         DataGroup occupancyGroup = new DataGroup("");
@@ -107,7 +107,7 @@ public class FMTmonitor extends DetectorMonitor {
 
         for (int sector = 1; sector <= maxNumberSectors; sector++) {
             for (int layer = 1; layer <= maxNumberLayers; layer++) {
-                H1F hitmapHisto = new H1F("Occupancy Layer " + layer + " Sector " + sector, "Occupancy Layer " + layer + " Sector " + sector,
+                H1F hitmapHisto = new H1F("occupancy Layer " + layer + " Sector " + sector, "occupancy Layer " + layer + " Sector " + sector,
                         (numberStrips[layer]) + 1, 0., (double) (numberStrips[layer]) + 1);
                 hitmapHisto.setTitleX("strips (Layer " + layer + " Sector " + sector + ")");
                 hitmapHisto.setTitleY("Nb of hits");
@@ -125,9 +125,9 @@ public class FMTmonitor extends DetectorMonitor {
                 timeOfMaxGroup.addDataSet(timeMaxHisto, 0);
                 this.getDataGroup().add(timeOfMaxGroup, sector, layer, 1);
 
-                H1F amplitudeHisto = new H1F("Amplitude : Layer " + layer + " Sector " + sector, "Amplitude : Layer " + layer + " Sector " + sector,
+                H1F amplitudeHisto = new H1F("amplitude : Layer " + layer + " Sector " + sector, "amplitude : Layer " + layer + " Sector " + sector,
                         500, 0., 5000.);
-                amplitudeHisto.setTitleX("Amplitude (Layer " + layer + " Sector " + sector + ")");
+                amplitudeHisto.setTitleX("amplitude (Layer " + layer + " Sector " + sector + ")");
                 amplitudeHisto.setTitleY("Nb hits");
                 amplitudeHisto.setFillColor(4);
                 DataGroup amplitudeGroup = new DataGroup("");
@@ -141,23 +141,23 @@ public class FMTmonitor extends DetectorMonitor {
     @Override
     public void plotHistos() {
 
-        this.getDetectorCanvas().getCanvas("Occupancy").divide(maxNumberSectors * 2, maxNumberLayers / 2);
-        this.getDetectorCanvas().getCanvas("Occupancy").setGridX(false);
-        this.getDetectorCanvas().getCanvas("Occupancy").setGridY(false);
-        this.getDetectorCanvas().getCanvas("Occupancy").setAxisTitleSize(12);
-        this.getDetectorCanvas().getCanvas("Occupancy").setAxisLabelSize(12);
+        this.getDetectorCanvas().getCanvas("occupancy").divide(maxNumberSectors * 2, maxNumberLayers / 2);
+        this.getDetectorCanvas().getCanvas("occupancy").setGridX(false);
+        this.getDetectorCanvas().getCanvas("occupancy").setGridY(false);
+        this.getDetectorCanvas().getCanvas("occupancy").setAxisTitleSize(12);
+        this.getDetectorCanvas().getCanvas("occupancy").setAxisLabelSize(12);
 
-        this.getDetectorCanvas().getCanvas("TimeMax").divide(maxNumberSectors, maxNumberLayers);
-        this.getDetectorCanvas().getCanvas("TimeMax").setGridX(false);
-        this.getDetectorCanvas().getCanvas("TimeMax").setGridY(false);
-        this.getDetectorCanvas().getCanvas("TimeMax").setAxisTitleSize(12);
-        this.getDetectorCanvas().getCanvas("TimeMax").setAxisLabelSize(12);
+        this.getDetectorCanvas().getCanvas("tmax").divide(maxNumberSectors, maxNumberLayers);
+        this.getDetectorCanvas().getCanvas("tmax").setGridX(false);
+        this.getDetectorCanvas().getCanvas("tmax").setGridY(false);
+        this.getDetectorCanvas().getCanvas("tmax").setAxisTitleSize(12);
+        this.getDetectorCanvas().getCanvas("tmax").setAxisLabelSize(12);
 
-        this.getDetectorCanvas().getCanvas("Amplitude").divide(maxNumberSectors, maxNumberLayers);
-        this.getDetectorCanvas().getCanvas("Amplitude").setGridX(false);
-        this.getDetectorCanvas().getCanvas("Amplitude").setGridY(false);
-        this.getDetectorCanvas().getCanvas("Amplitude").setAxisTitleSize(12);
-        this.getDetectorCanvas().getCanvas("Amplitude").setAxisLabelSize(12);
+        this.getDetectorCanvas().getCanvas("amplitude").divide(maxNumberSectors, maxNumberLayers);
+        this.getDetectorCanvas().getCanvas("amplitude").setGridX(false);
+        this.getDetectorCanvas().getCanvas("amplitude").setGridY(false);
+        this.getDetectorCanvas().getCanvas("amplitude").setAxisTitleSize(12);
+        this.getDetectorCanvas().getCanvas("amplitude").setAxisLabelSize(12);
 
         for (int sector = 1; sector <= maxNumberSectors; sector++) {
             for (int layer = 1; layer <= maxNumberLayers; layer++) {
@@ -187,31 +187,31 @@ public class FMTmonitor extends DetectorMonitor {
                         row = -1;
                         break;
                 }
-                this.getDetectorCanvas().getCanvas("Occupancy").cd(column + numberOfColumns * row);
-                this.getDetectorCanvas().getCanvas("Occupancy").draw(
-                        this.getDataGroup().getItem(sector, layer, 2).getH1F("Occupancy Layer " + layer + " Sector " + sector));
+                this.getDetectorCanvas().getCanvas("occupancy").cd(column + numberOfColumns * row);
+                this.getDetectorCanvas().getCanvas("occupancy").draw(
+                        this.getDataGroup().getItem(sector, layer, 2).getH1F("occupancy Layer " + layer + " Sector " + sector));
 
-                this.getDetectorCanvas().getCanvas("TimeMax").cd(column + numberOfColumns * row);
-                this.getDetectorCanvas().getCanvas("TimeMax").draw(
+                this.getDetectorCanvas().getCanvas("tmax").cd(column + numberOfColumns * row);
+                this.getDetectorCanvas().getCanvas("tmax").draw(
                         this.getDataGroup().getItem(sector, layer, 1).getH1F("TimeOfMax : Layer " + layer + " Sector " + sector));
 
-                this.getDetectorCanvas().getCanvas("Amplitude").cd(column + numberOfColumns * row);
-                this.getDetectorCanvas().getCanvas("Amplitude").getPad(column + numberOfColumns * row).getAxisY().setLog(true);
-                this.getDetectorCanvas().getCanvas("Amplitude").draw(
-                        this.getDataGroup().getItem(sector, layer, 3).getH1F("Amplitude : Layer " + layer + " Sector " + sector));
+                this.getDetectorCanvas().getCanvas("amplitude").cd(column + numberOfColumns * row);
+                this.getDetectorCanvas().getCanvas("amplitude").getPad(column + numberOfColumns * row).getAxisY().setLog(true);
+                this.getDetectorCanvas().getCanvas("amplitude").draw(
+                        this.getDataGroup().getItem(sector, layer, 3).getH1F("amplitude : Layer " + layer + " Sector " + sector));
             }
         }
-        this.getDetectorCanvas().getCanvas("Occupancy").update();
-        this.getDetectorCanvas().getCanvas("TimeMax").update();
-        this.getDetectorCanvas().getCanvas("Amplitude").update();
+        this.getDetectorCanvas().getCanvas("occupancy").update();
+        this.getDetectorCanvas().getCanvas("tmax").update();
+        this.getDetectorCanvas().getCanvas("amplitude").update();
 
-        this.getDetectorCanvas().getCanvas("Multiplicity").divide(1, 1);
-        this.getDetectorCanvas().getCanvas("Multiplicity").setGridX(false);
-        this.getDetectorCanvas().getCanvas("Multiplicity").setGridY(false);
-        this.getDetectorCanvas().getCanvas("Multiplicity").cd(0);
-        this.getDetectorCanvas().getCanvas("Multiplicity").draw(this.getDataGroup().getItem(0, 0, 0).getH1F("multi"));
-        this.getDetectorCanvas().getCanvas("Multiplicity").setStatBoxFontSize(18);
-        this.getDetectorCanvas().getCanvas("Multiplicity").update();
+        this.getDetectorCanvas().getCanvas("multiplicity").divide(1, 1);
+        this.getDetectorCanvas().getCanvas("multiplicity").setGridX(false);
+        this.getDetectorCanvas().getCanvas("multiplicity").setGridY(false);
+        this.getDetectorCanvas().getCanvas("multiplicity").cd(0);
+        this.getDetectorCanvas().getCanvas("multiplicity").draw(this.getDataGroup().getItem(0, 0, 0).getH1F("multi"));
+        this.getDetectorCanvas().getCanvas("multiplicity").setStatBoxFontSize(18);
+        this.getDetectorCanvas().getCanvas("multiplicity").update();
     }
 
     @Override
@@ -233,11 +233,11 @@ public class FMTmonitor extends DetectorMonitor {
                     continue;
                 }
 
-                this.getDataGroup().getItem(sector, layer, 2).getH1F("Occupancy Layer " + layer + " Sector " + sector).fill(strip);
+                this.getDataGroup().getItem(sector, layer, 2).getH1F("occupancy Layer " + layer + " Sector " + sector).fill(strip);
                 if ((samplingTime < timeOfMax) && (timeOfMax < samplingTime * (numberOfSamples - 1))) {
                     this.getDataGroup().getItem(sector, layer, 1).getH1F("TimeOfMax : Layer " + layer + " Sector " + sector).fill(timeOfMax);
                 }
-                this.getDataGroup().getItem(sector, layer, 3).getH1F("Amplitude : Layer " + layer + " Sector " + sector).fill(adc);
+                this.getDataGroup().getItem(sector, layer, 3).getH1F("amplitude : Layer " + layer + " Sector " + sector).fill(adc);
                 this.numberOfHitsPerDetector[sector][layer]++;
                 this.getDetectorSummary().getH1F("summary").setBinContent(maxNumberSectors * (layer - 1) + (sector - 1), (double) this.numberOfHitsPerDetector[sector][layer] / ((double) this.getNumberOfEvents()));
             }

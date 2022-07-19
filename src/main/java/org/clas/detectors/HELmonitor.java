@@ -19,7 +19,7 @@ public class HELmonitor extends DetectorMonitor {
     
     public HELmonitor(String name) {
         super(name);
-        this.setDetectorTabNames("Signals/Helicity");
+        this.setDetectorTabNames("signals");
         this.init(false);
     }
 
@@ -95,30 +95,30 @@ public class HELmonitor extends DetectorMonitor {
     @Override
     public void plotHistos() {
         // initialize canvas and plot histograms
-        this.getDetectorCanvas().getCanvas("Signals/Helicity").divide(3, 2);
-        this.getDetectorCanvas().getCanvas("Signals/Helicity").setGridX(false);
-        this.getDetectorCanvas().getCanvas("Signals/Helicity").setGridY(false);
-        this.getDetectorCanvas().getCanvas("Signals/Helicity").cd(0);
-        this.getDetectorCanvas().getCanvas("Signals/Helicity").getPad(0).getAxisY().setLog(true);
-        this.getDetectorCanvas().getCanvas("Signals/Helicity").draw(this.getDataGroup().getItem(0,0,0).getH1F("rawHelicity"));
-        this.getDetectorCanvas().getCanvas("Signals/Helicity").cd(1);
-        this.getDetectorCanvas().getCanvas("Signals/Helicity").getPad(1).getAxisY().setLog(true);
-        this.getDetectorCanvas().getCanvas("Signals/Helicity").draw(this.getDataGroup().getItem(0,0,0).getH1F("rawSync"));
-        this.getDetectorCanvas().getCanvas("Signals/Helicity").cd(2);
-        this.getDetectorCanvas().getCanvas("Signals/Helicity").getPad(2).getAxisY().setLog(true);
-        this.getDetectorCanvas().getCanvas("Signals/Helicity").draw(this.getDataGroup().getItem(0,0,0).getH1F("rawQuartet"));
-        this.getDetectorCanvas().getCanvas("Signals/Helicity").cd(3);
-        this.getDetectorCanvas().getCanvas("Signals/Helicity").draw(this.getDataGroup().getItem(0,0,0).getH1F("helicity"));
-        this.getDetectorCanvas().getCanvas("Signals/Helicity").cd(4);
-        this.getDetectorCanvas().getCanvas("Signals/Helicity").draw(this.getDataGroup().getItem(0,0,0).getH1F("sync"));
-        this.getDetectorCanvas().getCanvas("Signals/Helicity").cd(5);
-        this.getDetectorCanvas().getCanvas("Signals/Helicity").draw(this.getDataGroup().getItem(0,0,0).getH1F("quartet"));
+        this.getDetectorCanvas().getCanvas("signals").divide(3, 2);
+        this.getDetectorCanvas().getCanvas("signals").setGridX(false);
+        this.getDetectorCanvas().getCanvas("signals").setGridY(false);
+        this.getDetectorCanvas().getCanvas("signals").cd(0);
+        this.getDetectorCanvas().getCanvas("signals").getPad(0).getAxisY().setLog(true);
+        this.getDetectorCanvas().getCanvas("signals").draw(this.getDataGroup().getItem(0,0,0).getH1F("rawHelicity"));
+        this.getDetectorCanvas().getCanvas("signals").cd(1);
+        this.getDetectorCanvas().getCanvas("signals").getPad(1).getAxisY().setLog(true);
+        this.getDetectorCanvas().getCanvas("signals").draw(this.getDataGroup().getItem(0,0,0).getH1F("rawSync"));
+        this.getDetectorCanvas().getCanvas("signals").cd(2);
+        this.getDetectorCanvas().getCanvas("signals").getPad(2).getAxisY().setLog(true);
+        this.getDetectorCanvas().getCanvas("signals").draw(this.getDataGroup().getItem(0,0,0).getH1F("rawQuartet"));
+        this.getDetectorCanvas().getCanvas("signals").cd(3);
+        this.getDetectorCanvas().getCanvas("signals").draw(this.getDataGroup().getItem(0,0,0).getH1F("helicity"));
+        this.getDetectorCanvas().getCanvas("signals").cd(4);
+        this.getDetectorCanvas().getCanvas("signals").draw(this.getDataGroup().getItem(0,0,0).getH1F("sync"));
+        this.getDetectorCanvas().getCanvas("signals").cd(5);
+        this.getDetectorCanvas().getCanvas("signals").draw(this.getDataGroup().getItem(0,0,0).getH1F("quartet"));
 //        if(this.getDataGroup().getItem(0,0,0).getGraph("helSequence").getVectorX().size()>1) {
 //            this.getDetectorCanvas().getCanvas("Helicity").draw(this.getDataGroup().getItem(0,0,0).getGraph("helSequence"));
 //            this.getDetectorCanvas().getCanvas("Helicity").draw(this.getDataGroup().getItem(0,0,0).getGraph("syncSequence"),"same");
 //            this.getDetectorCanvas().getCanvas("Helicity").draw(this.getDataGroup().getItem(0,0,0).getGraph("quartetSequence"),"same");
 //        }
-        this.getDetectorCanvas().getCanvas("Signals/Helicity").update();
+        this.getDetectorCanvas().getCanvas("signals").update();
         
     }
 

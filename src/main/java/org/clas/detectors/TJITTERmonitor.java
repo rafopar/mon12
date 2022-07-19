@@ -28,7 +28,7 @@ public class TJITTERmonitor  extends DetectorMonitor {
     public TJITTERmonitor(String name) {
         super(name);
         
-        this.setDetectorTabNames("Time Jitter");
+        this.setDetectorTabNames("phase");
         this.init(false);
         this.getCcdb().setVariation("default");
         this.getCcdb().init(Arrays.asList(new String[]{"/calibration/ftof/time_jitter"}));
@@ -39,9 +39,9 @@ public class TJITTERmonitor  extends DetectorMonitor {
         // initialize canvas and create histograms
         this.setNumberOfEvents(0);
         H1F summary = new H1F("summary","summary",200,-40,60);
-        summary.setTitleX("TDC Time Jitter (ns)");
+        summary.setTitleX("TDC phase (ns)");
         summary.setTitleY("Counts");
-        summary.setTitle("TDC Time Jitter");
+        summary.setTitle("TDC phase");
         summary.setFillColor(2);
         DataGroup sum = new DataGroup(1,1);
         sum.addDataSet(summary, 0);
@@ -77,22 +77,22 @@ public class TJITTERmonitor  extends DetectorMonitor {
     @Override
     public void plotHistos() {        
         // plotting histos
-        this.getDetectorCanvas().getCanvas("Time Jitter").divide(2, 2);
-        this.getDetectorCanvas().getCanvas("Time Jitter").setGridX(false);
-        this.getDetectorCanvas().getCanvas("Time Jitter").setGridY(false);
-        this.getDetectorCanvas().getCanvas("Time Jitter").cd(0);
-        this.getDetectorCanvas().getCanvas("Time Jitter").getPad(0).getAxisZ().setLog(getLogZ());
-        this.getDetectorCanvas().getCanvas("Time Jitter").draw(this.getDataGroup().getItem(0,0,0).getH2F("hi_ctof_tlphase"));
-        this.getDetectorCanvas().getCanvas("Time Jitter").cd(1);
-        this.getDetectorCanvas().getCanvas("Time Jitter").getPad(1).getAxisZ().setLog(getLogZ());
-        this.getDetectorCanvas().getCanvas("Time Jitter").draw(this.getDataGroup().getItem(0,0,0).getH2F("hi_ftof_tlphase"));
-        this.getDetectorCanvas().getCanvas("Time Jitter").cd(2);
-        this.getDetectorCanvas().getCanvas("Time Jitter").getPad(2).getAxisZ().setLog(getLogZ());
-        this.getDetectorCanvas().getCanvas("Time Jitter").draw(this.getDataGroup().getItem(0,0,0).getH2F("hi_ctof_trphase"));
-        this.getDetectorCanvas().getCanvas("Time Jitter").cd(3);
-        this.getDetectorCanvas().getCanvas("Time Jitter").getPad(3).getAxisZ().setLog(getLogZ());
-        this.getDetectorCanvas().getCanvas("Time Jitter").draw(this.getDataGroup().getItem(0,0,0).getH2F("hi_ftof_trphase"));
-        this.getDetectorCanvas().getCanvas("Time Jitter").update();
+        this.getDetectorCanvas().getCanvas("phase").divide(2, 2);
+        this.getDetectorCanvas().getCanvas("phase").setGridX(false);
+        this.getDetectorCanvas().getCanvas("phase").setGridY(false);
+        this.getDetectorCanvas().getCanvas("phase").cd(0);
+        this.getDetectorCanvas().getCanvas("phase").getPad(0).getAxisZ().setLog(getLogZ());
+        this.getDetectorCanvas().getCanvas("phase").draw(this.getDataGroup().getItem(0,0,0).getH2F("hi_ctof_tlphase"));
+        this.getDetectorCanvas().getCanvas("phase").cd(1);
+        this.getDetectorCanvas().getCanvas("phase").getPad(1).getAxisZ().setLog(getLogZ());
+        this.getDetectorCanvas().getCanvas("phase").draw(this.getDataGroup().getItem(0,0,0).getH2F("hi_ftof_tlphase"));
+        this.getDetectorCanvas().getCanvas("phase").cd(2);
+        this.getDetectorCanvas().getCanvas("phase").getPad(2).getAxisZ().setLog(getLogZ());
+        this.getDetectorCanvas().getCanvas("phase").draw(this.getDataGroup().getItem(0,0,0).getH2F("hi_ctof_trphase"));
+        this.getDetectorCanvas().getCanvas("phase").cd(3);
+        this.getDetectorCanvas().getCanvas("phase").getPad(3).getAxisZ().setLog(getLogZ());
+        this.getDetectorCanvas().getCanvas("phase").draw(this.getDataGroup().getItem(0,0,0).getH2F("hi_ftof_trphase"));
+        this.getDetectorCanvas().getCanvas("phase").update();
     }
 
     @Override

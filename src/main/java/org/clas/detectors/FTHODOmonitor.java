@@ -22,7 +22,7 @@ public class FTHODOmonitor extends DetectorMonitor {
             "/geometry/ft/fthodo"}));
         geometry = this.getCcdb().getConstants(11, "/geometry/ft/fthodo");
 
-        this.setDetectorTabNames("FADC Occupancies", "FADC spectra");
+        this.setDetectorTabNames("occupancy", "adc");
         this.init(false);
     }
 
@@ -75,26 +75,26 @@ public class FTHODOmonitor extends DetectorMonitor {
     @Override
     public void plotHistos() {
         // plotting histos
-        this.getDetectorCanvas().getCanvas("FADC Occupancies").divide(2, 2);
-        this.getDetectorCanvas().getCanvas("FADC Occupancies").setGridX(false);
-        this.getDetectorCanvas().getCanvas("FADC Occupancies").setGridY(false);
+        this.getDetectorCanvas().getCanvas("occupancy").divide(2, 2);
+        this.getDetectorCanvas().getCanvas("occupancy").setGridX(false);
+        this.getDetectorCanvas().getCanvas("occupancy").setGridY(false);
         for (int ilayer = 1; ilayer <= 2; ilayer++) {
-            this.getDetectorCanvas().getCanvas("FADC Occupancies").cd(0 + (ilayer - 1) * 2);
-//            this.getDetectorCanvas().getCanvas("FADC Occupancies").getPad(0 + (ilayer - 1) * 2).getAxisZ().setLog(getLogZ());
-            this.getDetectorCanvas().getCanvas("FADC Occupancies").draw(this.getDataGroup().getItem(0, ilayer, 0).getH2F("occFADC_2D_l" + ilayer));
-            this.getDetectorCanvas().getCanvas("FADC Occupancies").cd(1 + (ilayer - 1) * 2);
-            this.getDetectorCanvas().getCanvas("FADC Occupancies").draw(this.getDataGroup().getItem(0, ilayer, 0).getH1F("occFADC_l" + ilayer));
+            this.getDetectorCanvas().getCanvas("occupancy").cd(0 + (ilayer - 1) * 2);
+//            this.getDetectorCanvas().getCanvas("occupancy").getPad(0 + (ilayer - 1) * 2).getAxisZ().setLog(getLogZ());
+            this.getDetectorCanvas().getCanvas("occupancy").draw(this.getDataGroup().getItem(0, ilayer, 0).getH2F("occFADC_2D_l" + ilayer));
+            this.getDetectorCanvas().getCanvas("occupancy").cd(1 + (ilayer - 1) * 2);
+            this.getDetectorCanvas().getCanvas("occupancy").draw(this.getDataGroup().getItem(0, ilayer, 0).getH1F("occFADC_l" + ilayer));
         }
-        this.getDetectorCanvas().getCanvas("FADC spectra").divide(2, 2);
-        this.getDetectorCanvas().getCanvas("FADC spectra").setGridX(false);
-        this.getDetectorCanvas().getCanvas("FADC spectra").setGridY(false);
+        this.getDetectorCanvas().getCanvas("adc").divide(2, 2);
+        this.getDetectorCanvas().getCanvas("adc").setGridX(false);
+        this.getDetectorCanvas().getCanvas("adc").setGridY(false);
         for (int ilayer = 1; ilayer <= 2; ilayer++) {
-            this.getDetectorCanvas().getCanvas("FADC spectra").cd(0 + (ilayer - 1) * 2);
-            this.getDetectorCanvas().getCanvas("FADC spectra").getPad(0 + (ilayer - 1) * 2).getAxisZ().setLog(getLogZ());
-            this.getDetectorCanvas().getCanvas("FADC spectra").draw(this.getDataGroup().getItem(0, ilayer, 0).getH2F("fadc_l" + ilayer));
-            this.getDetectorCanvas().getCanvas("FADC spectra").cd(1 + (ilayer - 1) * 2);
-            this.getDetectorCanvas().getCanvas("FADC spectra").getPad(1 + (ilayer - 1) * 2).getAxisZ().setLog(getLogZ());
-            this.getDetectorCanvas().getCanvas("FADC spectra").draw(this.getDataGroup().getItem(0, ilayer, 0).getH2F("fadc_time_l" + ilayer));
+            this.getDetectorCanvas().getCanvas("adc").cd(0 + (ilayer - 1) * 2);
+            this.getDetectorCanvas().getCanvas("adc").getPad(0 + (ilayer - 1) * 2).getAxisZ().setLog(getLogZ());
+            this.getDetectorCanvas().getCanvas("adc").draw(this.getDataGroup().getItem(0, ilayer, 0).getH2F("fadc_l" + ilayer));
+            this.getDetectorCanvas().getCanvas("adc").cd(1 + (ilayer - 1) * 2);
+            this.getDetectorCanvas().getCanvas("adc").getPad(1 + (ilayer - 1) * 2).getAxisZ().setLog(getLogZ());
+            this.getDetectorCanvas().getCanvas("adc").draw(this.getDataGroup().getItem(0, ilayer, 0).getH2F("fadc_time_l" + ilayer));
         }
     }
 

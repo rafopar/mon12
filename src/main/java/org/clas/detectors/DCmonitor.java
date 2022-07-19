@@ -6,6 +6,7 @@ import org.jlab.groot.data.H2F;
 import org.jlab.groot.group.DataGroup;
 import org.jlab.io.base.DataBank;
 import org.jlab.io.base.DataEvent;
+import org.jlab.utils.groups.IndexedTable;
 
 /**
  *
@@ -14,12 +15,12 @@ import org.jlab.io.base.DataEvent;
 
 public class DCmonitor extends DetectorMonitor {
     
-
     public DCmonitor(String name) {
         super(name);
-        this.setDetectorTabNames(/*"Raw Occupancies",*/"Normalized Occupancies log", "Normalized Occupancies lin", "Region Occupancies", "TDC raw spectra", "TDC spectra per Sector/Superlayer", "Hit Multiplicity");
+        this.setDetectorTabNames("occupancy", "occupancyNorm", "occupancyPercent", "multiplicity", "tdc2d", "tdc1d_s");
         this.useSectorButtons(true);
         this.init(false);
+        this.getCcdb().setVariation("default");
     }
 
     
@@ -80,7 +81,7 @@ public class DCmonitor extends DetectorMonitor {
             mult.setTitle("multiplicity sector " + sector);
             mult.setFillColor(3);
             
-            DataGroup dg = new DataGroup(6,1);
+            DataGroup dg = new DataGroup(7,1);
             dg.addDataSet(raw, 0);
             dg.addDataSet(occ, 1);
             dg.addDataSet(reg_occ, 2);
@@ -99,61 +100,61 @@ public class DCmonitor extends DetectorMonitor {
     public void plotHistos() {
         // initialize canvas and plot histograms
     	    
-        this.getDetectorCanvas().getCanvas("Normalized Occupancies log").divide(2, 3);
-        this.getDetectorCanvas().getCanvas("Normalized Occupancies log").setGridX(false);
-        this.getDetectorCanvas().getCanvas("Normalized Occupancies log").setGridY(false);
-        this.getDetectorCanvas().getCanvas("Normalized Occupancies lin").divide(2, 3);
-        this.getDetectorCanvas().getCanvas("Normalized Occupancies lin").setGridX(false);
-        this.getDetectorCanvas().getCanvas("Normalized Occupancies lin").setGridY(false);
+        this.getDetectorCanvas().getCanvas("occupancy").divide(2, 3);
+        this.getDetectorCanvas().getCanvas("occupancy").setGridX(false);
+        this.getDetectorCanvas().getCanvas("occupancy").setGridY(false);
+        this.getDetectorCanvas().getCanvas("occupancyNorm").divide(2, 3);
+        this.getDetectorCanvas().getCanvas("occupancyNorm").setGridX(false);
+        this.getDetectorCanvas().getCanvas("occupancyNorm").setGridY(false);
 //        this.getDetectorCanvas().getCanvas("Raw Occupancies").divide(2, 3);
 //        this.getDetectorCanvas().getCanvas("Raw Occupancies").setGridX(false);
 //        this.getDetectorCanvas().getCanvas("Raw Occupancies").setGridY(false);
-        this.getDetectorCanvas().getCanvas("Region Occupancies").divide(2, 3);
-        this.getDetectorCanvas().getCanvas("Region Occupancies").setGridX(false);
-        this.getDetectorCanvas().getCanvas("Region Occupancies").setGridY(false);
-        this.getDetectorCanvas().getCanvas("TDC raw spectra").divide(2, 3);
-        this.getDetectorCanvas().getCanvas("TDC raw spectra").setGridX(false);
-        this.getDetectorCanvas().getCanvas("TDC raw spectra").setGridY(false);
-        this.getDetectorCanvas().getCanvas("TDC spectra per Sector/Superlayer").divide(2, 3);
-        this.getDetectorCanvas().getCanvas("TDC spectra per Sector/Superlayer").setGridX(false);
-        this.getDetectorCanvas().getCanvas("TDC spectra per Sector/Superlayer").setGridY(false);
-        this.getDetectorCanvas().getCanvas("Hit Multiplicity").divide(2, 3);
-        this.getDetectorCanvas().getCanvas("Hit Multiplicity").setGridX(false);
-        this.getDetectorCanvas().getCanvas("Hit Multiplicity").setGridY(false);
+        this.getDetectorCanvas().getCanvas("occupancyPercent").divide(2, 3);
+        this.getDetectorCanvas().getCanvas("occupancyPercent").setGridX(false);
+        this.getDetectorCanvas().getCanvas("occupancyPercent").setGridY(false);
+        this.getDetectorCanvas().getCanvas("tdc2d").divide(2, 3);
+        this.getDetectorCanvas().getCanvas("tdc2d").setGridX(false);
+        this.getDetectorCanvas().getCanvas("tdc2d").setGridY(false);
+        this.getDetectorCanvas().getCanvas("tdc1d").divide(2, 3);
+        this.getDetectorCanvas().getCanvas("tdc1d").setGridX(false);
+        this.getDetectorCanvas().getCanvas("tdc1d").setGridY(false);
+        this.getDetectorCanvas().getCanvas("multiplicity").divide(2, 3);
+        this.getDetectorCanvas().getCanvas("multiplicity").setGridX(false);
+        this.getDetectorCanvas().getCanvas("multiplicity").setGridY(false);
         
         for(int sector=1; sector <=6; sector++) {
-            this.getDetectorCanvas().getCanvas("Normalized Occupancies log").getPad(sector-1).getAxisZ().setRange(0.01, max_occ);
-            this.getDetectorCanvas().getCanvas("Normalized Occupancies log").getPad(sector-1).getAxisZ().setLog(getLogZ());
-            this.getDetectorCanvas().getCanvas("Normalized Occupancies log").cd(sector-1);
-            this.getDetectorCanvas().getCanvas("Normalized Occupancies log").draw(this.getDataGroup().getItem(sector,0,0).getH2F("occ_sec"+sector));
-            this.getDetectorCanvas().getCanvas("Normalized Occupancies lin").getPad(sector-1).getAxisZ().setRange(0.01, max_occ);
-            this.getDetectorCanvas().getCanvas("Normalized Occupancies lin").getPad(sector-1).getAxisZ().setLog(!getLogZ());
-            this.getDetectorCanvas().getCanvas("Normalized Occupancies lin").cd(sector-1);
-            this.getDetectorCanvas().getCanvas("Normalized Occupancies lin").draw(this.getDataGroup().getItem(sector,0,0).getH2F("occ_sec"+sector));
+            this.getDetectorCanvas().getCanvas("occupancy").getPad(sector-1).getAxisZ().setRange(0.01, max_occ);
+            this.getDetectorCanvas().getCanvas("occupancy").getPad(sector-1).getAxisZ().setLog(getLogZ());
+            this.getDetectorCanvas().getCanvas("occupancy").cd(sector-1);
+            this.getDetectorCanvas().getCanvas("occupancy").draw(this.getDataGroup().getItem(sector,0,0).getH2F("occ_sec"+sector));
+            this.getDetectorCanvas().getCanvas("occupancyNorm").getPad(sector-1).getAxisZ().setRange(0.01, max_occ);
+            this.getDetectorCanvas().getCanvas("occupancyNorm").getPad(sector-1).getAxisZ().setLog(!getLogZ());
+            this.getDetectorCanvas().getCanvas("occupancyNorm").cd(sector-1);
+            this.getDetectorCanvas().getCanvas("occupancyNorm").draw(this.getDataGroup().getItem(sector,0,0).getH2F("occ_sec"+sector));
 //            this.getDetectorCanvas().getCanvas("Raw Occupancies").getPad(sector-1).getAxisZ().setLog(getLogZ());
 //            this.getDetectorCanvas().getCanvas("Raw Occupancies").cd(sector-1);
 //            this.getDetectorCanvas().getCanvas("Raw Occupancies").draw(this.getDataGroup().getItem(sector,0,0).getH2F("raw_sec"+sector));
-            this.getDetectorCanvas().getCanvas("Region Occupancies").cd(sector-1);
-            this.getDetectorCanvas().getCanvas("Region Occupancies").draw(this.getDataGroup().getItem(sector,0,0).getH1F("reg_occ_sec"+sector));
-            this.getDetectorCanvas().getCanvas("TDC raw spectra").getPad(sector-1).getAxisZ().setLog(getLogZ());
-            this.getDetectorCanvas().getCanvas("TDC raw spectra").cd(sector-1);
-            this.getDetectorCanvas().getCanvas("TDC raw spectra").draw(this.getDataGroup().getItem(sector,0,0).getH2F("tdc_raw" + sector));
-            this.getDetectorCanvas().getCanvas("Hit Multiplicity").cd(sector-1);
-            this.getDetectorCanvas().getCanvas("Hit Multiplicity").draw(this.getDataGroup().getItem(sector,0,0).getH1F("multiplicity_sec"+ sector));
+            this.getDetectorCanvas().getCanvas("occupancyPercent").cd(sector-1);
+            this.getDetectorCanvas().getCanvas("occupancyPercent").draw(this.getDataGroup().getItem(sector,0,0).getH1F("reg_occ_sec"+sector));
+            this.getDetectorCanvas().getCanvas("tdc2d").getPad(sector-1).getAxisZ().setLog(getLogZ());
+            this.getDetectorCanvas().getCanvas("tdc2d").cd(sector-1);
+            this.getDetectorCanvas().getCanvas("tdc2d").draw(this.getDataGroup().getItem(sector,0,0).getH2F("tdc_raw" + sector));
+            this.getDetectorCanvas().getCanvas("multiplicity").cd(sector-1);
+            this.getDetectorCanvas().getCanvas("multiplicity").draw(this.getDataGroup().getItem(sector,0,0).getH1F("multiplicity_sec"+ sector));
             if(getActiveSector()==sector) {
                for(int sl=1; sl <=6; sl++) {
-                   this.getDetectorCanvas().getCanvas("TDC spectra per Sector/Superlayer").cd(sl-1);
-                   this.getDetectorCanvas().getCanvas("TDC spectra per Sector/Superlayer").draw(this.getDataGroup().getItem(sector,sl,0).getH1F("tdc_sl_raw" + sector+ sl));
+                   this.getDetectorCanvas().getCanvas("tdc1d").cd(sl-1);
+                   this.getDetectorCanvas().getCanvas("tdc1d").draw(this.getDataGroup().getItem(sector,sl,0).getH1F("tdc_sl_raw" + sector+ sl));
                }
             }
         }
 
-        this.getDetectorCanvas().getCanvas("Normalized Occupancies log").update();
-        this.getDetectorCanvas().getCanvas("Normalized Occupancies lin").update();
+        this.getDetectorCanvas().getCanvas("occupancy").update();
+        this.getDetectorCanvas().getCanvas("occupancyNorm").update();
 //        this.getDetectorCanvas().getCanvas("Raw Occupancies").update();
-        this.getDetectorCanvas().getCanvas("Region Occupancies").update();
-        this.getDetectorCanvas().getCanvas("TDC raw spectra").update();
-        this.getDetectorCanvas().getCanvas("Hit Multiplicity").update();
+        this.getDetectorCanvas().getCanvas("occupancyPercent").update();
+        this.getDetectorCanvas().getCanvas("tdc2d").update();
+        this.getDetectorCanvas().getCanvas("multiplicity").update();
         
     }
 
@@ -163,16 +164,14 @@ public class DCmonitor extends DetectorMonitor {
         // process event info and save into data group
         if(event.hasBank("DC::tdc")==true){
             DataBank  bank = event.getBank("DC::tdc");
-            this.getDetectorOccupancy().addTDCBank(bank);
             int rows = bank.rows();
-            int[] nEventSector = {0,0,0,0,0,0};
+            int[] nHitSector = {0,0,0,0,0,0};
             
             for(int i = 0; i < rows; i++){
                 int    sector = bank.getByte("sector",i);
                 int     layer = bank.getByte("layer",i);
                 int      wire = bank.getShort("component",i);
                 int       TDC = bank.getInt("TDC",i);
-                int     order = bank.getByte("order",i); 
                 int    region = (int) (layer-1)/12+1;
                 int        sl = (int) (layer-1)/6+1;
                 
@@ -188,34 +187,12 @@ public class DCmonitor extends DetectorMonitor {
                 }
                 
                 
-                nEventSector[sector-1]++;
-                
-//                if(sector == 1 && sec1_check == 0){
-//                    this.getDataGroup().getItem(sector,0,0).getH1F("multiplicity_sec"+ sector).fill(rows);
-//                    sec1_check += 1;
-//                }
-//                if(sector == 2 && sec2_check == 0){
-//                    this.getDataGroup().getItem(sector,0,0).getH1F("multiplicity_sec"+ sector).fill(rows);
-//                    sec2_check += 1;
-//                }
-//                if(sector == 3 && sec3_check == 0){
-//                    this.getDataGroup().getItem(sector,0,0).getH1F("multiplicity_sec"+ sector).fill(rows);
-//                    sec3_check += 1;
-//                }
-//                if(sector == 4 && sec4_check == 0){
-//                    this.getDataGroup().getItem(sector,0,0).getH1F("multiplicity_sec"+ sector).fill(rows);
-//                    sec4_check += 1;
-//                }
-//                if(sector == 5 && sec5_check == 0){
-//                    this.getDataGroup().getItem(sector,0,0).getH1F("multiplicity_sec"+ sector).fill(rows);
-//                    sec5_check += 1;
-//                }
-//                if(sector == 6 && sec6_check == 0){
-//                    this.getDataGroup().getItem(sector,0,0).getH1F("multiplicity_sec"+ sector).fill(rows);
-//                    sec6_check += 1;
-//                }              
+                nHitSector[sector-1]++;
             }
-            for(int sec=1; sec<=6; sec++) this.getDataGroup().getItem(sec,0,0).getH1F("multiplicity_sec"+ sec).fill(nEventSector[sec-1]*1.0);
+ 
+            for(int sec=1; sec<=6; sec++) {
+                this.getDataGroup().getItem(sec,0,0).getH1F("multiplicity_sec"+ sec).fill(nHitSector[sec-1]*1.0);
+            }
             
        }   
     }
@@ -248,11 +225,11 @@ public class DCmonitor extends DetectorMonitor {
                     ave.setBinContent(loop, 100*raw.getBinContent(loop)/this.getNumberOfEvents()/112/12);
                 }
                 }
-                this.getDetectorCanvas().getCanvas("Normalized Occupancies log").getPad(sector-1).getAxisZ().setRange(0.01, max_occ);
-                this.getDetectorCanvas().getCanvas("Normalized Occupancies lin").getPad(sector-1).getAxisZ().setRange(0.01, max_occ);
+                this.getDetectorCanvas().getCanvas("occupancy").getPad(sector-1).getAxisZ().setRange(0.01, max_occ);
+                this.getDetectorCanvas().getCanvas("occupancyNorm").getPad(sector-1).getAxisZ().setRange(0.01, max_occ);
                 
             }
         }   
     }
-
+    
 }
