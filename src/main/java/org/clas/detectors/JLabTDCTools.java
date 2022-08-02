@@ -102,7 +102,7 @@ public class JLabTDCTools {
             }
 
             SLCO cur_SLCO = new SLCO(sector, layer, component, order);
-            TDCHit curHit = new TDCHit(tdc, interval, tdcBin, timestamp);
+            TDCHit curHit = new TDCHit(tdc, interval, tdcBin, edge, timestamp);
 
             if (!m_v_leadHits.containsKey(cur_SLCO)) {
                 m_v_leadHits.put(cur_SLCO, new ArrayList<TDCHit>());
@@ -111,6 +111,7 @@ public class JLabTDCTools {
         }
 
         int n_timeHits = 0; // counter for 'real hits' each signal is noe measured twice or triple, this will represent number of signals
+
         for (SLCO cur_SLCO : mv_LUTs.keySet()) {
 
             // checking if there is a hit with the given SLCO in the event
@@ -120,6 +121,7 @@ public class JLabTDCTools {
 
             m_v_OrganizedLeadHits.put(cur_SLCO, GetOrganizedHits(m_v_leadHits.get(cur_SLCO)));
             n_timeHits = n_timeHits + m_v_OrganizedLeadHits.get(cur_SLCO).size();
+
         }
 
         DataBank bank = event.createBank("FTOF::vfTime", n_timeHits);
@@ -132,7 +134,7 @@ public class JLabTDCTools {
 
                 double time;
 
-                if (curHurHits.size() > 2) {
+                if (curHurHits.size() >= 2) {
 
                     double t_1 = mv_LUTs.get(curSLCO).get(curHurHits.get(0).tdcBin);
                     double t_2 = mv_LUTs.get(curSLCO).get(curHurHits.get(1).tdcBin);
@@ -144,33 +146,33 @@ public class JLabTDCTools {
                     double Value_2_2ns = curHurHits.get(1).interval % 2;
 
                     double time_1 = 4000 * Value_1_4ns + 2000 * Value_1_2ns + t_1;
-                    double time_2 = 4000 * Value_2_4ns + 2000 * Value_2_2ns + 2_1;
+                    double time_2 = 4000 * Value_2_4ns + 2000 * Value_2_2ns + t_2;
+                    //double time_2 = 4000 * Value_2_4ns + 2000 * Value_2_2ns + 2_1;
 
-                    double time_1_err = mv_LUTErrs.get(curSLCO).get( curHurHits.get(0).tdcBin );
-                    double time_2_err = mv_LUTErrs.get(curSLCO).get( curHurHits.get(1).tdcBin );
-                  
+                    double time_1_err = mv_LUTErrs.get(curSLCO).get(curHurHits.get(0).tdcBin);
+                    double time_2_err = mv_LUTErrs.get(curSLCO).get(curHurHits.get(1).tdcBin);
+
                     time = (time_1 * time_2_err * time_2_err + time_2 * time_1_err * time_1_err) / (time_1_err * time_1_err + time_2_err * time_2_err);
-                    
-                }else {
-                    
+
+                } else {
+
                     /*
                      * These in principle can happen when times are at the beginning or at the end of the window,
                      * So we will take in this case the best estimate of the time
                      */
-                    
                     double t_1 = mv_LUTs.get(curSLCO).get(curHurHits.get(0).tdcBin);
                     double Value_1_4ns = curHurHits.get(0).rawTDC / 256;
                     double Value_1_2ns = curHurHits.get(0).interval % 2;
                     double time_1 = 4000 * Value_1_4ns + 2000 * Value_1_2ns + t_1;
                     time = time_1;
-                    
-                    System.out.println("Oho The number of hits is less than2");
-                    System.out.println("The tdc of this Single hit is " + curHurHits.get(0).rawTDC);
 
-                    if (curHurHits.get(0).rawTDC > 1000 && curHurHits.get(0).rawTDC < 50000) {
-                        System.out.println("The SLCO is " + curSLCO.toString());
-                        bvftdc.show();
-                    }
+//                    System.out.println("Oho The number of hits is less than2");
+//                    System.out.println("The tdc of this Single hit is " + curHurHits.get(0).rawTDC);
+//
+//                    if (curHurHits.get(0).rawTDC > 1000 && curHurHits.get(0).rawTDC < 50000) {
+//                        System.out.println("The SLCO is " + curSLCO.toString());
+//                        bvftdc.show();
+//                    }
                 }
 
                 bank.setByte("sector", row, (byte) curSLCO.sector);
@@ -178,6 +180,8 @@ public class JLabTDCTools {
                 bank.setShort("component", row, (short) curSLCO.component);
                 bank.setByte("order", row, (byte) curSLCO.order);
                 bank.setFloat("time", row, (float) time);
+                bank.setByte("edge", row, (byte) curHurHits.get(0).edge);
+                bank.setLong("timestamp", row, curHurHits.get(0).timestamp);
 
                 row = row + 1;
             }
@@ -188,25 +192,53 @@ public class JLabTDCTools {
     public ArrayList< ArrayList<TDCHit>> GetOrganizedHits(ArrayList<TDCHit> v_allHits) {
         ArrayList< ArrayList<TDCHit>> v_organizedHits = new ArrayList<>();
 
-        Iterator<TDCHit> it1 = v_allHits.listIterator();
+        int n_leadHits = v_allHits.size();
 
-        while (it1.hasNext()) {
+        ListIterator<TDCHit> it1 = v_allHits.listIterator();
+
+        boolean debug = false;
+//        if (v_allHits.size() > 3) {
+//            debug = true;
+//        }
+
+        if (debug) {
+            System.out.println("All Leading Hits");
+            for (int ii = 0; ii < v_allHits.size(); ii++) {
+                System.out.print(v_allHits.get(ii).rawTDC + "  ");
+            }
+            System.out.println("\n " + "Now Organize hits");
+        }
+
+        for (int ii = 0; ii < n_leadHits - 1; ii++) {
             ArrayList<TDCHit> v_curHits = new ArrayList<>();
 
-            TDCHit curHit = it1.next();
-
+            TDCHit curHit = v_allHits.get(ii);
             v_curHits.add(curHit);
 
-            Iterator<TDCHit> it2 = it1;
+            if (debug) {
+                System.out.println(curHit.rawTDC + "-->-");
+            }
 
-            while (it2.hasNext()) {
+            for (int jj = ii + 1; jj < n_leadHits; jj++) {
+                TDCHit nextHit = v_allHits.get(jj);
 
-                TDCHit nextHit = it2.next();
+                if (debug) {
+
+                    System.out.println("The next hit is " + nextHit.rawTDC);
+                }
 
                 if (Math.abs(curHit.interval - nextHit.interval) < 3) {
+                    if (debug) {
+                        System.out.println("                               Added");
+                    }
                     v_curHits.add(nextHit);
-                    it2.remove();
-                    it2 = it1;
+                    v_allHits.remove(jj);
+                    jj = jj - 1;
+                    n_leadHits = n_leadHits - 1;
+                } else {
+                    if (debug) {
+                        System.out.println("                               Not Added");
+                    }
                 }
 
             }
@@ -214,6 +246,9 @@ public class JLabTDCTools {
             v_organizedHits.add(v_curHits);
         }
 
+        if (debug) {
+            System.out.println("All Done");
+        }
         return v_organizedHits;
     }
 
@@ -269,16 +304,18 @@ public class JLabTDCTools {
 
     public class TDCHit {
 
-        public TDCHit(int rawTDC, int interval, int tdcBin, Long timestamp) {
+        public TDCHit(int rawTDC, int interval, int tdcBin, int edge, Long timestamp) {
             this.rawTDC = rawTDC;
             this.interval = interval;
             this.tdcBin = tdcBin;
+            this.edge = edge;
             this.timestamp = timestamp;
         }
 
         int interval;
         int rawTDC;
         int tdcBin;
+        int edge;
         Long timestamp;
 
     }
