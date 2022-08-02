@@ -69,7 +69,8 @@ public class DetectorMonitor implements IDataEventListener, ActionListener {
     private boolean testTrigger = true;
     private int UITriggerMask = 0;     // trigger mask from UI
 
-    public double tdcconv = 0.023456;
+    //public double tdcconv = 0.023456;
+    public double tdcconv = 0.0234375;
     public double period = 4;
     public double phase = 1;
     public int ncycles = 6;
