@@ -364,7 +364,7 @@ public class EventViewer implements IDataEventListener, DetectorListener, Action
         this.plotSummaries();
         
         for(String key : monitors.keySet()) {
-            if(monitors.get(key).isActive()) this.tabbedpane.add(this.monitors.get(key).getDetectorPanel(), monitors.get(key).getDetectorName());
+            if(monitors.get(key).isActive()) this.tabbedpane.add(this.monitors.get(key).getDetectorPanel(), monitors.get(key).getDetectorName()); //don't show FMT tab
             monitors.get(key).getDetectorView().getView().addDetectorListener(this);                       
         }
         this.tabbedpane.add(new Acronyms(),"Acronyms");
@@ -855,8 +855,10 @@ public class EventViewer implements IDataEventListener, DetectorListener, Action
     @Override
     public void resetEventListener() {
         for(String key : monitors.keySet()) {
-            this.monitors.get(key).resetEventListener();
-            this.monitors.get(key).timerUpdate();
+            if(this.monitors.get(key).isActive()) {
+                this.monitors.get(key).resetEventListener();
+                this.monitors.get(key).timerUpdate();
+            }
         }      
         this.plotSummaries();
     }
@@ -893,7 +895,7 @@ public class EventViewer implements IDataEventListener, DetectorListener, Action
             }
         }
         for(String key : monitors.keySet()) {
-            this.monitors.get(key).setCanvasUpdate(time);
+            if(this.monitors.get(key).isActive()) this.monitors.get(key).setCanvasUpdate(time);
         }
     }
     
@@ -942,7 +944,7 @@ public class EventViewer implements IDataEventListener, DetectorListener, Action
     public void timerUpdate() {
 //        System.out.println("Time to update ...");
         for(String key : monitors.keySet()) {
-            this.monitors.get(key).timerUpdate();
+            if(this.monitors.get(key).isActive()) this.monitors.get(key).timerUpdate();
         }
         this.plotSummaries();
    }
