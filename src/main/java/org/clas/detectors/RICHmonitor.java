@@ -47,7 +47,7 @@ public class RICHmonitor  extends DetectorMonitor {
     private final Integer[] TWOTILERS = {3, 5, 7, 12, 15, 19, 24, 28, 33, 39, 44, 50, 57, 63, 70, 78, 85, 93, 102, 110, 119, 129, 138};
     private final int[] FIRSTPMTS = {1, 7, 14, 22, 31, 41, 52, 64, 77, 91, 106, 122, 139, 157, 176, 196, 217, 239, 262, 286, 311, 337, 364};   
     private final int[] SECTOR = {1, 4};
-    private final int[] VIEW = {1, 0, 0, 2, 0, 0 }; //determines the order in which the two modules are plotted
+    private final int[] VIEW = {1, 0, 0, 2, 0, 0 }; //determines the order in which the two modules plots are displayed
     
     private IndexedList<Integer> tileToPMT = null;
     
@@ -156,7 +156,7 @@ public class RICHmonitor  extends DetectorMonitor {
             this.getDetectorCanvas().getCanvas("occupancy2d").draw(this.getDataGroup().getItem(i+1,0,0).getH2F("hi_scaler_" + SECTOR[i]));
             this.getDetectorCanvas().getCanvas("occupancy2d").getPad(i).getAxisZ().setLog(true);
             this.getDetectorCanvas().getCanvas("occupancy2d").update();
-            this.DrawTiles(i+1);
+            this.DrawTiles();
         }
     }
 
@@ -279,7 +279,7 @@ public class RICHmonitor  extends DetectorMonitor {
         }
     }
     
-    private void DrawTiles(int module) {
+    private void DrawTiles() {
         for(int i=0; i<NTILE; i++) {
             int tile = i+1;
             int pmt0 = this.tileToPMT.getItem(tile,2);

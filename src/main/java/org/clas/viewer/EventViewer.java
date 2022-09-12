@@ -671,7 +671,7 @@ public class EventViewer implements IDataEventListener, DetectorListener, Action
         
         /////////////////////////////////////////////////
         /// FD:
-        if(this.CLAS12Canvas.getCanvas("FD")!=null) {
+        if(this.CLAS12Canvas!=null && this.CLAS12Canvas.getCanvas("FD")!=null) {
             // DC
             this.CLAS12Canvas.getCanvas("FD").cd(0);
             if(this.monitors.get("DC").isActive() && this.monitors.get("DC").getDetectorSummary()!=null) 
@@ -726,8 +726,8 @@ public class EventViewer implements IDataEventListener, DetectorListener, Action
         }
         
         //////////////////////////////////////////////////
-            ///  CD:
-            if(this.CLAS12Canvas.getCanvas("CD")!=null) {
+        ///  CD:
+        if(this.CLAS12Canvas!=null && this.CLAS12Canvas.getCanvas("CD")!=null) {
             // CND
             this.CLAS12Canvas.getCanvas("CD").cd(0);
             if(this.monitors.get("CND").isActive() && this.monitors.get("CND").getDetectorSummary()!=null) 
@@ -757,7 +757,7 @@ public class EventViewer implements IDataEventListener, DetectorListener, Action
         
         ///////////////////////////////////////////////////
         // FT:
-        if(this.CLAS12Canvas.getCanvas("FT")!=null) {
+        if(this.CLAS12Canvas!=null && this.CLAS12Canvas.getCanvas("FT")!=null) {
             // FTCAL
             this.CLAS12Canvas.getCanvas("FT").cd(0);
             if(this.monitors.get("FTCAL").isActive() && this.monitors.get("FTCAL").getDetectorSummary()!=null) 
@@ -775,7 +775,7 @@ public class EventViewer implements IDataEventListener, DetectorListener, Action
       
         ///////////////////////////////////////////////////
         // RF/HEL/JITTER/TRIGGER:
-        if(this.CLAS12Canvas.getCanvas("RF/HEL/JITTER/TRIGGER")!=null) {
+        if(this.CLAS12Canvas!=null && this.CLAS12Canvas.getCanvas("RF/HEL/JITTER/TRIGGER")!=null) {
             // RF
             this.CLAS12Canvas.getCanvas("RF/HEL/JITTER/TRIGGER").cd(0);
             if(this.monitors.get("RF").isActive() && this.monitors.get("RF").getDetectorSummary()!=null) 
@@ -855,8 +855,10 @@ public class EventViewer implements IDataEventListener, DetectorListener, Action
     @Override
     public void resetEventListener() {
         for(String key : monitors.keySet()) {
-            this.monitors.get(key).resetEventListener();
-            this.monitors.get(key).timerUpdate();
+            if(this.monitors.get(key).isActive()) {
+                this.monitors.get(key).resetEventListener();
+                this.monitors.get(key).timerUpdate();
+            }
         }      
         this.plotSummaries();
     }
@@ -874,24 +876,26 @@ public class EventViewer implements IDataEventListener, DetectorListener, Action
     public void setCanvasUpdate(int time) {
         System.out.println("Setting " + time + " ms update interval");
         this.canvasUpdateTime = time;
-        if(this.CLAS12Canvas.getCanvas("FD")!=null) {
-            this.CLAS12Canvas.getCanvas("FD").initTimer(time);
-            this.CLAS12Canvas.getCanvas("FD").update();
-        }
-        if (this.CLAS12Canvas.getCanvas("CD") != null) {
-            this.CLAS12Canvas.getCanvas("CD").initTimer(time);
-            this.CLAS12Canvas.getCanvas("CD").update();
-        }
-        if (this.CLAS12Canvas.getCanvas("FT") != null) {
-            this.CLAS12Canvas.getCanvas("FT").initTimer(time);
-            this.CLAS12Canvas.getCanvas("FT").update();
-        }
-        if(this.CLAS12Canvas.getCanvas("RF/HEL/JITTER/TRIGGER")!=null) {
-            this.CLAS12Canvas.getCanvas("RF/HEL/JITTER/TRIGGER").initTimer(time);
-            this.CLAS12Canvas.getCanvas("RF/HEL/JITTER/TRIGGER").update();
+        if(this.CLAS12Canvas!=null) {
+            if(this.CLAS12Canvas.getCanvas("FD")!=null) {
+                this.CLAS12Canvas.getCanvas("FD").initTimer(time);
+                this.CLAS12Canvas.getCanvas("FD").update();
+            }
+            if (this.CLAS12Canvas.getCanvas("CD") != null) {
+                this.CLAS12Canvas.getCanvas("CD").initTimer(time);
+                this.CLAS12Canvas.getCanvas("CD").update();
+            }
+            if (this.CLAS12Canvas.getCanvas("FT") != null) {
+                this.CLAS12Canvas.getCanvas("FT").initTimer(time);
+                this.CLAS12Canvas.getCanvas("FT").update();
+            }
+            if(this.CLAS12Canvas.getCanvas("RF/HEL/JITTER/TRIGGER")!=null) {
+                this.CLAS12Canvas.getCanvas("RF/HEL/JITTER/TRIGGER").initTimer(time);
+                this.CLAS12Canvas.getCanvas("RF/HEL/JITTER/TRIGGER").update();
+            }
         }
         for(String key : monitors.keySet()) {
-            this.monitors.get(key).setCanvasUpdate(time);
+            if(this.monitors.get(key).isActive()) this.monitors.get(key).setCanvasUpdate(time);
         }
     }
     
@@ -940,7 +944,7 @@ public class EventViewer implements IDataEventListener, DetectorListener, Action
     public void timerUpdate() {
 //        System.out.println("Time to update ...");
         for(String key : monitors.keySet()) {
-            this.monitors.get(key).timerUpdate();
+            if(this.monitors.get(key).isActive()) this.monitors.get(key).timerUpdate();
         }
         this.plotSummaries();
    }
