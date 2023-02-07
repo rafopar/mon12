@@ -125,15 +125,15 @@ public class TJITTERmonitor  extends DetectorMonitor {
             }
         }
         if(ctofADC!=null && ctofTDC!=null) {
-	    IndexedList<ArrayList<Integer>> tdcs = new IndexedList<ArrayList<Integer>>(3);
-	    IndexedList<ArrayList<Double>>  adcs = new IndexedList<ArrayList<Double>>(3);
+	    IndexedList<ArrayList<Integer>> tdcs = new IndexedList<>(3);
+	    IndexedList<ArrayList<Double>>  adcs = new IndexedList<>(3);
 	    for(int i=0; i<ctofADC.rows(); i++) {
 	        int paddle = ctofADC.getShort("component",i);
                 int order  = ctofADC.getByte("order",i);
 	        int icomp  = (paddle-1)*2+order+1;
 	        double adct = (double) ctofADC.getFloat("time",i);
 	        if(adct>0) {
-                    if(!adcs.hasItem(1,1,icomp)) adcs.add(new ArrayList<Double>(),1,1,icomp);
+                    if(!adcs.hasItem(1,1,icomp)) adcs.add(new ArrayList<>(),1,1,icomp);
                     adcs.getItem(1,1,icomp).add(adct);
 		 }
 	    }
@@ -144,15 +144,15 @@ public class TJITTERmonitor  extends DetectorMonitor {
                 int tdc = ctofTDC.getInt("TDC", i);
                 if (tdc > 0) {
                     if (!tdcs.hasItem(1, 1, icomp)) {
-                        tdcs.add(new ArrayList<Integer>(), 1, 1, icomp);
+                        tdcs.add(new ArrayList<>(), 1, 1, icomp);
                     }
                     tdcs.getItem(1, 1, icomp).add(tdc);
                 }
             }
             for (int icomp = 1; icomp < this.ctofPaddles * 2 + 1; icomp++) {
                 if (tdcs.hasItem(1, 1, icomp) && adcs.hasItem(1, 1, icomp)) {
-                    List<Integer> listTDC = new ArrayList<Integer>();
-                    List<Double> listADC = new ArrayList<Double>();
+                    List<Integer> listTDC = new ArrayList<>();
+                    List<Double> listADC = new ArrayList<>();
                     listTDC = tdcs.getItem(1, 1, icomp);
                     listADC = adcs.getItem(1, 1, icomp);
                     for (int iadc = 0; iadc < listADC.size(); iadc++) {
