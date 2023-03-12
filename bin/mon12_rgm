@@ -1,0 +1,9 @@
+#!/bin/bash
+
+dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
+
+$dir/mon12 \
+    -tabs "BAND:BMT:BST:CND:CTOF:DC:ECAL:FMT:FTOF:HTCC:RICH:RF:HEL:Trigger:TimeJitter" \
+    -trigger 0x1 \
+    $*
+

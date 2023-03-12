@@ -1,15 +1,24 @@
 #!/bin/bash
 
-SCRIPT_DIR=`dirname $0`
-DISTRO_DIR=$SCRIPT_DIR/.. ; export DISTRO_DIR
+# In the counting house, use fixed COATJAVA installation, otherwise rely on
+# user-defined $CLAS12DIR to find COATJAVA for the HIPO schema directory:
+if [ -z ${CLAS12DIR+x} ]
+then
+   export CLAS12DIR=/usr/clas12/offline/coatjava/pro
+   echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+   echo "! \$CLAS12DIR undefined, assuming COATJAVA is at $CLAS12DIR !"
+   echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+fi
 
+# find the mon12 jar:
+dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
+jar=`ls $dir/../target/clas12mon-*-jar-with-dependencies.jar`
 
-echo +-------------------------------------------------------------------------
-echo "| Starting CLAS12 monitoring app"
-echo +-------------------------------------------------------------------------
+java \
+    -Dsun.java2d.pmoffscreen=false \
+    -Djava.util.logging.config.file=$CLAS12DIR/etc/logging/debug.properties \
+    -Xmx2048m -Xms1024m \
+    -cp $jar \
+    org.clas.viewer.EventViewer \
+    $*
 
-echo "INSTALLATION DIRECTORY = " $DISTRO_DIR
-
-LIB=`ls $DISTRO_DIR/target/clas12mon-*-jar-with-dependencies.jar`; export LIB
-
-java -Dsun.java2d.pmoffscreen=false -Djava.util.logging.config.file=$CLAS12DIR/etc/logging/debug.properties -Xmx2048m -Xms1024m -cp $LIB org.clas.viewer.EventViewer $*
