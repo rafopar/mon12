@@ -98,6 +98,7 @@ public class EventViewer implements IDataEventListener, DetectorListener, Action
     
     public final void initMonitors() {
         monitors.put("BAND",        new BANDmonitor("BAND"));
+        monitors.put("uRWell",      new uRWellMonitor("URWELL"));
         monitors.put("BMT",         new BMTmonitor("BMT"));
         monitors.put("BST",         new BSTmonitor("BST"));
         monitors.put("CND",         new CNDmonitor("CND")); 
