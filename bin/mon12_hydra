@@ -8,15 +8,15 @@ $dir/mon12 \
  -autosave 15000 \
  -outDir /work/hydra/images \
  $* \
- 2>&1 \
-| grep -v '^MnHesse' \
-| grep -v '^FunctionMinimum' \
-| grep -v '^VariableMetricBuilder' \
-| grep -v '^gdel:' \
-| grep -v '^gdel > ' \
-| grep -v '^matrix forced pos-def'  \
-| grep -v '^negative or zero diagonal' \
-| grep -v '^added' \
-| grep -v '^eigenvalue' \
-| grep -v -E '^a[0-9]+.[0-9]+$'
+ 2>&1
 
+#| grep -v '^MnHesse' \
+#| grep -v '^FunctionMinimum' \
+#| grep -v '^VariableMetricBuilder' \
+#| grep -v '^gdel:' \
+#| grep -v '^gdel > ' \
+#| grep -v '^matrix forced pos-def'  \
+#| grep -v '^negative or zero diagonal' \
+#| grep -v '^added' \
+#| grep -v '^eigenvalue' \
+#| grep -v -E '^a[0-9]+.[0-9]+$'
