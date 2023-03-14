@@ -21,8 +21,6 @@ import org.jlab.utils.groups.IndexedTable;
 public class RFmonitor extends DetectorMonitor {
     
     IndexedTable rfConfig = null;
-    private double tdc2Time = 0.023436;
-    private double rfbucket = 4.008;
     private int    ncycles  = 40;
     private int    eventNumber = 0;
     
@@ -40,8 +38,8 @@ public class RFmonitor extends DetectorMonitor {
     @Override
     public void createHistos() {
         // create histograms
-        int tdcMin = (int) (ncycles*rfbucket/tdc2Time)/-100;
-        int tdcMax = (int) (ncycles*3*rfbucket/tdc2Time)+100;
+        int tdcMin = (int) (ncycles*rfbucket/tdcconv)/-100;
+        int tdcMax = (int) (ncycles*3*rfbucket/tdcconv)+100;
         this.setNumberOfEvents(0);
         H1F summary = new H1F("summary","RF Difference",500, 0, rfbucket);
         summary.setTitleX("RF diff (ns)");
@@ -58,7 +56,7 @@ public class RFmonitor extends DetectorMonitor {
         rf2.setTitleX("RF2 tdc");
         rf2.setTitleY("Counts");
         rf2.setFillColor(36);
-        H1F rfdiff = new H1F("rfdiff","rfdiff", (int)(rfbucket/tdc2Time), 0, rfbucket);
+        H1F rfdiff = new H1F("rfdiff","rfdiff", (int)(rfbucket/tdcconv), 0, rfbucket);
         rfdiff.setTitleX("RF diff");
         rfdiff.setTitleY("Counts");
         F1D fdiff = new F1D("fdiff","[amp]*gaus(x,[mean],[sigma])", 0, rfbucket);
@@ -305,12 +303,12 @@ public class RFmonitor extends DetectorMonitor {
             double run_tdc2Time = rfConfig.getDoubleValue("tdc2time", 1, 1, 1);
             double run_rfbucket = rfConfig.getDoubleValue("clock", 1, 1, 1);
             int run_ncycles = rfConfig.getIntValue("cycles", 1, 1, 1);
-            if (run_tdc2Time != this.tdc2Time || run_rfbucket != this.rfbucket || run_ncycles != this.ncycles) {
-                this.tdc2Time = run_tdc2Time;
+            if (run_tdc2Time != this.tdcconv || run_rfbucket != this.rfbucket || run_ncycles != this.ncycles) {
+                this.tdcconv = run_tdc2Time;
                 this.rfbucket = run_rfbucket;
                 this.ncycles = run_ncycles;
                 this.resetEventListener();
-                System.out.println("RF config parameter changed to: \n\t tdc2time = " + this.tdc2Time + "\n\t rf bucket = " + this.rfbucket + "\n\t n. of cycles = " + this.ncycles);
+                System.out.println("RF config parameter changed to: \n\t tdc2time = " + this.tdcconv + "\n\t rf bucket = " + this.rfbucket + "\n\t n. of cycles = " + this.ncycles);
             }
 //            System.out.println();
         }
@@ -343,32 +341,32 @@ public class RFmonitor extends DetectorMonitor {
         for(int i=0; i<rf1.size()-1; i++) {
             this.getDataGroup().getItem(0,0,0).getH1F("rf1rawdiff").fill((rf1.get(i+1)-rf1.get(i))*1.0);
             this.getDataGroup().getItem(0,0,0).getH2F("rf1rawdiffrf1").fill(rf1.get(i),(rf1.get(i+1)-rf1.get(i))*1.0);
-            this.getDataGroup().getItem(0,0,0).getH1F("rf1diff").fill((rf1.get(i+1)-rf1.get(i))*tdc2Time);
-            this.getDataGroup().getItem(0,0,0).getH1F("rf1difftmp").fill((rf1.get(i+1)-rf1.get(i))*tdc2Time);
+            this.getDataGroup().getItem(0,0,0).getH1F("rf1diff").fill((rf1.get(i+1)-rf1.get(i))*tdcconv);
+            this.getDataGroup().getItem(0,0,0).getH1F("rf1difftmp").fill((rf1.get(i+1)-rf1.get(i))*tdcconv);
         }
         for(int i=0; i<rf2.size()-1; i++) {
             this.getDataGroup().getItem(0,0,0).getH1F("rf2rawdiff").fill((rf2.get(i+1)-rf2.get(i))*1.0);
             this.getDataGroup().getItem(0,0,0).getH2F("rf2rawdiffrf2").fill(rf2.get(i),(rf2.get(i+1)-rf2.get(i))*1.0);
-            this.getDataGroup().getItem(0,0,0).getH1F("rf2diff").fill((rf2.get(i+1)-rf2.get(i))*tdc2Time);
-            this.getDataGroup().getItem(0,0,0).getH1F("rf2difftmp").fill((rf2.get(i+1)-rf2.get(i))*tdc2Time);
+            this.getDataGroup().getItem(0,0,0).getH1F("rf2diff").fill((rf2.get(i+1)-rf2.get(i))*tdcconv);
+            this.getDataGroup().getItem(0,0,0).getH1F("rf2difftmp").fill((rf2.get(i+1)-rf2.get(i))*tdcconv);
         }
 
         if(rf1.size()==rf2.size() || true) {
 //            for(int i=0; i<rf1.size(); i++) System.out.println(rf1.get(i));
             int npairs = Math.min(rf1.size(),rf2.size());
             for(int i=0; i<npairs; i++) {
-                double rfTimei = ((rf1.get(i)-rf2.get(i))*tdc2Time + (100*rfbucket)) % rfbucket;
+                double rfTimei = ((rf1.get(i)-rf2.get(i))*tdcconv + (100*rfbucket)) % rfbucket;
                 this.getDataGroup().getItem(0,0,0).getH1F("rfdiff").fill(rfTimei);
                 this.getDataGroup().getItem(0,0,0).getH1F("rfdifftmp").fill(rfTimei);
             }
             double rfTime1 = 0;
             double rfTime2 = 0;
             for(int i=0; i<rf1.size(); i++) {
-                rfTime1 += ((rf1.get(i)*tdc2Time) % (ncycles*rfbucket));
+                rfTime1 += ((rf1.get(i)*tdcconv) % (ncycles*rfbucket));
 //                System.out.println(i + " " + rf1.get(i)*tdc2Time + " " + ((rf1.get(i)*tdc2Time) % (ncycles*rfbucket)));
             }
             for(int i=0; i<rf2.size(); i++) {
-                rfTime2 += ((rf2.get(i)*tdc2Time) % (ncycles*rfbucket));
+                rfTime2 += ((rf2.get(i)*tdcconv) % (ncycles*rfbucket));
             }
             rfTime1 /=rf1.size();
             rfTime2 /=rf2.size();            

@@ -1,12 +1,14 @@
 package org.clas.detectors;
 
 
+import java.util.Arrays;
 import org.clas.viewer.DetectorMonitor;
 import org.jlab.groot.data.H1F;
 import org.jlab.groot.data.H2F;
 import org.jlab.groot.group.DataGroup;
 import org.jlab.io.base.DataBank;
 import org.jlab.io.base.DataEvent;
+import org.jlab.utils.groups.IndexedTable;
 
 /**
  *
@@ -14,13 +16,16 @@ import org.jlab.io.base.DataEvent;
  */
 
 public class HTCCmonitor  extends DetectorMonitor {
-        
+    
+    private final int rfpmt = 1;
     
     public HTCCmonitor(String name) {
         super(name);
         
-        this.setDetectorTabNames("occupancy", "adcEnergy", "adcTime"/*, "TDC spectra"*/);
+        this.setDetectorTabNames("occupancy", "adcEnergy", "adcTime", "deltaRF");
         this.init(false);
+        this.getCcdb().setVariation("default");
+        this.getCcdb().init(Arrays.asList(new String[]{"/calibration/eb/rf/config","/calibration/eb/rf/jitter"}));
     }
 
     @Override
@@ -36,9 +41,9 @@ public class HTCCmonitor  extends DetectorMonitor {
         this.getDetectorCanvas().getCanvas("adcTime").divide(3, 2);
         this.getDetectorCanvas().getCanvas("adcTime").setGridX(false);
         this.getDetectorCanvas().getCanvas("adcTime").setGridY(false);
-//        this.getDetectorCanvas().getCanvas("TDC spectra").divide(3, 2);
-//        this.getDetectorCanvas().getCanvas("TDC spectra").setGridX(false);
-//        this.getDetectorCanvas().getCanvas("TDC spectra").setGridY(false);
+        this.getDetectorCanvas().getCanvas("deltaRF").divide(2, 2);
+        this.getDetectorCanvas().getCanvas("deltaRF").setGridX(false);
+        this.getDetectorCanvas().getCanvas("deltaRF").setGridY(false);
         H1F summary = new H1F("summary","summary",6,1,7);
         summary.setTitleX("sector");
         summary.setTitleY("HTCC hits");
@@ -111,30 +116,20 @@ public class HTCCmonitor  extends DetectorMonitor {
         fadc_time6.setTitleY("PMT");
         fadc_time6.setTitle("sector 6");
         
-        H2F tdc1 = new H2F("tdc_s1", "tdc_s1", 400, 0, 40000, 8, 0.5, 8.5);
-        tdc1.setTitleX("TDC time");
-        tdc1.setTitleY("PMT");
-        tdc1.setTitle("sector 1");
-        H2F tdc2 = new H2F("tdc_s2", "tdc_s2", 400, 0, 40000, 8, 0.5, 8.5);
-        tdc2.setTitleX("TDC time");
-        tdc2.setTitleY("PMT");
-        tdc2.setTitle("sector 2");
-        H2F tdc3 = new H2F("tdc_s3", "tdc_s3", 400, 0, 40000, 8, 0.5, 8.5);
-        tdc3.setTitleX("TDC time");
-        tdc3.setTitleY("PMT");
-        tdc3.setTitle("sector 3");
-        H2F tdc4 = new H2F("tdc_s4", "tdc_s4", 400, 0, 40000, 8, 0.5, 8.5);
-        tdc4.setTitleX("TDC time");
-        tdc4.setTitleY("PMT");
-        tdc4.setTitle("sector 4");
-        H2F tdc5 = new H2F("tdc_s5", "tdc_s5", 400, 0, 40000, 8, 0.5, 8.5);
-        tdc5.setTitleX("TDC time");
-        tdc5.setTitleY("PMT");
-        tdc5.setTitle("sector 5");
-        H2F tdc6 = new H2F("tdc_s6", "tdc_s6", 400, 0, 40000, 8, 0.5, 8.5);
-        tdc6.setTitleX("TDC time");
-        tdc6.setTitleY("PMT");
-        tdc6.setTitle("sector 6");
+        H2F tdc1 = new H2F("2dHTCC-RF1", "", 48, 0.5, 48.5, 100, -rfbucket/2, rfbucket/2);
+        tdc1.setTitleX("PMT");
+        tdc1.setTitleY("HTCC-RF1");
+        H2F tdc2 = new H2F("2dHTCC-RF2", "", 48, 0.5, 48.5, 100, -rfbucket/2, rfbucket/2);
+        tdc2.setTitleX("PMT");
+        tdc2.setTitleY("HTCC-RF2");
+        H1F tdc3 = new H1F("1dHTCC-RF1", "", 100, -rfbucket/2, rfbucket/2);
+        tdc3.setTitleX("HTCCpmt1-RF1");
+        tdc3.setTitleY("Counts");
+        tdc3.setFillColor(5);
+        H1F tdc4 = new H1F("1dHTCC-RF2", "", 100, -rfbucket/2, rfbucket/2);
+        tdc4.setTitleX("HTCCpmt1-RF2");
+        tdc4.setTitleY("Counts");
+        tdc4.setFillColor(5);
         
         DataGroup dg = new DataGroup(5,4);
         dg.addDataSet(occADC, 0);
@@ -156,8 +151,6 @@ public class HTCCmonitor  extends DetectorMonitor {
         dg.addDataSet(tdc2, 15);
         dg.addDataSet(tdc3, 16);
         dg.addDataSet(tdc4, 17);
-        dg.addDataSet(tdc5, 18);
-        dg.addDataSet(tdc6, 19);
         this.getDataGroup().add(dg,0,0,0);
     }
         
@@ -212,25 +205,17 @@ public class HTCCmonitor  extends DetectorMonitor {
         this.getDetectorCanvas().getCanvas("adcTime").draw(this.getDataGroup().getItem(0,0,0).getH2F("fadc_time_s6"));
         this.getDetectorCanvas().getCanvas("adcTime").update();
 
-//        this.getDetectorCanvas().getCanvas("TDC spectra").cd(0);
-//        this.getDetectorCanvas().getCanvas("TDC spectra").getPad(0).getAxisZ().setLog(getLogZ());
-//        this.getDetectorCanvas().getCanvas("TDC spectra").draw(this.getDataGroup().getItem(0,0,0).getH2F("tdc_s1"));
-//        this.getDetectorCanvas().getCanvas("TDC spectra").cd(1);
-//        this.getDetectorCanvas().getCanvas("TDC spectra").getPad(1).getAxisZ().setLog(getLogZ());
-//        this.getDetectorCanvas().getCanvas("TDC spectra").draw(this.getDataGroup().getItem(0,0,0).getH2F("tdc_s2"));
-//        this.getDetectorCanvas().getCanvas("TDC spectra").cd(2);
-//        this.getDetectorCanvas().getCanvas("TDC spectra").getPad(2).getAxisZ().setLog(getLogZ());
-//        this.getDetectorCanvas().getCanvas("TDC spectra").draw(this.getDataGroup().getItem(0,0,0).getH2F("tdc_s3"));
-//        this.getDetectorCanvas().getCanvas("TDC spectra").cd(3);
-//        this.getDetectorCanvas().getCanvas("TDC spectra").getPad(3).getAxisZ().setLog(getLogZ());
-//        this.getDetectorCanvas().getCanvas("TDC spectra").draw(this.getDataGroup().getItem(0,0,0).getH2F("tdc_s4"));
-//        this.getDetectorCanvas().getCanvas("TDC spectra").cd(4);
-//        this.getDetectorCanvas().getCanvas("TDC spectra").getPad(4).getAxisZ().setLog(getLogZ());
-//        this.getDetectorCanvas().getCanvas("TDC spectra").draw(this.getDataGroup().getItem(0,0,0).getH2F("tdc_s5"));
-//        this.getDetectorCanvas().getCanvas("TDC spectra").cd(5);
-//        this.getDetectorCanvas().getCanvas("TDC spectra").getPad(5).getAxisZ().setLog(getLogZ());
-//        this.getDetectorCanvas().getCanvas("TDC spectra").draw(this.getDataGroup().getItem(0,0,0).getH2F("tdc_s6"));
-//        this.getDetectorCanvas().getCanvas("TDC spectra").update();
+        this.getDetectorCanvas().getCanvas("deltaRF").cd(0);
+        this.getDetectorCanvas().getCanvas("deltaRF").getPad(0).getAxisZ().setLog(getLogZ());
+        this.getDetectorCanvas().getCanvas("deltaRF").draw(this.getDataGroup().getItem(0,0,0).getH2F("2dHTCC-RF1"));
+        this.getDetectorCanvas().getCanvas("deltaRF").cd(1);
+        this.getDetectorCanvas().getCanvas("deltaRF").getPad(1).getAxisZ().setLog(getLogZ());
+        this.getDetectorCanvas().getCanvas("deltaRF").draw(this.getDataGroup().getItem(0,0,0).getH2F("2dHTCC-RF2"));
+        this.getDetectorCanvas().getCanvas("deltaRF").cd(2);
+        this.getDetectorCanvas().getCanvas("deltaRF").draw(this.getDataGroup().getItem(0,0,0).getH1F("1dHTCC-RF1"));
+        this.getDetectorCanvas().getCanvas("deltaRF").cd(3);
+        this.getDetectorCanvas().getCanvas("deltaRF").draw(this.getDataGroup().getItem(0,0,0).getH1F("1dHTCC-RF2"));
+        this.getDetectorCanvas().getCanvas("deltaRF").update();
         
         
         
@@ -241,6 +226,21 @@ public class HTCCmonitor  extends DetectorMonitor {
     @Override
     public void processEvent(DataEvent event) {
 
+        // get rf period
+        double tjitter = 0;
+        if(event.hasBank("RUN::config")) {
+            DataBank config = event.getBank("RUN::config");
+            int  run       = config.getInt("run", 0);
+            long timestamp = config.getLong("timestamp",0);    
+            IndexedTable ctable = this.getCcdb().getConstants(run, "/calibration/eb/rf/config");
+            IndexedTable jtable = this.getCcdb().getConstants(run, "/calibration/eb/rf/jitter");
+            this.rfbucket = ctable.getDoubleValue("clock", 1, 1, 1);
+            this.tdcconv = ctable.getDoubleValue("tdc2time", 1, 1, 1);
+            this.period  = jtable.getDoubleValue("period",0,0,0);
+            this.phase   = jtable.getIntValue("phase",0,0,0);
+            this.ncycles = jtable.getIntValue("cycles",0,0,0);
+            tjitter = ((timestamp + phase) % ncycles) * period; 
+        }
         // process event info and save into data group
         if(event.hasBank("HTCC::adc")==true){
 	    DataBank bank = event.getBank("HTCC::adc");
@@ -271,6 +271,20 @@ public class HTCCmonitor  extends DetectorMonitor {
                     if(sector == 6) this.getDataGroup().getItem(0,0,0).getH2F("adc_s6").fill(adc*1.0,((comp-1)*2+layer)*1.0);
                     if(sector == 6) this.getDataGroup().getItem(0,0,0).getH2F("fadc_time_s6").fill(time,((comp-1)*2+layer)*1.0);
                     this.getDetectorSummary().getH1F("summary").fill(sector*1.0);
+                    
+                    if(event.hasBank("RF::tdc")) {
+                        int pmt = ((comp-1)*2+layer-1)*6+sector;
+                        DataBank rf = event.getBank("RF::tdc");
+                        for(int i = 0; i<rf.rows(); i++){
+                            int id  = rf.getShort("component",i);
+                            double tdc = rf.getInt("TDC",i);
+                            if(tdc>0) {
+                                double delta = (time - (tdc*tdcconv-tjitter)+rfbucket*10000)%rfbucket-rfbucket/2;
+                                this.getDataGroup().getItem(0,0,0).getH2F("2dHTCC-RF"+id).fill(pmt, delta);
+                                if(pmt==rfpmt) this.getDataGroup().getItem(0,0,0).getH1F("1dHTCC-RF"+id).fill(delta);
+                            }
+                        }
+                    }
                 }
 	    }
     	}
@@ -307,6 +321,5 @@ public class HTCCmonitor  extends DetectorMonitor {
     public void analysisUpdate() {
 
     }
-
 
 }
