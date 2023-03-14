@@ -1,4 +1,4 @@
-package org.clas.viewer;
+    package org.clas.viewer;
 
 import java.awt.BorderLayout;
 import java.awt.Font;
@@ -96,6 +96,7 @@ public class EventViewer implements IDataEventListener, DetectorListener, Action
  
     public final void initMonitors() {
         this.monitors.put("BAND",        new BANDmonitor("BAND"));
+        this.monitors.put("URWELL",      new uRWellMonitor("URWELL"));
         this.monitors.put("BMT",         new BMTmonitor("BMT"));
         this.monitors.put("BST",         new BSTmonitor("BST"));
         this.monitors.put("CND",         new CNDmonitor("CND")); 
